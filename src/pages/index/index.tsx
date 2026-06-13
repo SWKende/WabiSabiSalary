@@ -100,14 +100,26 @@ function SettingRow({ label, value, onChange, suffix }: {
   )
 }
 
+// 获取窗口信息（兼容新旧版本基础库）
+function getWindowInfo() {
+  try {
+    if (typeof Taro.getWindowInfo === 'function') {
+      return Taro.getWindowInfo()
+    }
+  } catch { /* ignore */ }
+  // 回退：旧版 API
+  const fallback = Taro.getSystemInfoSync()
+  return { statusBarHeight: fallback.statusBarHeight ?? 20, windowWidth: fallback.windowWidth ?? 375 }
+}
+
 // 自定义导航栏 — 适配微信小程序胶囊按钮
 function CustomNavBar({ timeStr, isWorking, capsuleRight }: {
   timeStr: string
   isWorking: boolean
   capsuleRight: number
 }) {
-  const sysInfo = Taro.getSystemInfoSync()
-  const statusBarHeight = sysInfo.statusBarHeight ?? 20
+  const windowInfo = getWindowInfo()
+  const statusBarHeight = windowInfo.statusBarHeight ?? 20
 
   // 胶囊按钮位置（CSS 像素）
   let capsuleTop = statusBarHeight + 4
@@ -151,10 +163,10 @@ export default function Index() {
   // 胶囊按钮右侧预留空间（屏幕宽度 - 胶囊左边距 + 安全边距）
   const capsuleRight = useMemo(() => {
     try {
-      const sysInfo = Taro.getSystemInfoSync()
+      const windowInfo = getWindowInfo()
       const rect = Taro.getMenuButtonBoundingClientRect()
       if (rect && rect.width > 0) {
-        return sysInfo.windowWidth - rect.left + 12
+        return windowInfo.windowWidth - rect.left + 12
       }
     } catch { /* ignore */ }
     return 100 // 回退默认值
