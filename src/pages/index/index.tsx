@@ -1,4 +1,4 @@
-import { View, Text, Input } from '@tarojs/components'
+import { View, Text, Input, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Taro from '@tarojs/taro'
 import './index.scss'
@@ -160,6 +160,146 @@ function CustomNavBar({ timeStr, isWorking, capsuleRight, hasCapsule }: {
   )
 }
 
+// 记账页面组件
+function BookkeepingPage() {
+  const [amount, setAmount] = useState('')
+  const [note, setNote] = useState('')
+  const [category, setCategory] = useState('支出')
+  const [records, setRecords] = useState<Array<{
+    id: number
+    amount: string
+    note: string
+    category: string
+    time: string
+  }>>(() => {
+    try {
+      return Taro.getStorageSync('bookkeeping_records') || []
+    } catch { return [] }
+  })
+
+  const categories = ['支出', '收入', '餐饮', '交通', '购物', '娱乐']
+
+  const handleSubmit = () => {
+    if (!amount) return
+    const newRecord = {
+      id: Date.now(),
+      amount,
+      note: note || (category === '支出' ? '支出' : category),
+      category,
+      time: new Date().toLocaleString('zh-CN'),
+    }
+    const updated = [newRecord, ...records]
+    setRecords(updated)
+    try { Taro.setStorageSync('bookkeeping_records', updated) } catch {}
+    setAmount('')
+    setNote('')
+    Taro.showToast({ title: '記録済み', icon: 'success' })
+  }
+
+  const handleDelete = (id: number) => {
+    const updated = records.filter(r => r.id !== id)
+    setRecords(updated)
+    try { Taro.setStorageSync('bookkeeping_records', updated) } catch {}
+  }
+
+  const monthTotal = useMemo(() => {
+    const now = new Date()
+    return records
+      .filter(r => {
+        const d = new Date(r.time)
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+      })
+      .reduce((sum, r) => {
+        const val = parseFloat(r.amount) || 0
+        return sum + (r.category === '収入' ? val : -val)
+      }, 0)
+  }, [records])
+
+  return (
+    <View className='bookkeeping-page'>
+      <View className='bookkeeping-header'>
+        <Text className='bookkeeping-title'>記 帳</Text>
+        <View className='bookkeeping-summary'>
+          <Text className='summary-label'>今月収支</Text>
+          <Text className={`summary-value ${monthTotal >= 0 ? 'positive' : 'negative'}`}>
+            {monthTotal >= 0 ? '+' : ''}{monthTotal.toFixed(2)}
+          </Text>
+        </View>
+      </View>
+
+      <View className='bookkeeping-form'>
+        <View className='form-card'>
+          <View className='amount-row'>
+            <Text className='amount-symbol'>¥</Text>
+            <Input
+              className='amount-input'
+              type='digit'
+              placeholder='金額を入力'
+              value={amount}
+              onInput={(e) => setAmount(e.detail.value)}
+            />
+          </View>
+
+          <View className='category-grid'>
+            {categories.map(cat => (
+              <View
+                key={cat}
+                className={`category-btn ${category === cat ? 'active' : ''}`}
+                onClick={() => setCategory(cat)}
+              >
+                <Text className='category-text'>{cat}</Text>
+              </View>
+            ))}
+          </View>
+
+          <View className='note-row'>
+            <Input
+              className='note-input'
+              placeholder='備考（任意）'
+              value={note}
+              onInput={(e) => setNote(e.detail.value)}
+            />
+          </View>
+
+          <View
+            className={`submit-btn ${!amount ? 'disabled' : ''}`}
+            onClick={handleSubmit}
+          >
+            <Text className='submit-text'>記 録</Text>
+          </View>
+        </View>
+      </View>
+
+      {records.length > 0 && (
+        <View className='records-section'>
+          <Text className='records-title'>最近の記録</Text>
+          {records.slice(0, 20).map(record => (
+            <View key={record.id} className='record-item'>
+              <View className='record-left'>
+                <View className='record-category-badge'>
+                  <Text className='record-category'>{record.category}</Text>
+                </View>
+                <View className='record-info'>
+                  <Text className='record-note'>{record.note}</Text>
+                  <Text className='record-time'>{record.time}</Text>
+                </View>
+              </View>
+              <View className='record-right'>
+                <Text className={`record-amount ${record.category === '収入' ? 'positive' : 'negative'}`}>
+                  {record.category === '収入' ? '+' : '-'}¥{record.amount}
+                </Text>
+                <View className='record-delete' onClick={() => handleDelete(record.id)}>
+                  <Text className='record-delete-icon'>×</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  )
+}
+
 export default function Index() {
   // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
   const navLayout = useMemo(() => {
@@ -186,6 +326,7 @@ export default function Index() {
   })
   const [showDetail, setShowDetail] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
 
   // 用 ref 存储实时数据，避免每秒 setState 导致整个组件树重渲染
   const timeInfoRef = useRef({
@@ -324,8 +465,22 @@ export default function Index() {
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
   const endStr = `${String(config.workEndHour).padStart(2, '0')}:00`
 
+  // 计算 Swiper 高度（视口 - 导航栏 - 指示器）
+  const scrollHeight = useMemo(() => {
+    const windowInfo = getWindowInfo()
+    const wh = (windowInfo as any).windowHeight ?? 812
+    let navH = (windowInfo.statusBarHeight ?? 20)
+    try {
+      const rect = Taro.getMenuButtonBoundingClientRect()
+      if (rect && rect.width > 0) navH = rect.bottom + 4
+      else navH += 44
+    } catch { navH += 44 }
+    const indicatorH = 36
+    return wh - navH - indicatorH
+  }, [])
+
   return (
-    <View className='salary-app'>
+    <View className='salary-app-root'>
       {/* 自定义导航栏（适配胶囊按钮） */}
       <CustomNavBar
         timeStr={timeInfo.timeStr}
@@ -334,110 +489,141 @@ export default function Index() {
         hasCapsule={navLayout.hasCapsule}
       />
 
-      {/* 主金额 — 留白呼吸 */}
-      <View className='hero-section'>
-        <Text className='hero-label'>今 月 已 赚</Text>
-        <View className='hero-amount'>
-          <Text className='hero-currency'>¥</Text>
-          <AnimatedNumber className='hero-number' value={timeInfo.monthEarnedStr} />
-        </View>
-        <View className='hero-progress-bg'>
-          <View
-            className='hero-progress-fill'
-            style={{ width: `${Math.min(100, (parseFloat(timeInfo.monthEarnedStr.replace(/,/g, '')) / config.monthlySalary) * 100)}%` }}
-          />
-        </View>
-        <Text className='hero-target'>目標 ¥{config.monthlySalary.toLocaleString()}</Text>
-      </View>
+      {/* 双页滑动容器 */}
+      <Swiper
+        className='page-swiper'
+        indicatorDots={false}
+        current={currentPage}
+        onChange={(e) => setCurrentPage(e.detail.current)}
+      >
+        {/* 第一页：工资时钟 */}
+        <SwiperItem>
+          <ScrollView scrollY className='page-scroll'>
+            <View className='salary-app'>
+              {/* 主金额 — 留白呼吸 */}
+              <View className='hero-section'>
+                <Text className='hero-label'>今 月 已 赚</Text>
+                <View className='hero-amount'>
+                  <Text className='hero-currency'>¥</Text>
+                  <AnimatedNumber className='hero-number' value={timeInfo.monthEarnedStr} />
+                </View>
+                <View className='hero-progress-bg'>
+                  <View
+                    className='hero-progress-fill'
+                    style={{ width: `${Math.min(100, (parseFloat(timeInfo.monthEarnedStr.replace(/,/g, '')) / config.monthlySalary) * 100)}%` }}
+                  />
+                </View>
+                <Text className='hero-target'>目標 ¥{config.monthlySalary.toLocaleString()}</Text>
+              </View>
 
-      {/* 实时收益 — 水墨 */}
-      <View className='live-earning'>
-        <View className='live-glow' />
-        <Text className='live-label'>今 日 收 益</Text>
-        <View className='live-amount-wrap'>
-          <Text className='live-currency'>¥</Text>
-          <AnimatedNumber className='live-amount' value={timeInfo.todayEarnedStr} />
-        </View>
-        <Text className='live-rate'>+¥{secondSalary.toFixed(6)} / 秒</Text>
-      </View>
+              {/* 实时收益 — 水墨 */}
+              <View className='live-earning'>
+                <View className='live-glow' />
+                <Text className='live-label'>今 日 收 益</Text>
+                <View className='live-amount-wrap'>
+                  <Text className='live-currency'>¥</Text>
+                  <AnimatedNumber className='live-amount' value={timeInfo.todayEarnedStr} />
+                </View>
+                <Text className='live-rate'>+¥{secondSalary.toFixed(6)} / 秒</Text>
+              </View>
 
-      {/* 薪资明细 — 卷轴 */}
-      <View className={`detail-card ${showDetail ? 'expanded' : ''}`} onClick={() => setShowDetail(!showDetail)}>
-        <View className='detail-header'>
-          <Text className='detail-title'>薪 賄 明 細</Text>
-          <Text className='detail-arrow'>{showDetail ? '▲' : '▼'}</Text>
-        </View>
+              {/* 薪资明细 — 卷轴 */}
+              <View className={`detail-card ${showDetail ? 'expanded' : ''}`} onClick={() => setShowDetail(!showDetail)}>
+                <View className='detail-header'>
+                  <Text className='detail-title'>薪 賄 明 細</Text>
+                  <Text className='detail-arrow'>{showDetail ? '▲' : '▼'}</Text>
+                </View>
 
-        {showDetail && (
-          <View className='detail-body'>
-            <View className='detail-row'>
-              <Text className='detail-name'>月薪</Text>
-              <Text className='detail-value'>¥{config.monthlySalary.toLocaleString()}</Text>
+                {showDetail && (
+                  <View className='detail-body'>
+                    <View className='detail-row'>
+                      <Text className='detail-name'>月薪</Text>
+                      <Text className='detail-value'>¥{config.monthlySalary.toLocaleString()}</Text>
+                    </View>
+                    <View className='detail-row'>
+                      <Text className='detail-name'>日薪</Text>
+                      <Text className='detail-value highlight'>¥{dailySalary.toFixed(2)}</Text>
+                    </View>
+                    <View className='detail-row'>
+                      <Text className='detail-name'>时薪</Text>
+                      <Text className='detail-value highlight'>¥{hourlySalary.toFixed(4)}</Text>
+                    </View>
+                    <View className='detail-row'>
+                      <Text className='detail-name'>分薪</Text>
+                      <Text className='detail-value highlight'>¥{minuteSalary.toFixed(6)}</Text>
+                    </View>
+                    <View className='detail-row'>
+                      <Text className='detail-name'>秒薪</Text>
+                      <Text className='detail-value gold'>¥{secondSalary.toFixed(8)}</Text>
+                    </View>
+                  </View>
+                )}
+              </View>
+
+              {/* 工作进度 — 枯山水砂纹 */}
+              <View className='progress-card'>
+                <View className='progress-header'>
+                  <Text className='progress-title'>今日進度</Text>
+                  <Text className='progress-percent'>{timeInfo.workProgress.toFixed(1)}%</Text>
+                </View>
+                <View className='progress-bar-bg'>
+                  <View
+                    className={`progress-bar-fill ${timeInfo.isWorking ? 'active' : ''}`}
+                    style={{ width: `${timeInfo.workProgress}%` }}
+                  />
+                </View>
+                <View className='progress-time'>
+                  <Text className='progress-start'>{startStr}</Text>
+                  <Text className='progress-end'>{endStr}</Text>
+                </View>
+              </View>
+
+              {/* 发薪日倒计时 */}
+              <View className='countdown-card'>
+                <Text className='countdown-title'>次 回 給 与 日</Text>
+                <View className='countdown-grid'>
+                  <View className='countdown-item'>
+                    <Text className='countdown-num'>{timeInfo.paydayDays}</Text>
+                    <Text className='countdown-unit'>日</Text>
+                  </View>
+                  <View className='countdown-item'>
+                    <Text className='countdown-num'>{timeInfo.paydayHours}</Text>
+                    <Text className='countdown-unit'>時</Text>
+                  </View>
+                  <View className='countdown-item'>
+                    <Text className='countdown-num'>{timeInfo.paydayMinutes}</Text>
+                    <Text className='countdown-unit'>分</Text>
+                  </View>
+                  <View className='countdown-item'>
+                    <Text className='countdown-num'>{timeInfo.paydaySeconds}</Text>
+                    <Text className='countdown-unit'>秒</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* 底部 */}
+              <View className='footer-info'>
+                <Text className='footer-text'>每月{config.payday}日給与 · {startStr}-{endStr}</Text>
+              </View>
+
+              {/* 底部安全区占位 */}
+              <View style={{ height: '60px' }} />
             </View>
-            <View className='detail-row'>
-              <Text className='detail-name'>日薪</Text>
-              <Text className='detail-value highlight'>¥{dailySalary.toFixed(2)}</Text>
-            </View>
-            <View className='detail-row'>
-              <Text className='detail-name'>时薪</Text>
-              <Text className='detail-value highlight'>¥{hourlySalary.toFixed(4)}</Text>
-            </View>
-            <View className='detail-row'>
-              <Text className='detail-name'>分薪</Text>
-              <Text className='detail-value highlight'>¥{minuteSalary.toFixed(6)}</Text>
-            </View>
-            <View className='detail-row'>
-              <Text className='detail-name'>秒薪</Text>
-              <Text className='detail-value gold'>¥{secondSalary.toFixed(8)}</Text>
-            </View>
-          </View>
-        )}
-      </View>
+          </ScrollView>
+        </SwiperItem>
 
-      {/* 工作进度 — 枯山水砂纹 */}
-      <View className='progress-card'>
-        <View className='progress-header'>
-          <Text className='progress-title'>今日進度</Text>
-          <Text className='progress-percent'>{timeInfo.workProgress.toFixed(1)}%</Text>
-        </View>
-        <View className='progress-bar-bg'>
-          <View
-            className={`progress-bar-fill ${timeInfo.isWorking ? 'active' : ''}`}
-            style={{ width: `${timeInfo.workProgress}%` }}
-          />
-        </View>
-        <View className='progress-time'>
-          <Text className='progress-start'>{startStr}</Text>
-          <Text className='progress-end'>{endStr}</Text>
-        </View>
-      </View>
+        {/* 第二页：记账 */}
+        <SwiperItem>
+          <ScrollView scrollY className='page-scroll'>
+            <BookkeepingPage />
+          </ScrollView>
+        </SwiperItem>
+      </Swiper>
 
-      {/* 发薪日倒计时 */}
-      <View className='countdown-card'>
-        <Text className='countdown-title'>次 回 給 与 日</Text>
-        <View className='countdown-grid'>
-          <View className='countdown-item'>
-            <Text className='countdown-num'>{timeInfo.paydayDays}</Text>
-            <Text className='countdown-unit'>日</Text>
-          </View>
-          <View className='countdown-item'>
-            <Text className='countdown-num'>{timeInfo.paydayHours}</Text>
-            <Text className='countdown-unit'>時</Text>
-          </View>
-          <View className='countdown-item'>
-            <Text className='countdown-num'>{timeInfo.paydayMinutes}</Text>
-            <Text className='countdown-unit'>分</Text>
-          </View>
-          <View className='countdown-item'>
-            <Text className='countdown-num'>{timeInfo.paydaySeconds}</Text>
-            <Text className='countdown-unit'>秒</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* 底部 */}
-      <View className='footer-info'>
-        <Text className='footer-text'>每月{config.payday}日給与 · {startStr}-{endStr}</Text>
+      {/* 页面指示器 */}
+      <View className='page-indicator'>
+        <View className={`indicator-dot ${currentPage === 0 ? 'active' : ''}`} />
+        <View className={`indicator-dot ${currentPage === 1 ? 'active' : ''}`} />
       </View>
 
       {/* 浮动设置按钮 */}

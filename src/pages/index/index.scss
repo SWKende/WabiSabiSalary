@@ -2,10 +2,66 @@
 // 色调：枯山水砂石、苔藓、和纸、墨
 
 
+// 页面根容器 — Swiper 布局
+.salary-app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f0e8;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+// Swiper 容器
+.page-swiper {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+// SwiperItem 内滚动区域
+.page-scroll {
+  height: 100%;
+}
+
+// 页面指示器 — 侘寂极简
+.page-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  height: 36px;
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom, 8px);
+
+  .indicator-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(44, 44, 44, 0.15);
+    transition: all 0.4s ease;
+
+    &.active {
+      width: 24px;
+      border-radius: 3px;
+      background: #c8b99a;
+    }
+  }
+}
+
 .salary-app {
   position: relative;
-  min-height: 100vh;
-  background: #f5f0e8;
+  min-height: 100%;
+  background: transparent;
   padding: 0 20px 40px;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -28,6 +84,8 @@
   z-index: 50;
   width: 100%;
   margin-bottom: 20px;
+  padding: 0 20px;
+  box-sizing: border-box;
 
   .nav-status-spacer {
     width: 100%;
@@ -779,5 +837,268 @@
     font-weight: 300;
     margin-top: 4px;
     font-family: 'Noto Serif SC', serif;
+  }
+}
+
+// ========== 记账页面 ==========
+.bookkeeping-page {
+  position: relative;
+  z-index: 1;
+  padding: 0 20px 60px;
+  box-sizing: border-box;
+}
+
+.bookkeeping-header {
+  padding: 16px 4px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .bookkeeping-title {
+    font-size: 32px;
+    color: #2c2c2c;
+    font-weight: 500;
+    letter-spacing: 6px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .bookkeeping-summary {
+    text-align: right;
+
+    .summary-label {
+      display: block;
+      font-size: 20px;
+      color: #8a8279;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .summary-value {
+      font-size: 28px;
+      font-weight: 500;
+      font-family: 'Shippori Mincho B1', serif;
+
+      &.positive { color: #7a8c6e; }
+      &.negative { color: #b85450; }
+    }
+  }
+}
+
+// 记账表单卡片
+.bookkeeping-form {
+  margin-bottom: 28px;
+
+  .form-card {
+    background: #faf8f4;
+    border: 1px solid rgba(44, 44, 44, 0.08);
+    border-radius: 2px;
+    padding: 28px 24px;
+  }
+
+  .amount-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+
+    .amount-symbol {
+      font-size: 36px;
+      color: #a89878;
+      font-weight: 300;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .amount-input {
+      flex: 1;
+      font-size: 48px;
+      color: #2c2c2c;
+      font-weight: 500;
+      font-family: 'Shippori Mincho B1', serif;
+      letter-spacing: 1px;
+    }
+  }
+
+  .category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+
+    .category-btn {
+      padding: 12px 20px;
+      border: 1px solid rgba(44, 44, 44, 0.08);
+      border-radius: 2px;
+      background: transparent;
+      transition: all 0.3s ease;
+
+      &.active {
+        background: #2c2c2c;
+        border-color: #2c2c2c;
+
+        .category-text {
+          color: #faf8f4;
+        }
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      .category-text {
+        font-size: 24px;
+        color: #5c5650;
+        font-family: 'Noto Serif SC', serif;
+        letter-spacing: 2px;
+      }
+    }
+  }
+
+  .note-row {
+    margin-bottom: 24px;
+
+    .note-input {
+      width: 100%;
+      padding: 18px 16px;
+      background: #f5f0e8;
+      border: 1px solid rgba(44, 44, 44, 0.08);
+      border-radius: 2px;
+      font-size: 26px;
+      color: #2c2c2c;
+      font-family: 'Noto Serif SC', serif;
+      box-sizing: border-box;
+    }
+  }
+
+  .submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 0;
+    background: #2c2c2c;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+
+    &.disabled {
+      opacity: 0.4;
+    }
+
+    &:active:not(.disabled) {
+      transform: scale(0.97);
+      background: #5c5650;
+    }
+
+    .submit-text {
+      font-size: 28px;
+      color: #faf8f4;
+      letter-spacing: 6px;
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 400;
+    }
+  }
+}
+
+// 记录列表
+.records-section {
+  .records-title {
+    display: block;
+    font-size: 24px;
+    color: #8a8279;
+    letter-spacing: 4px;
+    margin-bottom: 16px;
+    padding-left: 4px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+  }
+
+  .record-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px;
+    background: #faf8f4;
+    border: 1px solid rgba(44, 44, 44, 0.08);
+    border-radius: 2px;
+    margin-bottom: 10px;
+
+    .record-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+
+      .record-category-badge {
+        padding: 6px 12px;
+        background: rgba(200, 185, 154, 0.12);
+        border-radius: 2px;
+        flex-shrink: 0;
+
+        .record-category {
+          font-size: 20px;
+          color: #a89878;
+          font-family: 'Noto Serif SC', serif;
+          letter-spacing: 1px;
+        }
+      }
+
+      .record-info {
+        min-width: 0;
+
+        .record-note {
+          display: block;
+          font-size: 26px;
+          color: #2c2c2c;
+          font-family: 'Noto Serif SC', serif;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .record-time {
+          display: block;
+          font-size: 20px;
+          color: #8a8279;
+          margin-top: 4px;
+          font-family: 'Noto Serif SC', serif;
+        }
+      }
+    }
+
+    .record-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+
+      .record-amount {
+        font-size: 28px;
+        font-weight: 500;
+        font-family: 'Shippori Mincho B1', serif;
+
+        &.positive { color: #7a8c6e; }
+        &.negative { color: #2c2c2c; }
+      }
+
+      .record-delete {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .record-delete-icon {
+          font-size: 28px;
+          color: #b85450;
+          opacity: 0.5;
+        }
+
+        &:active .record-delete-icon {
+          opacity: 1;
+        }
+      }
+    }
   }
 }
