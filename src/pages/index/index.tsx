@@ -100,7 +100,66 @@ function SettingRow({ label, value, onChange, suffix }: {
   )
 }
 
+// 自定义导航栏 — 适配微信小程序胶囊按钮
+function CustomNavBar({ timeStr, isWorking, capsuleRight }: {
+  timeStr: string
+  isWorking: boolean
+  capsuleRight: number
+}) {
+  const sysInfo = Taro.getSystemInfoSync()
+  const statusBarHeight = sysInfo.statusBarHeight ?? 20
+
+  // 胶囊按钮位置（CSS 像素）
+  let capsuleTop = statusBarHeight + 4
+  let capsuleBottom = statusBarHeight + 36
+  try {
+    const rect = Taro.getMenuButtonBoundingClientRect()
+    if (rect && rect.width > 0) {
+      capsuleTop = rect.top
+      capsuleBottom = rect.bottom
+    }
+  } catch { /* ignore */ }
+
+  // 胶囊垂直中心（相对状态栏底部）
+  const capsuleCenterOffset = (capsuleTop + capsuleBottom) / 2 - statusBarHeight
+  // 导航内容区高度 = 胶囊中心偏移 × 2（上下对称，flex 居中后正好对齐胶囊中心）
+  const navContentHeight = capsuleCenterOffset * 2
+
+  return (
+    <View className='custom-nav-bar'>
+      {/* 状态栏占位 */}
+      <View className='nav-status-spacer' style={{ height: `${statusBarHeight}px` }} />
+      {/* 导航内容：右侧为胶囊预留空间，不加 paddingTop，纯靠 flex align-items:center 居中 */}
+      <View
+        className='nav-content'
+        style={{
+          height: `${navContentHeight}px`,
+          paddingRight: `${capsuleRight}px`,
+        }}
+      >
+        <Text className='status-time'>{timeStr}</Text>
+        <View className={`status-badge ${isWorking ? 'working' : 'resting'}`}>
+          <View className='status-dot' />
+          <Text className='status-text'>{isWorking ? '稼働中' : '休憩中'}</Text>
+        </View>
+      </View>
+    </View>
+  )
+}
+
 export default function Index() {
+  // 胶囊按钮右侧预留空间（屏幕宽度 - 胶囊左边距 + 安全边距）
+  const capsuleRight = useMemo(() => {
+    try {
+      const sysInfo = Taro.getSystemInfoSync()
+      const rect = Taro.getMenuButtonBoundingClientRect()
+      if (rect && rect.width > 0) {
+        return sysInfo.windowWidth - rect.left + 12
+      }
+    } catch { /* ignore */ }
+    return 100 // 回退默认值
+  }, [])
+
   const [config, setConfig] = useState<SalaryConfig>(() => {
     try {
       const saved = Taro.getStorageSync('salary_config')
@@ -251,14 +310,12 @@ export default function Index() {
 
   return (
     <View className='salary-app'>
-      {/* 顶部状态栏 */}
-      <View className='status-bar'>
-        <Text className='status-time'>{timeInfo.timeStr}</Text>
-        <View className={`status-badge ${timeInfo.isWorking ? 'working' : 'resting'}`}>
-          <View className='status-dot' />
-          <Text className='status-text'>{timeInfo.isWorking ? '稼働中' : '休憩中'}</Text>
-        </View>
-      </View>
+      {/* 自定义导航栏（适配胶囊按钮） */}
+      <CustomNavBar
+        timeStr={timeInfo.timeStr}
+        isWorking={timeInfo.isWorking}
+        capsuleRight={capsuleRight}
+      />
 
       {/* 主金额 — 留白呼吸 */}
       <View className='hero-section'>

@@ -6,7 +6,7 @@
   position: relative;
   min-height: 100vh;
   background: #f5f0e8;
-  padding: 40px 28px 60px;
+  padding: 0 28px 60px;
   box-sizing: border-box;
   overflow-x: hidden;
 
@@ -22,62 +22,71 @@
   }
 }
 
-// 顶部状态栏 — 极简
-.status-bar {
+// 自定义导航栏 — 适配胶囊按钮
+.custom-nav-bar {
   position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 48px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+  z-index: 50;
+  width: 100%;
+  margin-bottom: 20px;
 
-  .status-time {
-    font-size: 26px;
-    font-weight: 300;
-    color: #5c5650;
-    font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
-    letter-spacing: 4px;
+  .nav-status-spacer {
+    width: 100%;
   }
 
-  .status-badge {
+  .nav-content {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border-radius: 2px;
-    font-size: 20px;
-    font-weight: 400;
-    letter-spacing: 2px;
-    transition: all 0.6s ease;
+    box-sizing: border-box;
+    padding-left: 4px;
+  }
+}
+
+// 导航栏内复用状态元素
+.status-time {
+  font-size: 26px;
+  font-weight: 300;
+  color: #5c5650;
+  font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
+  letter-spacing: 4px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 2px;
+  font-size: 20px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  transition: all 0.6s ease;
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: dotBreath 4s ease-in-out infinite;
+  }
+
+  &.working {
+    background: rgba(122, 140, 110, 0.08);
+    border: 1px solid rgba(122, 140, 110, 0.15);
+    color: #5a6b50;
 
     .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      animation: dotBreath 4s ease-in-out infinite;
+      background: #a3b496;
     }
+  }
 
-    &.working {
-      background: rgba(122, 140, 110, 0.08);
-      border: 1px solid rgba(122, 140, 110, 0.15);
-      color: #5a6b50;
+  &.resting {
+    background: rgba(184, 84, 80, 0.12);
+    border: 1px solid rgba(184, 84, 80, 0.12);
+    color: #b85450;
 
-      .status-dot {
-        background: #a3b496;
-      }
-    }
-
-    &.resting {
-      background: rgba(184, 84, 80, 0.12);
-      border: 1px solid rgba(184, 84, 80, 0.12);
-      color: #b85450;
-
-      .status-dot {
-        background: #b85450;
-        animation: none;
-      }
+    .status-dot {
+      background: #b85450;
+      animation: none;
     }
   }
 }
@@ -480,8 +489,8 @@
   right: 28px;
   bottom: 48px;
   z-index: 100;
-  width: 48px;
-  height: 48px;
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -496,7 +505,7 @@
   }
 
   .fab-icon {
-    font-size: 20px;
+    font-size: 32px;
     color: #5c5650;
     line-height: 1;
   }
@@ -542,12 +551,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 28px 16px;
+  padding: 32px 32px 24px;
   border-bottom: 1px solid rgba(44, 44, 44, 0.08);
   flex-shrink: 0;
 
   .settings-title {
-    font-size: 22px;
+    font-size: 28px;
     color: #2c2c2c;
     font-weight: 500;
     letter-spacing: 4px;
@@ -555,14 +564,14 @@
   }
 
   .settings-close {
-    width: 32px;
-    height: 32px;
+    width: 56px;
+    height: 56px;
     display: flex;
     align-items: center;
     justify-content: center;
 
     .settings-close-text {
-      font-size: 18px;
+      font-size: 28px;
       color: #8a8279;
     }
   }
@@ -570,20 +579,20 @@
 
 // 面板内容
 .settings-body {
-  padding: 8px 28px 16px;
+  padding: 12px 32px 24px;
   flex: 1;
   overflow-y: auto;
 }
 
 .settings-section {
-  padding: 12px 0;
+  padding: 16px 0;
 
   .settings-section-title {
     display: block;
-    font-size: 16px;
+    font-size: 22px;
     color: #8a8279;
     letter-spacing: 4px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
   }
@@ -600,7 +609,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 0;
+  padding: 20px 0;
   border-bottom: 1px solid rgba(44, 44, 44, 0.08);
 
   &:last-child {
@@ -608,7 +617,7 @@
   }
 
   .setting-label {
-    font-size: 20px;
+    font-size: 28px;
     color: #2c2c2c;
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
@@ -619,17 +628,17 @@
   .setting-input-wrap {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
     background: #f5f0e8;
     border: 1px solid rgba(44, 44, 44, 0.08);
-    padding: 8px 12px;
-    min-width: 120px;
+    padding: 14px 18px;
+    min-width: 150px;
     justify-content: flex-end;
 
     .setting-input {
-      width: 80px;
+      width: 100px;
       text-align: right;
-      font-size: 20px;
+      font-size: 28px;
       color: #2c2c2c;
       font-family: 'Shippori Mincho B1', serif;
       font-weight: 500;
@@ -637,7 +646,7 @@
     }
 
     .setting-suffix {
-      font-size: 16px;
+      font-size: 22px;
       color: #8a8279;
       font-family: 'Noto Serif SC', serif;
       font-weight: 300;
@@ -649,7 +658,7 @@
 .settings-footer {
   display: flex;
   gap: 16px;
-  padding: 16px 28px 24px;
+  padding: 20px 32px 36px;
   border-top: 1px solid rgba(44, 44, 44, 0.08);
   flex-shrink: 0;
 
@@ -658,7 +667,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 14px 0;
+    padding: 22px 0;
     transition: all 0.3s ease;
 
     &:active {
@@ -666,7 +675,7 @@
     }
 
     .settings-btn-text {
-      font-size: 18px;
+      font-size: 26px;
       letter-spacing: 4px;
       font-family: 'Noto Serif SC', serif;
       font-weight: 400;

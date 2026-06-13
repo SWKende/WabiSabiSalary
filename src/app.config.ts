@@ -3,8 +3,9 @@ export default defineAppConfig({
     'pages/index/index'
   ],
   window: {
+    navigationStyle: 'custom',
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#fff',
+    navigationBarBackgroundColor: '#f5f0e8',
     navigationBarTitleText: 'Taro Demo',
     navigationBarTextStyle: 'black'
   }
