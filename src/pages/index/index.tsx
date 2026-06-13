@@ -113,10 +113,11 @@ function getWindowInfo() {
 }
 
 // 自定义导航栏 — 适配微信小程序胶囊按钮
-function CustomNavBar({ timeStr, isWorking, capsuleRight }: {
+function CustomNavBar({ timeStr, isWorking, capsuleRight, hasCapsule }: {
   timeStr: string
   isWorking: boolean
   capsuleRight: number
+  hasCapsule: boolean
 }) {
   const windowInfo = getWindowInfo()
   const statusBarHeight = windowInfo.statusBarHeight ?? 20
@@ -141,15 +142,15 @@ function CustomNavBar({ timeStr, isWorking, capsuleRight }: {
     <View className='custom-nav-bar'>
       {/* 状态栏占位 */}
       <View className='nav-status-spacer' style={{ height: `${statusBarHeight}px` }} />
-      {/* 导航内容：右侧为胶囊预留空间，不加 paddingTop，纯靠 flex align-items:center 居中 */}
+      {/* 导航内容 */}
       <View
-        className='nav-content'
+        className={`nav-content ${hasCapsule ? 'nav-capsule' : ''}`}
         style={{
           height: `${navContentHeight}px`,
-          paddingRight: `${capsuleRight}px`,
+          paddingRight: hasCapsule ? `${capsuleRight}px` : '4px',
         }}
       >
-        <Text className='status-time'>{timeStr}</Text>
+        {!hasCapsule && <Text className='status-time'>{timeStr}</Text>}
         <View className={`status-badge ${isWorking ? 'working' : 'resting'}`}>
           <View className='status-dot' />
           <Text className='status-text'>{isWorking ? '稼働中' : '休憩中'}</Text>
@@ -160,16 +161,19 @@ function CustomNavBar({ timeStr, isWorking, capsuleRight }: {
 }
 
 export default function Index() {
-  // 胶囊按钮右侧预留空间（屏幕宽度 - 胶囊左边距 + 安全边距）
-  const capsuleRight = useMemo(() => {
+  // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
+  const navLayout = useMemo(() => {
     try {
       const windowInfo = getWindowInfo()
       const rect = Taro.getMenuButtonBoundingClientRect()
       if (rect && rect.width > 0) {
-        return windowInfo.windowWidth - rect.left + 12
+        return {
+          capsuleRight: windowInfo.windowWidth - rect.left + 12,
+          hasCapsule: true,
+        }
       }
     } catch { /* ignore */ }
-    return 100 // 回退默认值
+    return { capsuleRight: 0, hasCapsule: false }
   }, [])
 
   const [config, setConfig] = useState<SalaryConfig>(() => {
@@ -326,7 +330,8 @@ export default function Index() {
       <CustomNavBar
         timeStr={timeInfo.timeStr}
         isWorking={timeInfo.isWorking}
-        capsuleRight={capsuleRight}
+        capsuleRight={navLayout.capsuleRight}
+        hasCapsule={navLayout.hasCapsule}
       />
 
       {/* 主金额 — 留白呼吸 */}
