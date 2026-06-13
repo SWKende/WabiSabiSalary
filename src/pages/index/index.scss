@@ -1,0 +1,770 @@
+// 侘寂 · 時間の流れ — 日式工资时钟
+// 色调：枯山水砂石、苔藓、和纸、墨
+
+
+.salary-app {
+  position: relative;
+  min-height: 100vh;
+  background: #f5f0e8;
+  padding: 40px 28px 60px;
+  box-sizing: border-box;
+  overflow-x: hidden;
+
+  // 和纸纹理叠加
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+// 顶部状态栏 — 极简
+.status-bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 48px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+
+  .status-time {
+    font-size: 26px;
+    font-weight: 300;
+    color: #5c5650;
+    font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
+    letter-spacing: 4px;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 2px;
+    font-size: 20px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    transition: all 0.6s ease;
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      animation: dotBreath 4s ease-in-out infinite;
+    }
+
+    &.working {
+      background: rgba(122, 140, 110, 0.08);
+      border: 1px solid rgba(122, 140, 110, 0.15);
+      color: #5a6b50;
+
+      .status-dot {
+        background: #a3b496;
+      }
+    }
+
+    &.resting {
+      background: rgba(184, 84, 80, 0.12);
+      border: 1px solid rgba(184, 84, 80, 0.12);
+      color: #b85450;
+
+      .status-dot {
+        background: #b85450;
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes dotBreath {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+// 主金额 — 禅意留白
+.hero-section {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 48px 20px 40px;
+
+  .hero-label {
+    display: block;
+    font-size: 22px;
+    color: #8a8279;
+    letter-spacing: 8px;
+    margin-bottom: 20px;
+    font-weight: 400;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .hero-amount {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2px;
+    margin-bottom: 28px;
+
+    .hero-currency {
+      font-size: 32px;
+      color: #a89878;
+      font-weight: 300;
+      margin-top: 12px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .hero-number {
+      font-size: 68px;
+      font-weight: 600;
+      color: #2c2c2c;
+      font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
+      letter-spacing: 2px;
+      line-height: 1;
+    }
+  }
+
+  // 枯山水砂纹进度条
+  .hero-progress-bg {
+    width: 200px;
+    height: 2px;
+    background: rgba(44, 44, 44, 0.08);
+    margin: 0 auto 16px;
+    position: relative;
+    overflow: hidden;
+
+    .hero-progress-fill {
+      height: 100%;
+      background: #c8b99a;
+      transition: width 1s ease;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        right: -1px;
+        top: -3px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #c8b99a;
+        opacity: 0.6;
+      }
+    }
+  }
+
+  .hero-target {
+    font-size: 18px;
+    color: #8a8279;
+    letter-spacing: 3px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+  }
+}
+
+// 实时收益 — 水墨晕染感
+.live-earning {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 36px 24px;
+  margin-bottom: 28px;
+  background: #faf8f4;
+  border-radius: 2px;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+
+  .live-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200, 185, 154, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    animation: inkBreath 6s ease-in-out infinite;
+  }
+
+  .live-label {
+    position: relative;
+    display: block;
+    font-size: 18px;
+    color: #8a8279;
+    letter-spacing: 6px;
+    margin-bottom: 16px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+  }
+
+  .live-amount {
+    position: relative;
+    display: block;
+    font-size: 44px;
+    font-weight: 500;
+    color: #2c2c2c;
+    font-family: 'Shippori Mincho B1', serif;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .live-rate {
+    position: relative;
+    display: block;
+    font-size: 16px;
+    color: #7a8c6e;
+    font-family: 'Noto Serif SC', serif;
+    letter-spacing: 2px;
+    font-weight: 400;
+  }
+}
+
+@keyframes inkBreath {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+// 薪资明细 — 卷轴展开感
+.detail-card {
+  position: relative;
+  z-index: 1;
+  background: #faf8f4;
+  border-radius: 2px;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  margin-bottom: 24px;
+  overflow: hidden;
+  transition: all 0.4s ease;
+
+  &:active {
+    background: #f0e8d8;
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+
+    .detail-title {
+      font-size: 22px;
+      color: #2c2c2c;
+      font-weight: 500;
+      letter-spacing: 3px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .detail-arrow {
+      font-size: 16px;
+      color: #a89878;
+      transition: transform 0.4s ease;
+    }
+  }
+
+  &.expanded .detail-arrow {
+    transform: rotate(180deg);
+  }
+
+  .detail-body {
+    padding: 0 24px 20px;
+    animation: scrollUnfurl 0.5s ease;
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .detail-name {
+        font-size: 20px;
+        color: #8a8279;
+        font-family: 'Noto Serif SC', serif;
+        font-weight: 400;
+        letter-spacing: 2px;
+      }
+
+      .detail-value {
+        font-size: 22px;
+        color: #2c2c2c;
+        font-family: 'Shippori Mincho B1', serif;
+        font-weight: 500;
+
+        &.highlight {
+          color: #a89878;
+        }
+
+        &.gold {
+          color: #2c2c2c;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+@keyframes scrollUnfurl {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 400px;
+  }
+}
+
+// 工作进度 — 枯山水石纹
+.progress-card {
+  position: relative;
+  z-index: 1;
+  background: #faf8f4;
+  border-radius: 2px;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .progress-title {
+      font-size: 20px;
+      color: #2c2c2c;
+      font-weight: 500;
+      letter-spacing: 3px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .progress-percent {
+      font-size: 24px;
+      color: #a89878;
+      font-family: 'Shippori Mincho B1', serif;
+      font-weight: 500;
+    }
+  }
+
+  // 砂纹进度条
+  .progress-bar-bg {
+    width: 100%;
+    height: 3px;
+    background: #ece5d8;
+    border-radius: 0;
+    overflow: hidden;
+    margin-bottom: 16px;
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #c8b99a;
+      transition: width 1s ease;
+      position: relative;
+
+      &.active::after {
+        content: '';
+        position: absolute;
+        top: -2px;
+        right: 0;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #c8b99a;
+        opacity: 0.5;
+        animation: stoneGlow 3s ease-in-out infinite;
+      }
+    }
+  }
+
+  .progress-time {
+    display: flex;
+    justify-content: space-between;
+
+    .progress-start,
+    .progress-end {
+      font-size: 16px;
+      color: #8a8279;
+      font-family: 'Noto Serif SC', serif;
+      letter-spacing: 2px;
+      font-weight: 300;
+    }
+  }
+}
+
+@keyframes stoneGlow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+// 发薪日倒计时 — 竖排文字的禅意
+.countdown-card {
+  position: relative;
+  z-index: 1;
+  background: #f0e8d8;
+  border-radius: 2px;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  padding: 32px 24px;
+  margin-bottom: 32px;
+
+  .countdown-title {
+    display: block;
+    font-size: 20px;
+    color: #5c5650;
+    font-weight: 400;
+    letter-spacing: 4px;
+    margin-bottom: 28px;
+    text-align: center;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .countdown-grid {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+
+    .countdown-item {
+      text-align: center;
+
+      .countdown-num {
+        display: block;
+        font-size: 36px;
+        font-weight: 600;
+        color: #2c2c2c;
+        font-family: 'Shippori Mincho B1', serif;
+        line-height: 1;
+        margin-bottom: 10px;
+      }
+
+      .countdown-unit {
+        display: block;
+        font-size: 16px;
+        color: #8a8279;
+        letter-spacing: 3px;
+        font-family: 'Noto Serif SC', serif;
+        font-weight: 300;
+      }
+    }
+  }
+}
+
+// 底部 — 极淡
+.footer-info {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding-top: 20px;
+
+  .footer-text {
+    font-size: 16px;
+    color: #8a8279;
+    letter-spacing: 2px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+    opacity: 0.7;
+  }
+}
+
+// 浮动设置按钮 — 侘寂石纽
+.fab-btn {
+  position: fixed;
+  right: 28px;
+  bottom: 48px;
+  z-index: 100;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #faf8f4;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  box-shadow: 0 2px 12px rgba(44, 44, 44, 0.08);
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.95);
+    background: #f0e8d8;
+  }
+
+  .fab-icon {
+    font-size: 20px;
+    color: #5c5650;
+    line-height: 1;
+  }
+}
+
+// 设置面板遮罩
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(44, 44, 44, 0.3);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: overlayFadeIn 0.3s ease;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+// 设置面板 — 卷轴从底部展开
+.settings-panel {
+  width: 100%;
+  max-height: 92vh;
+  background: #faf8f4;
+  border-top: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 8px 8px 0 0;
+  animation: panelSlideUp 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+
+@keyframes panelSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+// 面板头部
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px 16px;
+  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+  flex-shrink: 0;
+
+  .settings-title {
+    font-size: 22px;
+    color: #2c2c2c;
+    font-weight: 500;
+    letter-spacing: 4px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .settings-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .settings-close-text {
+      font-size: 18px;
+      color: #8a8279;
+    }
+  }
+}
+
+// 面板内容
+.settings-body {
+  padding: 8px 28px 16px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.settings-section {
+  padding: 12px 0;
+
+  .settings-section-title {
+    display: block;
+    font-size: 16px;
+    color: #8a8279;
+    letter-spacing: 4px;
+    margin-bottom: 16px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+  }
+}
+
+.settings-divider {
+  height: 1px;
+  background: rgba(44, 44, 44, 0.08);
+  margin: 4px 0;
+}
+
+// 设置行
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .setting-label {
+    font-size: 20px;
+    color: #2c2c2c;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+
+  .setting-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f5f0e8;
+    border: 1px solid rgba(44, 44, 44, 0.08);
+    padding: 8px 12px;
+    min-width: 120px;
+    justify-content: flex-end;
+
+    .setting-input {
+      width: 80px;
+      text-align: right;
+      font-size: 20px;
+      color: #2c2c2c;
+      font-family: 'Shippori Mincho B1', serif;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .setting-suffix {
+      font-size: 16px;
+      color: #8a8279;
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 300;
+    }
+  }
+}
+
+// 面板底部按钮
+.settings-footer {
+  display: flex;
+  gap: 16px;
+  padding: 16px 28px 24px;
+  border-top: 1px solid rgba(44, 44, 44, 0.08);
+  flex-shrink: 0;
+
+  .settings-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 0;
+    transition: all 0.3s ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
+
+    .settings-btn-text {
+      font-size: 18px;
+      letter-spacing: 4px;
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 400;
+    }
+
+    &.settings-btn-reset {
+      background: transparent;
+      border: 1px solid rgba(44, 44, 44, 0.08);
+
+      .settings-btn-text {
+        color: #8a8279;
+      }
+
+      &:active {
+        background: #ece5d8;
+      }
+    }
+
+    &.settings-btn-save {
+      background: #2c2c2c;
+      border: 1px solid #2c2c2c;
+
+      .settings-btn-text {
+        color: #faf8f4;
+      }
+
+      &:active {
+        background: #5c5650;
+      }
+    }
+  }
+}
+
+// 动画数字 — 逐字符从下往上渐入渐出
+.animated-number {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: 1;
+}
+
+.animated-char {
+  display: inline-block;
+  line-height: 1;
+}
+
+// 仅在 char-slide-up class 存在时触发动画
+.animated-char.char-slide-up {
+  animation: charSlideUp 0.25s ease-out both;
+}
+
+// 每个字符依次延迟，形成波浪效果
+.animated-char:nth-child(1).char-slide-up { animation-delay: 0ms; }
+.animated-char:nth-child(2).char-slide-up { animation-delay: 15ms; }
+.animated-char:nth-child(3).char-slide-up { animation-delay: 30ms; }
+.animated-char:nth-child(4).char-slide-up { animation-delay: 45ms; }
+.animated-char:nth-child(5).char-slide-up { animation-delay: 60ms; }
+.animated-char:nth-child(6).char-slide-up { animation-delay: 75ms; }
+.animated-char:nth-child(7).char-slide-up { animation-delay: 90ms; }
+.animated-char:nth-child(8).char-slide-up { animation-delay: 105ms; }
+.animated-char:nth-child(9).char-slide-up { animation-delay: 120ms; }
+.animated-char:nth-child(10).char-slide-up { animation-delay: 135ms; }
+.animated-char:nth-child(11).char-slide-up { animation-delay: 150ms; }
+.animated-char:nth-child(12).char-slide-up { animation-delay: 165ms; }
+.animated-char:nth-child(13).char-slide-up { animation-delay: 180ms; }
+.animated-char:nth-child(14).char-slide-up { animation-delay: 195ms; }
+.animated-char:nth-child(15).char-slide-up { animation-delay: 210ms; }
+.animated-char:nth-child(16).char-slide-up { animation-delay: 225ms; }
+.animated-char:nth-child(17).char-slide-up { animation-delay: 240ms; }
+.animated-char:nth-child(18).char-slide-up { animation-delay: 255ms; }
+.animated-char:nth-child(19).char-slide-up { animation-delay: 270ms; }
+.animated-char:nth-child(20).char-slide-up { animation-delay: 285ms; }
+
+@keyframes charSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 实时收益区域包裹
+.live-amount-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 12px;
+
+  .live-currency {
+    font-size: 32px;
+    color: #a89878;
+    font-weight: 300;
+    margin-top: 4px;
+    font-family: 'Noto Serif SC', serif;
+  }
+}
