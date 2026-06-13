@@ -1,4 +1,4 @@
-import { View, Text, Input, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
+import { View, Text, Input, ScrollView, Swiper, SwiperItem, Picker } from '@tarojs/components'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Taro from '@tarojs/taro'
 import './index.scss'
@@ -160,40 +160,64 @@ function CustomNavBar({ timeStr, isWorking, capsuleRight, hasCapsule }: {
   )
 }
 
+// 记账记录类型
+interface BookkeepingRecord {
+  id: number
+  type: 'expense' | 'income'
+  amount: string
+  note: string
+  category: string
+  time: string
+}
+
+// 旧数据迁移：无 type 字段时根据 category 推断
+function migrateRecord(r: any): BookkeepingRecord {
+  if (r.type) return r as BookkeepingRecord
+  return {
+    ...r,
+    type: (r.category === '收入' || r.category === '収入') ? 'income' : 'expense',
+  }
+}
+
 // 记账页面组件
 function BookkeepingPage() {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
-  const [category, setCategory] = useState('支出')
-  const [records, setRecords] = useState<Array<{
-    id: number
-    amount: string
-    note: string
-    category: string
-    time: string
-  }>>(() => {
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
+  const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
+  const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
+
+  const [activeType, setActiveType] = useState<'expense' | 'income'>('expense')
+  const [category, setCategory] = useState(expenseCategories[0])
+  const [records, setRecords] = useState<BookkeepingRecord[]>(() => {
     try {
-      return Taro.getStorageSync('bookkeeping_records') || []
+      const saved = Taro.getStorageSync('bookkeeping_records')
+      return saved ? (saved as any[]).filter(Boolean).map(migrateRecord) : []
     } catch { return [] }
   })
 
-  const categories = ['支出', '收入', '餐饮', '交通', '购物', '娱乐']
+  const handleTypeSwitch = (type: 'expense' | 'income') => {
+    setActiveType(type)
+    setCategory(type === 'expense' ? expenseCategories[0] : incomeCategories[0])
+  }
 
   const handleSubmit = () => {
     if (!amount) return
-    const newRecord = {
+    const newRecord: BookkeepingRecord = {
       id: Date.now(),
+      type: activeType,
       amount,
-      note: note || (category === '支出' ? '支出' : category),
+      note: note || category,
       category,
-      time: new Date().toLocaleString('zh-CN'),
+      time: new Date(selectedDate + 'T12:00:00').toISOString(),
     }
     const updated = [newRecord, ...records]
     setRecords(updated)
     try { Taro.setStorageSync('bookkeeping_records', updated) } catch {}
     setAmount('')
     setNote('')
-    Taro.showToast({ title: '記録済み', icon: 'success' })
+    setSelectedDate(new Date().toISOString().split('T')[0])
+    Taro.showToast({ title: '已記錄', icon: 'success' })
   }
 
   const handleDelete = (id: number) => {
@@ -204,23 +228,40 @@ function BookkeepingPage() {
 
   const monthTotal = useMemo(() => {
     const now = new Date()
-    return records
-      .filter(r => {
-        const d = new Date(r.time)
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-      })
-      .reduce((sum, r) => {
-        const val = parseFloat(r.amount) || 0
-        return sum + (r.category === '収入' ? val : -val)
-      }, 0)
+    const monthRecords = records.filter(r => {
+      const d = new Date(r.time)
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+    })
+    const income = monthRecords.filter(r => r.type === 'income').reduce((s, r) => s + (parseFloat(r.amount) || 0), 0)
+    const expense = monthRecords.filter(r => r.type === 'expense').reduce((s, r) => s + (parseFloat(r.amount) || 0), 0)
+    return income - expense
   }, [records])
+
+  // 近7日柱状图数据
+  const [chartType, setChartType] = useState<'expense' | 'income'>('expense')
+
+  const chartData = useMemo(() => {
+    const days: { date: string; label: string; total: number }[] = []
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date()
+      d.setDate(d.getDate() - i)
+      const dateStr = d.toISOString().split('T')[0]
+      const label = `${d.getMonth() + 1}/${d.getDate()}`
+      const dayTotal = records
+        .filter(r => r.type === chartType && r.time.startsWith(dateStr))
+        .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
+      days.push({ date: dateStr, label, total: dayTotal })
+    }
+    const maxVal = Math.max(...days.map(d => d.total), 1)
+    return { days, maxVal }
+  }, [records, chartType])
 
   return (
     <View className='bookkeeping-page'>
       <View className='bookkeeping-header'>
         <Text className='bookkeeping-title'>記 帳</Text>
         <View className='bookkeeping-summary'>
-          <Text className='summary-label'>今月収支</Text>
+          <Text className='summary-label'>本月收支</Text>
           <Text className={`summary-value ${monthTotal >= 0 ? 'positive' : 'negative'}`}>
             {monthTotal >= 0 ? '+' : ''}{monthTotal.toFixed(2)}
           </Text>
@@ -234,28 +275,63 @@ function BookkeepingPage() {
             <Input
               className='amount-input'
               type='digit'
-              placeholder='金額を入力'
+              placeholder='請輸入金額'
+              placeholderStyle='font-size: 28px; color: #a89878;'
               value={amount}
               onInput={(e) => setAmount(e.detail.value)}
             />
           </View>
 
-          <View className='category-grid'>
-            {categories.map(cat => (
+          <View className='category-section'>
+            <View className='type-tabs'>
               <View
-                key={cat}
-                className={`category-btn ${category === cat ? 'active' : ''}`}
-                onClick={() => setCategory(cat)}
+                className={`tab ${activeType === 'expense' ? 'active' : ''}`}
+                onClick={() => handleTypeSwitch('expense')}
               >
-                <Text className='category-text'>{cat}</Text>
+                <Text className='tab-text'>支 出</Text>
               </View>
-            ))}
+              <View
+                className={`tab ${activeType === 'income' ? 'active' : ''}`}
+                onClick={() => handleTypeSwitch('income')}
+              >
+                <Text className='tab-text'>收 入</Text>
+              </View>
+            </View>
+            <ScrollView scrollX className='category-scroll'>
+              <View className='category-row'>
+                {(activeType === 'expense' ? expenseCategories : incomeCategories).map(cat => (
+                  <View
+                    key={cat}
+                    className={`cat-chip ${category === cat ? 'active' : ''}`}
+                    onClick={() => setCategory(cat)}
+                  >
+                    <Text className='cat-chip-text'>{cat}</Text>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* 日期选择器 */}
+          <View className='date-row'>
+            <Text className='date-label'>日期</Text>
+            <Picker
+              mode='date'
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.detail.value)}
+            >
+              <View className='date-picker'>
+                <Text className='date-value'>{selectedDate}</Text>
+                <Text className='date-arrow'>›</Text>
+              </View>
+            </Picker>
           </View>
 
           <View className='note-row'>
+            <Text className='note-label'>備註</Text>
             <Input
               className='note-input'
-              placeholder='備考（任意）'
+              placeholder='備註（選填）'
               value={note}
               onInput={(e) => setNote(e.detail.value)}
             />
@@ -265,14 +341,62 @@ function BookkeepingPage() {
             className={`submit-btn ${!amount ? 'disabled' : ''}`}
             onClick={handleSubmit}
           >
-            <Text className='submit-text'>記 録</Text>
+            <Text className='submit-text'>記 錄</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* 近7日柱状图 */}
+      <View className='chart-section'>
+        <View className='chart-header'>
+          <Text className='chart-title'>近 7 日</Text>
+          <View className='chart-toggle'>
+            <View
+              className={`toggle-btn ${chartType === 'expense' ? 'active' : ''}`}
+              onClick={() => setChartType('expense')}
+            >
+              <Text className='toggle-text'>支出</Text>
+            </View>
+            <View
+              className={`toggle-btn ${chartType === 'income' ? 'active' : ''}`}
+              onClick={() => setChartType('income')}
+            >
+              <Text className='toggle-text'>收入</Text>
+            </View>
+          </View>
+        </View>
+
+        <View className='chart-body'>
+          <View className='chart-y-axis'>
+            <Text className='y-label'>{chartData.maxVal > 0 ? chartData.maxVal.toFixed(0) : '0'}</Text>
+            <Text className='y-label'>{chartData.maxVal > 0 ? (chartData.maxVal / 2).toFixed(0) : '0'}</Text>
+            <Text className='y-label'>0</Text>
+          </View>
+          <View className='chart-bars'>
+            {chartData.days.map((day, i) => (
+              <View key={i} className='chart-bar-col'>
+                <Text className='bar-value'>{day.total > 0 ? day.total.toFixed(0) : ''}</Text>
+                <View className='bar-track'>
+                  <View
+                    className={`bar-fill ${chartType}`}
+                    style={{ height: chartData.maxVal > 0 ? `${(day.total / chartData.maxVal) * 100}%` : '0%' }}
+                  />
+                </View>
+                <Text className='bar-label'>{day.label}</Text>
+              </View>
+            ))}
+            {chartData.days.every(d => d.total === 0) && (
+              <View className='chart-empty'>
+                <Text className='chart-empty-text'>尚無記錄</Text>
+              </View>
+            )}
           </View>
         </View>
       </View>
 
       {records.length > 0 && (
         <View className='records-section'>
-          <Text className='records-title'>最近の記録</Text>
+          <Text className='records-title'>最近記錄</Text>
           {records.slice(0, 20).map(record => (
             <View key={record.id} className='record-item'>
               <View className='record-left'>
@@ -285,8 +409,8 @@ function BookkeepingPage() {
                 </View>
               </View>
               <View className='record-right'>
-                <Text className={`record-amount ${record.category === '収入' ? 'positive' : 'negative'}`}>
-                  {record.category === '収入' ? '+' : '-'}¥{record.amount}
+                <Text className={`record-amount ${record.type === 'income' ? 'positive' : 'negative'}`}>
+                  {record.type === 'income' ? '+' : '-'}¥{record.amount}
                 </Text>
                 <View className='record-delete' onClick={() => handleDelete(record.id)}>
                   <Text className='record-delete-icon'>×</Text>
