@@ -1,0 +1,242 @@
+// ========== 自定义日期选择器 — 侘寂美学 ==========
+
+.dp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(44, 44, 44, 0.3);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: dpFadeIn 0.25s ease;
+}
+
+@keyframes dpFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dp-panel {
+  width: 100%;
+  background: #faf8f4;
+  border-radius: 12px 12px 0 0;
+  padding: 28px 24px;
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+  animation: dpSlideUp 0.3s ease;
+}
+
+@keyframes dpSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+// 头部：月份导航 + 今天按钮
+.dp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.dp-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.dp-nav-btn {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+
+  &.disabled {
+    opacity: 0.3;
+  }
+
+  &:active:not(.disabled) {
+    background: #f0e8d8;
+  }
+
+  .dp-nav-text {
+    font-size: 32px;
+    color: #5c5650;
+    font-weight: 300;
+    line-height: 1;
+  }
+}
+
+.dp-month-label {
+  font-size: 28px;
+  color: #2c2c2c;
+  font-weight: 500;
+  font-family: 'Noto Serif SC', serif;
+  letter-spacing: 2px;
+  min-width: 160px;
+  text-align: center;
+}
+
+.dp-today-btn {
+  padding: 10px 20px;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+
+  &:active {
+    background: #f0e8d8;
+  }
+
+  .dp-today-text {
+    font-size: 22px;
+    color: #a89878;
+    font-family: 'Noto Serif SC', serif;
+    letter-spacing: 2px;
+  }
+}
+
+// 星期标签行
+.dp-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 8px;
+}
+
+.dp-weekday {
+  text-align: center;
+  font-size: 22px;
+  color: #8a8279;
+  font-family: 'Noto Serif SC', serif;
+  padding: 10px 0;
+  letter-spacing: 2px;
+}
+
+// 日期网格
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.dp-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+
+  &.dp-day-empty {
+    pointer-events: none;
+  }
+
+  &.dp-day-disabled {
+    .dp-day-text {
+      color: rgba(44, 44, 44, 0.18);
+    }
+    pointer-events: none;
+  }
+
+  &.dp-day-today {
+    .dp-day-text {
+      color: #a89878;
+      font-weight: 600;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #c8b99a;
+    }
+    position: relative;
+  }
+
+  &.dp-day-selected {
+    background: #2c2c2c;
+
+    .dp-day-text {
+      color: #faf8f4;
+      font-weight: 500;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+
+  &:active:not(.dp-day-disabled):not(.dp-day-empty) {
+    background: #f0e8d8;
+  }
+
+  .dp-day-text {
+    font-size: 28px;
+    color: #2c2c2c;
+    font-family: 'Shippori Mincho B1', serif;
+    font-weight: 400;
+  }
+}
+
+// 底部按钮
+.dp-footer {
+  display: flex;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(44, 44, 44, 0.08);
+}
+
+.dp-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px 0;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  .dp-btn-text {
+    font-size: 26px;
+    letter-spacing: 4px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+  }
+
+  &.dp-btn-cancel {
+    background: transparent;
+    border: 1px solid rgba(44, 44, 44, 0.08);
+
+    .dp-btn-text {
+      color: #8a8279;
+    }
+
+    &:active {
+      background: #ece5d8;
+    }
+  }
+
+  &.dp-btn-confirm {
+    background: #2c2c2c;
+    border: 1px solid #2c2c2c;
+
+    .dp-btn-text {
+      color: #faf8f4;
+    }
+
+    &:active {
+      background: #5c5650;
+    }
+  }
+}

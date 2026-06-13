@@ -1,6 +1,7 @@
-import { View, Text, Input, ScrollView, Swiper, SwiperItem, Picker } from '@tarojs/components'
+import { View, Text, Input, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Taro from '@tarojs/taro'
+import DatePicker from '../../components/DatePicker'
 import './index.scss'
 
 // 默认配置
@@ -184,6 +185,7 @@ function BookkeepingPage() {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
 
@@ -315,16 +317,10 @@ function BookkeepingPage() {
           {/* 日期选择器 */}
           <View className='date-row'>
             <Text className='date-label'>日期</Text>
-            <Picker
-              mode='date'
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.detail.value)}
-            >
-              <View className='date-picker'>
-                <Text className='date-value'>{selectedDate}</Text>
-                <Text className='date-arrow'>›</Text>
-              </View>
-            </Picker>
+            <View className='date-picker' onClick={() => setShowDatePicker(true)}>
+              <Text className='date-value'>{selectedDate}</Text>
+              <Text className='date-arrow'>›</Text>
+            </View>
           </View>
 
           <View className='note-row'>
@@ -420,6 +416,13 @@ function BookkeepingPage() {
           ))}
         </View>
       )}
+      {/* 自定义日期选择器 */}
+      <DatePicker
+        visible={showDatePicker}
+        value={selectedDate}
+        onConfirm={(date) => { setSelectedDate(date); setShowDatePicker(false) }}
+        onCancel={() => setShowDatePicker(false)}
+      />
     </View>
   )
 }
