@@ -186,6 +186,7 @@ function BookkeepingPage() {
   const [note, setNote] = useState('')
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const [showForm, setShowForm] = useState(false)
   const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
 
@@ -219,6 +220,7 @@ function BookkeepingPage() {
     setAmount('')
     setNote('')
     setSelectedDate(new Date().toISOString().split('T')[0])
+    setShowForm(false)
     Taro.showToast({ title: '已記錄', icon: 'success' })
   }
 
@@ -270,8 +272,17 @@ function BookkeepingPage() {
         </View>
       </View>
 
+      {/* 记忆笔按钮 / 表单卡片 */}
+      {!showForm ? (
+        <View className='memory-pen-btn' onClick={() => setShowForm(true)}>
+          <Text className='memory-pen-text'>記 一 筆</Text>
+        </View>
+      ) : (
       <View className='bookkeeping-form'>
         <View className='form-card'>
+          <View className='form-close-btn' onClick={() => setShowForm(false)}>
+            <Text className='form-close-icon'>✕</Text>
+          </View>
           <View className='amount-row'>
             <Text className='amount-symbol'>¥</Text>
             <Input
@@ -341,6 +352,7 @@ function BookkeepingPage() {
           </View>
         </View>
       </View>
+      )}
 
       {/* 近7日柱状图 */}
       <View className='chart-section'>
