@@ -1,0 +1,586 @@
+// ========== 记账页面 ==========
+.bookkeeping-page {
+  position: relative;
+  z-index: 1;
+  padding: 0 20px 60px;
+  box-sizing: border-box;
+}
+
+.bookkeeping-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #f5f0e8;
+  padding: 16px 4px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .bookkeeping-title {
+    font-size: 32px;
+    color: #2c2c2c;
+    font-weight: 500;
+    letter-spacing: 6px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .bookkeeping-summary {
+    text-align: right;
+
+    .summary-label {
+      display: block;
+      font-size: 20px;
+      color: #8a8279;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .summary-value {
+      font-size: 28px;
+      font-weight: 500;
+      font-family: 'Shippori Mincho B1', serif;
+
+      &.positive { color: #7a8c6e; }
+      &.negative { color: #b85450; }
+    }
+  }
+}
+
+// 记账表单卡片
+.bookkeeping-form {
+  margin-bottom: 28px;
+  animation: formFadeIn 0.3s ease;
+
+  .form-card {
+    background: #faf8f4;
+    border: 1px solid rgba(44, 44, 44, 0.08);
+    border-radius: 2px;
+    padding: 32px 24px;
+    position: relative;
+  }
+
+  .form-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+
+    &:active {
+      opacity: 0.5;
+    }
+
+    .form-close-icon {
+      font-size: 24px;
+      color: #8a8279;
+      line-height: 1;
+    }
+  }
+
+  .amount-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+
+    .amount-symbol {
+      font-size: 36px;
+      color: #a89878;
+      font-weight: 300;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .amount-input {
+      flex: 1;
+      font-size: 48px;
+      color: #a89878;
+      font-weight: 500;
+      font-family: 'Shippori Mincho B1', serif;
+      letter-spacing: 1px;
+      min-height: 60px;
+      line-height: 60px;
+    }
+  }
+
+  .category-section {
+    margin-bottom: 28px;
+
+    .type-tabs {
+      display: flex;
+      border: 1px solid rgba(44, 44, 44, 0.08);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 16px;
+
+      .tab {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 0;
+        background: transparent;
+        transition: all 0.3s ease;
+
+        &.active {
+          background: #2c2c2c;
+
+          .tab-text {
+            color: #faf8f4;
+          }
+        }
+
+        &:active:not(.active) {
+          background: rgba(44, 44, 44, 0.04);
+        }
+
+        .tab-text {
+          font-size: 26px;
+          color: #8a8279;
+          font-family: 'Noto Serif SC', serif;
+          letter-spacing: 4px;
+        }
+      }
+    }
+
+    .category-scroll {
+      white-space: nowrap;
+    }
+
+    .category-row {
+      display: inline-flex;
+      gap: 12px;
+      padding: 4px 0;
+
+      .cat-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 22px;
+        border: 1px solid rgba(44, 44, 44, 0.08);
+        border-radius: 2px;
+        background: transparent;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+
+        &.active {
+          background: #2c2c2c;
+          border-color: #2c2c2c;
+
+          .cat-chip-text {
+            color: #faf8f4;
+          }
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        .cat-chip-text {
+          font-size: 24px;
+          color: #5c5650;
+          font-family: 'Noto Serif SC', serif;
+          letter-spacing: 2px;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+
+  .date-row {
+    margin-bottom: 24px;
+
+    .date-label {
+      display: block;
+      font-size: 22px;
+      color: #8a8279;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 400;
+    }
+
+    .date-picker {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 20px;
+      background: #f5f0e8;
+      border: 1px solid rgba(44, 44, 44, 0.12);
+      border-radius: 2px;
+
+      .date-value {
+        font-size: 28px;
+        color: #2c2c2c;
+        font-family: 'Shippori Mincho B1', serif;
+        font-weight: 400;
+        letter-spacing: 1px;
+      }
+
+      .date-arrow {
+        font-size: 32px;
+        color: #a89878;
+        font-weight: 300;
+      }
+    }
+  }
+
+  .note-row {
+    margin-bottom: 28px;
+
+    .note-label {
+      display: block;
+      font-size: 22px;
+      color: #8a8279;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 400;
+    }
+
+    .note-input {
+      width: 100%;
+      padding: 20px;
+      background: #f5f0e8;
+      border: 1px solid rgba(44, 44, 44, 0.12);
+      border-radius: 2px;
+      font-size: 28px;
+      color: #2c2c2c;
+      font-family: 'Noto Serif SC', serif;
+      box-sizing: border-box;
+      min-height: 80px;
+    }
+  }
+
+  .submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 0;
+    background: #2c2c2c;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+
+    &.disabled {
+      opacity: 0.4;
+    }
+
+    &:active:not(.disabled) {
+      transform: scale(0.97);
+      background: #5c5650;
+    }
+
+    .submit-text {
+      font-size: 28px;
+      color: #faf8f4;
+      letter-spacing: 6px;
+      font-family: 'Noto Serif SC', serif;
+      font-weight: 400;
+    }
+  }
+}
+
+@keyframes formFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// 记忆笔按钮
+.memory-pen-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 28px 0;
+  margin-bottom: 28px;
+  background: #faf8f4;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.97);
+    background: #f0e8d8;
+  }
+
+  .memory-pen-icon {
+    font-size: 32px;
+    color: #a89878;
+    line-height: 1;
+  }
+
+  .memory-pen-text {
+    font-size: 28px;
+    color: #5c5650;
+    font-family: 'Noto Serif SC', serif;
+    letter-spacing: 6px;
+    font-weight: 400;
+  }
+}
+
+// ========== 近7日柱状图 ==========
+.chart-section {
+  position: relative;
+  z-index: 1;
+  background: #faf8f4;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 2px;
+  padding: 24px;
+  margin-bottom: 28px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .chart-title {
+    font-size: 24px;
+    color: #2c2c2c;
+    font-weight: 500;
+    letter-spacing: 4px;
+    font-family: 'Noto Serif SC', serif;
+  }
+}
+
+.chart-toggle {
+  display: flex;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+
+  .toggle-btn {
+    padding: 8px 16px;
+    background: transparent;
+    transition: all 0.3s ease;
+
+    &.active {
+      background: #2c2c2c;
+
+      .toggle-text {
+        color: #faf8f4;
+      }
+    }
+
+    .toggle-text {
+      font-size: 22px;
+      color: #8a8279;
+      font-family: 'Noto Serif SC', serif;
+      letter-spacing: 2px;
+    }
+  }
+}
+
+.chart-body {
+  display: flex;
+  gap: 8px;
+  height: 240px;
+}
+
+.chart-y-axis {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 60px;
+  flex-shrink: 0;
+  padding-bottom: 28px;
+
+  .y-label {
+    font-size: 18px;
+    color: #8a8279;
+    font-family: 'Shippori Mincho B1', serif;
+    text-align: right;
+  }
+}
+
+.chart-bars {
+  flex: 1;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  padding-bottom: 28px;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 28px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(44, 44, 44, 0.08);
+  }
+}
+
+.chart-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  height: 100%;
+  justify-content: flex-end;
+
+  .bar-value {
+    font-size: 18px;
+    color: #8a8279;
+    font-family: 'Shippori Mincho B1', serif;
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  .bar-track {
+    width: 20px;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+
+    .bar-fill {
+      width: 100%;
+      border-radius: 2px 2px 0 0;
+      transition: height 0.4s ease;
+      min-height: 2px;
+
+      &.expense {
+        background: rgba(184, 84, 80, 0.5);
+      }
+
+      &.income {
+        background: rgba(122, 140, 110, 0.5);
+      }
+    }
+  }
+
+  .bar-label {
+    font-size: 18px;
+    color: #8a8279;
+    font-family: 'Noto Serif SC', serif;
+    margin-top: 8px;
+    letter-spacing: 1px;
+  }
+}
+
+.chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .chart-empty-text {
+    font-size: 24px;
+    color: #8a8279;
+    letter-spacing: 4px;
+    font-family: 'Noto Serif SC', serif;
+    opacity: 0.5;
+  }
+}
+
+// 记录列表
+.records-section {
+  .records-title {
+    display: block;
+    font-size: 24px;
+    color: #8a8279;
+    letter-spacing: 4px;
+    margin-bottom: 16px;
+    padding-left: 4px;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+  }
+
+  .record-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 16px;
+    background: #faf8f4;
+    border: 1px solid rgba(44, 44, 44, 0.08);
+    border-radius: 2px;
+    margin-bottom: 10px;
+
+    .record-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+      min-width: 0;
+
+      .record-category-badge {
+        padding: 6px 12px;
+        background: rgba(200, 185, 154, 0.12);
+        border-radius: 2px;
+        flex-shrink: 0;
+
+        .record-category {
+          font-size: 20px;
+          color: #a89878;
+          font-family: 'Noto Serif SC', serif;
+          letter-spacing: 1px;
+        }
+      }
+
+      .record-info {
+        min-width: 0;
+
+        .record-note {
+          display: block;
+          font-size: 26px;
+          color: #2c2c2c;
+          font-family: 'Noto Serif SC', serif;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .record-time {
+          display: block;
+          font-size: 20px;
+          color: #8a8279;
+          margin-top: 4px;
+          font-family: 'Noto Serif SC', serif;
+        }
+      }
+    }
+
+    .record-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+
+      .record-amount {
+        font-size: 28px;
+        font-weight: 500;
+        font-family: 'Shippori Mincho B1', serif;
+
+        &.positive { color: #7a8c6e; }
+        &.negative { color: #2c2c2c; }
+      }
+
+      .record-delete {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .record-delete-icon {
+          font-size: 28px;
+          color: #b85450;
+          opacity: 0.5;
+        }
+
+        &:active .record-delete-icon {
+          opacity: 1;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+// 动画数字 — 逐字符从下往上渐入渐出
+.animated-number {
+  display: inline-flex;
+  overflow: hidden;
+  vertical-align: bottom;
+  line-height: 1;
+}
+
+.animated-char {
+  display: inline-block;
+  line-height: 1;
+}
+
+// 仅在 char-slide-up class 存在时触发动画
+.animated-char.char-slide-up {
+  animation: charSlideUp 0.25s ease-out both;
+}
+
+// 每个字符依次延迟，形成波浪效果
+.animated-char:nth-child(1).char-slide-up { animation-delay: 0ms; }
+.animated-char:nth-child(2).char-slide-up { animation-delay: 15ms; }
+.animated-char:nth-child(3).char-slide-up { animation-delay: 30ms; }
+.animated-char:nth-child(4).char-slide-up { animation-delay: 45ms; }
+.animated-char:nth-child(5).char-slide-up { animation-delay: 60ms; }
+.animated-char:nth-child(6).char-slide-up { animation-delay: 75ms; }
+.animated-char:nth-child(7).char-slide-up { animation-delay: 90ms; }
+.animated-char:nth-child(8).char-slide-up { animation-delay: 105ms; }
+.animated-char:nth-child(9).char-slide-up { animation-delay: 120ms; }
+.animated-char:nth-child(10).char-slide-up { animation-delay: 135ms; }
+.animated-char:nth-child(11).char-slide-up { animation-delay: 150ms; }
+.animated-char:nth-child(12).char-slide-up { animation-delay: 165ms; }
+.animated-char:nth-child(13).char-slide-up { animation-delay: 180ms; }
+.animated-char:nth-child(14).char-slide-up { animation-delay: 195ms; }
+.animated-char:nth-child(15).char-slide-up { animation-delay: 210ms; }
+.animated-char:nth-child(16).char-slide-up { animation-delay: 225ms; }
+.animated-char:nth-child(17).char-slide-up { animation-delay: 240ms; }
+.animated-char:nth-child(18).char-slide-up { animation-delay: 255ms; }
+.animated-char:nth-child(19).char-slide-up { animation-delay: 270ms; }
+.animated-char:nth-child(20).char-slide-up { animation-delay: 285ms; }
+
+@keyframes charSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

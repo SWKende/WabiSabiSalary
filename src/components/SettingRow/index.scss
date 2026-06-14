@@ -1,0 +1,49 @@
+// 设置行 — 用于设置面板
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .setting-label {
+    font-size: 28px;
+    color: #2c2c2c;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+    letter-spacing: 2px;
+    flex-shrink: 0;
+  }
+
+  .setting-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f5f0e8;
+    border: 1px solid rgba(44, 44, 44, 0.08);
+    padding: 14px 18px;
+    min-width: 150px;
+    justify-content: flex-end;
+  }
+
+  .setting-input {
+    width: 100px;
+    text-align: right;
+    font-size: 28px;
+    color: #2c2c2c;
+    font-family: 'Shippori Mincho B1', serif;
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  .setting-suffix {
+    font-size: 22px;
+    color: #8a8279;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 300;
+  }
+}

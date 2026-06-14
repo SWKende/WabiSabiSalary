@@ -1,443 +1,14 @@
-import { View, Text, Input, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
+import { View, Text, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Taro from '@tarojs/taro'
-import DatePicker from '../../components/DatePicker'
+import AnimatedNumber from '../../components/AnimatedNumber'
+import CustomNavBar from '../../components/CustomNavBar'
+import SettingRow from '../../components/SettingRow'
+import BookkeepingPage from '../../components/Bookkeeping'
+import { DEFAULT_CONFIG, SalaryConfig } from '../../constants/salary'
+import { formatMoney2, formatMoney4 } from '../../utils/format'
+import { getWindowInfo } from '../../utils/window'
 import './index.scss'
-
-// 默认配置
-const DEFAULT_CONFIG = {
-  monthlySalary: 3000,
-  workDaysPerMonth: 30,
-  workHoursPerDay: 8,
-  workStartHour: 8,
-  workEndHour: 16,
-  payday: 1,
-}
-
-interface SalaryConfig {
-  monthlySalary: number
-  workDaysPerMonth: number
-  workHoursPerDay: number
-  workStartHour: number
-  workEndHour: number
-  payday: number
-}
-
-// 格式化：固定小数位，避免 toLocaleString 的不确定性
-function formatMoney2(amount: number): string {
-  return amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-}
-
-function formatMoney4(amount: number): string {
-  return amount.toFixed(4)
-}
-
-// 单个字符位 — 独立检测变化并触发动画
-// 使用 View 包裹而非 Text，避免 Taro Text 组件对 children key 的干扰
-function DigitSlot({ char }: { char: string }) {
-  const [animating, setAnimating] = useState(false)
-  const prevRef = useRef(char)
-
-  useEffect(() => {
-    if (char !== prevRef.current) {
-      prevRef.current = char
-      setAnimating(false)
-      const raf = requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          setAnimating(true)
-        })
-      })
-      return () => cancelAnimationFrame(raf)
-    }
-  }, [char])
-
-  return (
-    <View className={`animated-char ${animating ? 'char-slide-up' : ''}`}>
-      {char}
-    </View>
-  )
-}
-
-// 动画数字组件 — 按数字位独立控制，仅变化的位触发动画
-function AnimatedNumber({ value, className }: { value: string; className?: string }) {
-  // 直接按字符拆分，每个字符一个独立槽位
-  // key 使用 "pos-" 前缀 + 绝对位置索引，确保唯一且稳定
-  const chars = useMemo(() => {
-    return value.split('').map((char, i) => ({
-      char,
-      key: `pos-${i}`,
-    }))
-  }, [value])
-
-  return (
-    <View className={`animated-number ${className || ''}`}>
-      {chars.map((item) => (
-        <DigitSlot key={item.key} char={item.char} />
-      ))}
-    </View>
-  )
-}
-
-// 设置面板项
-function SettingRow({ label, value, onChange, suffix }: {
-  label: string
-  value: string
-  onChange: (v: string) => void
-  suffix?: string
-}) {
-  return (
-    <View className='setting-row'>
-      <Text className='setting-label'>{label}</Text>
-      <View className='setting-input-wrap'>
-        <Input
-          className='setting-input'
-          type='number'
-          value={value}
-          onInput={(e) => onChange(e.detail.value)}
-        />
-        {suffix && <Text className='setting-suffix'>{suffix}</Text>}
-      </View>
-    </View>
-  )
-}
-
-// 获取窗口信息（兼容新旧版本基础库）
-function getWindowInfo() {
-  try {
-    if (typeof Taro.getWindowInfo === 'function') {
-      return Taro.getWindowInfo()
-    }
-  } catch { /* ignore */ }
-  // 回退：旧版 API
-  const fallback = Taro.getSystemInfoSync()
-  return { statusBarHeight: fallback.statusBarHeight ?? 20, windowWidth: fallback.windowWidth ?? 375 }
-}
-
-// 自定义导航栏 — 适配微信小程序胶囊按钮
-function CustomNavBar({ timeStr, isWorking, capsuleRight, hasCapsule }: {
-  timeStr: string
-  isWorking: boolean
-  capsuleRight: number
-  hasCapsule: boolean
-}) {
-  const windowInfo = getWindowInfo()
-  const statusBarHeight = windowInfo.statusBarHeight ?? 20
-
-  // 胶囊按钮位置（CSS 像素）
-  let capsuleTop = statusBarHeight + 4
-  let capsuleBottom = statusBarHeight + 36
-  try {
-    const rect = Taro.getMenuButtonBoundingClientRect()
-    if (rect && rect.width > 0) {
-      capsuleTop = rect.top
-      capsuleBottom = rect.bottom
-    }
-  } catch { /* ignore */ }
-
-  // 胶囊垂直中心（相对状态栏底部）
-  const capsuleCenterOffset = (capsuleTop + capsuleBottom) / 2 - statusBarHeight
-  // 导航内容区高度 = 胶囊中心偏移 × 2（上下对称，flex 居中后正好对齐胶囊中心）
-  const navContentHeight = capsuleCenterOffset * 2
-
-  return (
-    <View className='custom-nav-bar'>
-      {/* 状态栏占位 */}
-      <View className='nav-status-spacer' style={{ height: `${statusBarHeight}px` }} />
-      {/* 导航内容 */}
-      <View
-        className={`nav-content ${hasCapsule ? 'nav-capsule' : ''}`}
-        style={{
-          height: `${navContentHeight}px`,
-          paddingRight: hasCapsule ? `${capsuleRight}px` : '4px',
-        }}
-      >
-        {!hasCapsule && <Text className='status-time'>{timeStr}</Text>}
-        <View className={`status-badge ${isWorking ? 'working' : 'resting'}`}>
-          <View className='status-dot' />
-          <Text className='status-text'>{isWorking ? '稼働中' : '休憩中'}</Text>
-        </View>
-      </View>
-    </View>
-  )
-}
-
-// 记账记录类型
-interface BookkeepingRecord {
-  id: number
-  type: 'expense' | 'income'
-  amount: string
-  note: string
-  category: string
-  time: string
-}
-
-// 旧数据迁移：无 type 字段时根据 category 推断
-function migrateRecord(r: any): BookkeepingRecord {
-  if (r.type) return r as BookkeepingRecord
-  return {
-    ...r,
-    type: (r.category === '收入' || r.category === '収入') ? 'income' : 'expense',
-  }
-}
-
-// 记账页面组件
-function BookkeepingPage() {
-  const [amount, setAmount] = useState('')
-  const [note, setNote] = useState('')
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
-  const [showDatePicker, setShowDatePicker] = useState(false)
-  const [showForm, setShowForm] = useState(false)
-  const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
-  const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
-
-  const [activeType, setActiveType] = useState<'expense' | 'income'>('expense')
-  const [category, setCategory] = useState(expenseCategories[0])
-  const [records, setRecords] = useState<BookkeepingRecord[]>(() => {
-    try {
-      const saved = Taro.getStorageSync('bookkeeping_records')
-      return saved ? (saved as any[]).filter(Boolean).map(migrateRecord) : []
-    } catch { return [] }
-  })
-
-  const handleTypeSwitch = (type: 'expense' | 'income') => {
-    setActiveType(type)
-    setCategory(type === 'expense' ? expenseCategories[0] : incomeCategories[0])
-  }
-
-  const handleSubmit = () => {
-    if (!amount) return
-    const newRecord: BookkeepingRecord = {
-      id: Date.now(),
-      type: activeType,
-      amount,
-      note: note || category,
-      category,
-      time: new Date(selectedDate + 'T12:00:00').toISOString(),
-    }
-    const updated = [newRecord, ...records]
-    setRecords(updated)
-    try { Taro.setStorageSync('bookkeeping_records', updated) } catch {}
-    setAmount('')
-    setNote('')
-    setSelectedDate(new Date().toISOString().split('T')[0])
-    setShowForm(false)
-    Taro.showToast({ title: '已記錄', icon: 'success' })
-  }
-
-  const handleDelete = (id: number) => {
-    const updated = records.filter(r => r.id !== id)
-    setRecords(updated)
-    try { Taro.setStorageSync('bookkeeping_records', updated) } catch {}
-  }
-
-  const monthTotal = useMemo(() => {
-    const now = new Date()
-    const monthRecords = records.filter(r => {
-      const d = new Date(r.time)
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
-    })
-    const income = monthRecords.filter(r => r.type === 'income').reduce((s, r) => s + (parseFloat(r.amount) || 0), 0)
-    const expense = monthRecords.filter(r => r.type === 'expense').reduce((s, r) => s + (parseFloat(r.amount) || 0), 0)
-    return income - expense
-  }, [records])
-
-  // 近7日柱状图数据
-  const [chartType, setChartType] = useState<'expense' | 'income'>('expense')
-
-  const chartData = useMemo(() => {
-    const days: { date: string; label: string; total: number }[] = []
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date()
-      d.setDate(d.getDate() - i)
-      const dateStr = d.toISOString().split('T')[0]
-      const label = `${d.getMonth() + 1}/${d.getDate()}`
-      const dayTotal = records
-        .filter(r => r.type === chartType && r.time.startsWith(dateStr))
-        .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
-      days.push({ date: dateStr, label, total: dayTotal })
-    }
-    const maxVal = Math.max(...days.map(d => d.total), 1)
-    return { days, maxVal }
-  }, [records, chartType])
-
-  return (
-    <View className='bookkeeping-page'>
-      <View className='bookkeeping-header'>
-        <Text className='bookkeeping-title'>記 帳</Text>
-        <View className='bookkeeping-summary'>
-          <Text className='summary-label'>本月收支</Text>
-          <Text className={`summary-value ${monthTotal >= 0 ? 'positive' : 'negative'}`}>
-            {monthTotal >= 0 ? '+' : ''}{monthTotal.toFixed(2)}
-          </Text>
-        </View>
-      </View>
-
-      {/* 记忆笔按钮 / 表单卡片 */}
-      {!showForm ? (
-        <View className='memory-pen-btn' onClick={() => setShowForm(true)}>
-          <Text className='memory-pen-text'>記 一 筆</Text>
-        </View>
-      ) : (
-      <View className='bookkeeping-form'>
-        <View className='form-card'>
-          <View className='form-close-btn' onClick={() => setShowForm(false)}>
-            <Text className='form-close-icon'>✕</Text>
-          </View>
-          <View className='amount-row'>
-            <Text className='amount-symbol'>¥</Text>
-            <Input
-              className='amount-input'
-              type='digit'
-              placeholder='請輸入金額'
-              placeholderStyle='font-size: 28px; color: #a89878;'
-              value={amount}
-              onInput={(e) => setAmount(e.detail.value)}
-            />
-          </View>
-
-          <View className='category-section'>
-            <View className='type-tabs'>
-              <View
-                className={`tab ${activeType === 'expense' ? 'active' : ''}`}
-                onClick={() => handleTypeSwitch('expense')}
-              >
-                <Text className='tab-text'>支 出</Text>
-              </View>
-              <View
-                className={`tab ${activeType === 'income' ? 'active' : ''}`}
-                onClick={() => handleTypeSwitch('income')}
-              >
-                <Text className='tab-text'>收 入</Text>
-              </View>
-            </View>
-            <ScrollView scrollX className='category-scroll'>
-              <View className='category-row'>
-                {(activeType === 'expense' ? expenseCategories : incomeCategories).map(cat => (
-                  <View
-                    key={cat}
-                    className={`cat-chip ${category === cat ? 'active' : ''}`}
-                    onClick={() => setCategory(cat)}
-                  >
-                    <Text className='cat-chip-text'>{cat}</Text>
-                  </View>
-                ))}
-              </View>
-            </ScrollView>
-          </View>
-
-          {/* 日期选择器 */}
-          <View className='date-row'>
-            <Text className='date-label'>日期</Text>
-            <View className='date-picker' onClick={() => setShowDatePicker(true)}>
-              <Text className='date-value'>{selectedDate}</Text>
-              <Text className='date-arrow'>›</Text>
-            </View>
-          </View>
-
-          <View className='note-row'>
-            <Text className='note-label'>備註</Text>
-            <Input
-              className='note-input'
-              placeholder='備註（選填）'
-              value={note}
-              onInput={(e) => setNote(e.detail.value)}
-            />
-          </View>
-
-          <View
-            className={`submit-btn ${!amount ? 'disabled' : ''}`}
-            onClick={handleSubmit}
-          >
-            <Text className='submit-text'>記 錄</Text>
-          </View>
-        </View>
-      </View>
-      )}
-
-      {/* 近7日柱状图 */}
-      <View className='chart-section'>
-        <View className='chart-header'>
-          <Text className='chart-title'>近 7 日</Text>
-          <View className='chart-toggle'>
-            <View
-              className={`toggle-btn ${chartType === 'expense' ? 'active' : ''}`}
-              onClick={() => setChartType('expense')}
-            >
-              <Text className='toggle-text'>支出</Text>
-            </View>
-            <View
-              className={`toggle-btn ${chartType === 'income' ? 'active' : ''}`}
-              onClick={() => setChartType('income')}
-            >
-              <Text className='toggle-text'>收入</Text>
-            </View>
-          </View>
-        </View>
-
-        <View className='chart-body'>
-          <View className='chart-y-axis'>
-            <Text className='y-label'>{chartData.maxVal > 0 ? chartData.maxVal.toFixed(0) : '0'}</Text>
-            <Text className='y-label'>{chartData.maxVal > 0 ? (chartData.maxVal / 2).toFixed(0) : '0'}</Text>
-            <Text className='y-label'>0</Text>
-          </View>
-          <View className='chart-bars'>
-            {chartData.days.map((day, i) => (
-              <View key={i} className='chart-bar-col'>
-                <Text className='bar-value'>{day.total > 0 ? day.total.toFixed(0) : ''}</Text>
-                <View className='bar-track'>
-                  <View
-                    className={`bar-fill ${chartType}`}
-                    style={{ height: chartData.maxVal > 0 ? `${(day.total / chartData.maxVal) * 100}%` : '0%' }}
-                  />
-                </View>
-                <Text className='bar-label'>{day.label}</Text>
-              </View>
-            ))}
-            {chartData.days.every(d => d.total === 0) && (
-              <View className='chart-empty'>
-                <Text className='chart-empty-text'>尚無記錄</Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </View>
-
-      {records.length > 0 && (
-        <View className='records-section'>
-          <Text className='records-title'>最近記錄</Text>
-          {records.slice(0, 20).map(record => (
-            <View key={record.id} className='record-item'>
-              <View className='record-left'>
-                <View className='record-category-badge'>
-                  <Text className='record-category'>{record.category}</Text>
-                </View>
-                <View className='record-info'>
-                  <Text className='record-note'>{record.note}</Text>
-                  <Text className='record-time'>{record.time}</Text>
-                </View>
-              </View>
-              <View className='record-right'>
-                <Text className={`record-amount ${record.type === 'income' ? 'positive' : 'negative'}`}>
-                  {record.type === 'income' ? '+' : '-'}¥{record.amount}
-                </Text>
-                <View className='record-delete' onClick={() => handleDelete(record.id)}>
-                  <Text className='record-delete-icon'>×</Text>
-                </View>
-              </View>
-            </View>
-          ))}
-        </View>
-      )}
-      {/* 自定义日期选择器 */}
-      <DatePicker
-        visible={showDatePicker}
-        value={selectedDate}
-        onConfirm={(date) => { setSelectedDate(date); setShowDatePicker(false) }}
-        onCancel={() => setShowDatePicker(false)}
-      />
-    </View>
-  )
-}
 
 export default function Index() {
   // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
@@ -451,7 +22,9 @@ export default function Index() {
           hasCapsule: true,
         }
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return { capsuleRight: 0, hasCapsule: false }
   }, [])
 
@@ -497,7 +70,7 @@ export default function Index() {
       const sec = now.getSeconds()
       if (sec !== lastSecondRef.current) {
         lastSecondRef.current = sec
-        setTick(t => t + 1)
+        setTick((t) => t + 1)
       }
     }, 200) // 200ms 检查一次，确保不漏秒
 
@@ -538,7 +111,7 @@ export default function Index() {
     }
 
     const workProgress = isWorking
-      ? ((hour - workStartHour) * 3600 + minute * 60 + second) / (workHoursPerDay * 3600) * 100
+      ? (((hour - workStartHour) * 3600 + minute * 60 + second) / (workHoursPerDay * 3600)) * 100
       : hour >= workEndHour ? 100 : 0
 
     let nextPayday: Date
@@ -567,14 +140,31 @@ export default function Index() {
     setConfig(newConfig)
     try {
       Taro.setStorageSync('salary_config', newConfig)
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, [])
 
-  // 设置面板输入处理
-  const [editForm, setEditForm] = useState<SalaryConfig>(config)
+  // 设置面板输入处理 — 编辑态用字符串类型，与 SettingRow 的 onChange 对齐
+  type EditForm = { [K in keyof SalaryConfig]: string }
+  const [editForm, setEditForm] = useState<EditForm>(() => ({
+    monthlySalary: String(config.monthlySalary),
+    workDaysPerMonth: String(config.workDaysPerMonth),
+    workHoursPerDay: String(config.workHoursPerDay),
+    workStartHour: String(config.workStartHour),
+    workEndHour: String(config.workEndHour),
+    payday: String(config.payday),
+  }))
 
   const openSettings = useCallback(() => {
-    setEditForm({ ...config })
+    setEditForm({
+      monthlySalary: String(config.monthlySalary),
+      workDaysPerMonth: String(config.workDaysPerMonth),
+      workHoursPerDay: String(config.workHoursPerDay),
+      workStartHour: String(config.workStartHour),
+      workEndHour: String(config.workEndHour),
+      payday: String(config.payday),
+    })
     setShowSettings(true)
   }, [config])
 
@@ -584,7 +174,10 @@ export default function Index() {
 
   const applySettings = useCallback(() => {
     // 用 NaN 检查替代 ||，避免 0 被当作 falsy 回退到默认值
-    const n = (v: string) => { const x = Number(v); return isNaN(x) ? undefined : x }
+    const n = (v: string) => {
+      const x = Number(v)
+      return isNaN(x) ? undefined : x
+    }
     const parsed: SalaryConfig = {
       monthlySalary: n(editForm.monthlySalary) ?? DEFAULT_CONFIG.monthlySalary,
       workDaysPerMonth: Math.max(1, n(editForm.workDaysPerMonth) ?? DEFAULT_CONFIG.workDaysPerMonth),
@@ -598,7 +191,14 @@ export default function Index() {
   }, [editForm, saveConfig])
 
   const resetSettings = useCallback(() => {
-    setEditForm({ ...DEFAULT_CONFIG })
+    setEditForm({
+      monthlySalary: String(DEFAULT_CONFIG.monthlySalary),
+      workDaysPerMonth: String(DEFAULT_CONFIG.workDaysPerMonth),
+      workHoursPerDay: String(DEFAULT_CONFIG.workHoursPerDay),
+      workStartHour: String(DEFAULT_CONFIG.workStartHour),
+      workEndHour: String(DEFAULT_CONFIG.workEndHour),
+      payday: String(DEFAULT_CONFIG.payday),
+    })
   }, [])
 
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
@@ -608,12 +208,14 @@ export default function Index() {
   const scrollHeight = useMemo(() => {
     const windowInfo = getWindowInfo()
     const wh = (windowInfo as any).windowHeight ?? 812
-    let navH = (windowInfo.statusBarHeight ?? 20)
+    let navH = windowInfo.statusBarHeight ?? 20
     try {
       const rect = Taro.getMenuButtonBoundingClientRect()
       if (rect && rect.width > 0) navH = rect.bottom + 4
       else navH += 44
-    } catch { navH += 44 }
+    } catch {
+      navH += 44
+    }
     const indicatorH = 36
     return wh - navH - indicatorH
   }, [])
@@ -649,7 +251,12 @@ export default function Index() {
                 <View className='hero-progress-bg'>
                   <View
                     className='hero-progress-fill'
-                    style={{ width: `${Math.min(100, (parseFloat(timeInfo.monthEarnedStr.replace(/,/g, '')) / config.monthlySalary) * 100)}%` }}
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        (parseFloat(timeInfo.monthEarnedStr.replace(/,/g, '')) / config.monthlySalary) * 100
+                      )}%`,
+                    }}
                   />
                 </View>
                 <Text className='hero-target'>目標 ¥{config.monthlySalary.toLocaleString()}</Text>
@@ -667,7 +274,10 @@ export default function Index() {
               </View>
 
               {/* 薪资明细 — 卷轴 */}
-              <View className={`detail-card ${showDetail ? 'expanded' : ''}`} onClick={() => setShowDetail(!showDetail)}>
+              <View
+                className={`detail-card ${showDetail ? 'expanded' : ''}`}
+                onClick={() => setShowDetail(!showDetail)}
+              >
                 <View className='detail-header'>
                   <Text className='detail-title'>薪 賄 明 細</Text>
                   <Text className='detail-arrow'>{showDetail ? '▲' : '▼'}</Text>
@@ -742,7 +352,9 @@ export default function Index() {
 
               {/* 底部 */}
               <View className='footer-info'>
-                <Text className='footer-text'>每月{config.payday}日給与 · {startStr}-{endStr}</Text>
+                <Text className='footer-text'>
+                  每月{config.payday}日給与 · {startStr}-{endStr}
+                </Text>
               </View>
 
               {/* 底部安全区占位 */}
@@ -786,19 +398,19 @@ export default function Index() {
                 <Text className='settings-section-title'>薪 賄</Text>
                 <SettingRow
                   label='月薪'
-                  value={String(editForm.monthlySalary)}
+                  value={editForm.monthlySalary}
                   onChange={(v) => setEditForm({ ...editForm, monthlySalary: v })}
                   suffix='元'
                 />
                 <SettingRow
                   label='月工作天数'
-                  value={String(editForm.workDaysPerMonth)}
+                  value={editForm.workDaysPerMonth}
                   onChange={(v) => setEditForm({ ...editForm, workDaysPerMonth: v })}
                   suffix='天'
                 />
                 <SettingRow
                   label='日工作时长'
-                  value={String(editForm.workHoursPerDay)}
+                  value={editForm.workHoursPerDay}
                   onChange={(v) => setEditForm({ ...editForm, workHoursPerDay: v })}
                   suffix='时'
                 />
@@ -810,19 +422,19 @@ export default function Index() {
                 <Text className='settings-section-title'>時 間</Text>
                 <SettingRow
                   label='上班时间'
-                  value={String(editForm.workStartHour)}
+                  value={editForm.workStartHour}
                   onChange={(v) => setEditForm({ ...editForm, workStartHour: v })}
                   suffix='时'
                 />
                 <SettingRow
                   label='下班时间'
-                  value={String(editForm.workEndHour)}
+                  value={editForm.workEndHour}
                   onChange={(v) => setEditForm({ ...editForm, workEndHour: v })}
                   suffix='时'
                 />
                 <SettingRow
                   label='发薪日'
-                  value={String(editForm.payday)}
+                  value={editForm.payday}
                   onChange={(v) => setEditForm({ ...editForm, payday: v })}
                   suffix='日'
                 />

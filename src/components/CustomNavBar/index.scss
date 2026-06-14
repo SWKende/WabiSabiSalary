@@ -1,0 +1,79 @@
+// 自定义导航栏 — 适配胶囊按钮
+.custom-nav-bar {
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 0 20px;
+  box-sizing: border-box;
+
+  .nav-status-spacer {
+    width: 100%;
+  }
+
+  .nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding-left: 4px;
+
+    &.nav-capsule {
+      justify-content: flex-start;
+    }
+  }
+}
+
+// 导航栏内复用状态元素
+.status-time {
+  font-size: 26px;
+  font-weight: 300;
+  color: #5c5650;
+  font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
+  letter-spacing: 4px;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 2px;
+  font-size: 24px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  transition: all 0.6s ease;
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: dotBreath 4s ease-in-out infinite;
+  }
+
+  &.working {
+    background: rgba(122, 140, 110, 0.08);
+    border: 1px solid rgba(122, 140, 110, 0.15);
+    color: #5a6b50;
+
+    .status-dot {
+      background: #a3b496;
+    }
+  }
+
+  &.resting {
+    background: rgba(184, 84, 80, 0.12);
+    border: 1px solid rgba(184, 84, 80, 0.12);
+    color: #b85450;
+
+    .status-dot {
+      background: #b85450;
+      animation: none;
+    }
+  }
+}
+
+@keyframes dotBreath {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
