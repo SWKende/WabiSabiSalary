@@ -658,3 +658,58 @@
     }
   }
 }
+
+// ========== 记账设置弹窗 — 开关行 + 缩略图 ==========
+.bk-setting-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.bk-setting-label {
+  flex: 1;
+  font-size: 28px;
+  color: #2c2c2c;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 400;
+  letter-spacing: 2px;
+}
+
+// 迷你柱状图缩略图
+.mini-bar-chart {
+  width: 48px;
+  height: 32px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+
+  .mini-bar {
+    flex: 1;
+    border-radius: 1px 1px 0 0;
+    background: rgba(184, 84, 80, 0.4);
+  }
+
+  &.mini-bar-monthly {
+    gap: 2px;
+
+    .mini-bar {
+      background: rgba(200, 185, 154, 0.5);
+    }
+  }
+}
+
+// 迷你饼状图缩略图
+.mini-pie-chart {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: conic-gradient(#b85450 0% 35%, #c8b99a 35% 55%, #7a8c6e 55% 75%, #a89878 75% 100%);
+}

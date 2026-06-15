@@ -2,7 +2,16 @@ import { View, Text, Input, ScrollView } from '@tarojs/components'
 import { useState, useMemo } from 'react'
 import Taro from '@tarojs/taro'
 import DatePicker from '../DatePicker'
+import MonthlyBarChart from '../MonthlyBarChart'
+import MonthlyPieChart from '../MonthlyPieChart'
 import './index.scss'
+
+// 记账设置类型
+export interface BookkeepingSettings {
+  showWeeklyBar: boolean
+  showMonthlyBar: boolean
+  showMonthlyPie: boolean
+}
 
 // 记账记录类型
 export interface BookkeepingRecord {
@@ -24,7 +33,7 @@ function migrateRecord(r: any): BookkeepingRecord {
 }
 
 // 记账页面组件
-export default function BookkeepingPage() {
+export default function BookkeepingPage({ bkSettings }: { bkSettings: BookkeepingSettings }) {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
@@ -213,6 +222,7 @@ export default function BookkeepingPage() {
       )}
 
       {/* 近7日柱状图 */}
+      {bkSettings.showWeeklyBar && (
       <View className='chart-section'>
         <View className='chart-header'>
           <Text className='chart-title'>近 7 日</Text>
@@ -261,6 +271,13 @@ export default function BookkeepingPage() {
           </View>
         </View>
       </View>
+      )}
+
+      {/* 月度柱状图 */}
+      {bkSettings.showMonthlyBar && <MonthlyBarChart records={records} />}
+
+      {/* 月度饼状图 */}
+      {bkSettings.showMonthlyPie && <MonthlyPieChart records={records} />}
 
       {records.length > 0 && (
         <View className='records-section'>

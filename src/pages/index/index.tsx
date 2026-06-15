@@ -1,14 +1,21 @@
-import { View, Text, ScrollView, Swiper, SwiperItem } from '@tarojs/components'
+import { View, Text, ScrollView, Swiper, SwiperItem, Switch } from '@tarojs/components'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Taro from '@tarojs/taro'
 import AnimatedNumber from '../../components/AnimatedNumber'
 import CustomNavBar from '../../components/CustomNavBar'
 import SettingRow from '../../components/SettingRow'
 import BookkeepingPage from '../../components/Bookkeeping'
+import type { BookkeepingSettings } from '../../components/Bookkeeping'
 import { DEFAULT_CONFIG, SalaryConfig } from '../../constants/salary'
 import { formatMoney2, formatMoney4 } from '../../utils/format'
 import { getWindowInfo } from '../../utils/window'
 import './index.scss'
+
+const DEFAULT_BK_SETTINGS: BookkeepingSettings = {
+  showWeeklyBar: true,
+  showMonthlyBar: true,
+  showMonthlyPie: true,
+}
 
 export default function Index() {
   // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
@@ -39,6 +46,15 @@ export default function Index() {
   const [showDetail, setShowDetail] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
+  const [showBkSettings, setShowBkSettings] = useState(false)
+  const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
+    try {
+      const saved = Taro.getStorageSync('bookkeeping_settings')
+      return saved ? { ...DEFAULT_BK_SETTINGS, ...saved } : DEFAULT_BK_SETTINGS
+    } catch {
+      return DEFAULT_BK_SETTINGS
+    }
+  })
 
   // 用 ref 存储实时数据，避免每秒 setState 导致整个组件树重渲染
   const timeInfoRef = useRef({
@@ -170,6 +186,26 @@ export default function Index() {
 
   const closeSettings = useCallback(() => {
     setShowSettings(false)
+  }, [])
+
+  const openBkSettings = useCallback(() => {
+    setShowBkSettings(true)
+  }, [])
+
+  const closeBkSettings = useCallback(() => {
+    setShowBkSettings(false)
+  }, [])
+
+  const toggleBkSetting = useCallback((key: keyof BookkeepingSettings) => {
+    setBkSettings((prev) => {
+      const next = { ...prev, [key]: !prev[key] }
+      try {
+        Taro.setStorageSync('bookkeeping_settings', next)
+      } catch {
+        /* ignore */
+      }
+      return next
+    })
   }, [])
 
   const applySettings = useCallback(() => {
@@ -366,7 +402,7 @@ export default function Index() {
         {/* 第二页：记账 */}
         <SwiperItem>
           <ScrollView scrollY className='page-scroll'>
-            <BookkeepingPage />
+            <BookkeepingPage bkSettings={bkSettings} />
           </ScrollView>
         </SwiperItem>
       </Swiper>
@@ -378,7 +414,10 @@ export default function Index() {
       </View>
 
       {/* 浮动设置按钮 */}
-      <View className='fab-btn' onClick={openSettings}>
+      <View
+        className='fab-btn'
+        onClick={() => (currentPage === 0 ? openSettings() : openBkSettings())}
+      >
         <Text className='fab-icon'>⚙</Text>
       </View>
 
@@ -447,6 +486,67 @@ export default function Index() {
               </View>
               <View className='settings-btn settings-btn-save' onClick={applySettings}>
                 <Text className='settings-btn-text'>保 存</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {/* 记账设置面板 */}
+      {showBkSettings && (
+        <View className='settings-overlay' onClick={closeBkSettings}>
+          <View className='settings-panel' onClick={(e) => e.stopPropagation()}>
+            <View className='settings-header'>
+              <Text className='settings-title'>記帳設定</Text>
+              <View className='settings-close' onClick={closeBkSettings}>
+                <Text className='settings-close-text'>✕</Text>
+              </View>
+            </View>
+
+            <View className='settings-body'>
+              <View className='settings-section'>
+                <Text className='settings-section-title'>圖表顯示</Text>
+
+                {/* 近7日柱状图 */}
+                <View className='bk-setting-row'>
+                  <View className='mini-bar-chart'>
+                    {[40, 70, 50, 90, 60].map((h, i) => (
+                      <View key={i} className='mini-bar' style={{ height: `${h}%` }} />
+                    ))}
+                  </View>
+                  <Text className='bk-setting-label'>近7日柱狀圖</Text>
+                  <Switch
+                    checked={bkSettings.showWeeklyBar}
+                    onChange={() => toggleBkSetting('showWeeklyBar')}
+                    color='#c8b99a'
+                  />
+                </View>
+
+                {/* 月度柱状图 */}
+                <View className='bk-setting-row'>
+                  <View className='mini-bar-chart mini-bar-monthly'>
+                    {[30, 60, 45, 80, 55, 70, 40].map((h, i) => (
+                      <View key={i} className='mini-bar' style={{ height: `${h}%` }} />
+                    ))}
+                  </View>
+                  <Text className='bk-setting-label'>月度柱狀圖</Text>
+                  <Switch
+                    checked={bkSettings.showMonthlyBar}
+                    onChange={() => toggleBkSetting('showMonthlyBar')}
+                    color='#c8b99a'
+                  />
+                </View>
+
+                {/* 月度饼状图 */}
+                <View className='bk-setting-row'>
+                  <View className='mini-pie-chart' />
+                  <Text className='bk-setting-label'>月度餅狀圖</Text>
+                  <Switch
+                    checked={bkSettings.showMonthlyPie}
+                    onChange={() => toggleBkSetting('showMonthlyPie')}
+                    color='#c8b99a'
+                  />
+                </View>
               </View>
             </View>
           </View>

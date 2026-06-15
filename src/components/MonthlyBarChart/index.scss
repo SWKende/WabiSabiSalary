@@ -1,0 +1,20 @@
+// ========== 月度柱状图 ==========
+.monthly-chart {
+  .monthly-bars {
+    gap: 2px;
+  }
+
+  .monthly-bar-col {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .monthly-bar-track {
+    width: 6px;
+  }
+
+  .monthly-bar-label {
+    font-size: 16px;
+    margin-top: 4px;
+  }
+}
