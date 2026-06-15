@@ -217,6 +217,94 @@
   }
 }
 
+.holiday-sun-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 30px 24px;
+  margin-bottom: 28px;
+  background: linear-gradient(180deg, rgba(250, 248, 244, 0.96) 0%, rgba(241, 236, 228, 0.98) 100%);
+  border: 1px solid rgba(114, 107, 96, 0.12);
+  border-radius: 2px;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: auto auto -48px -28px;
+    width: 168px;
+    height: 168px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(220, 206, 177, 0.26) 0%, rgba(220, 206, 177, 0) 72%);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(231, 221, 195, 0.45) 0%, rgba(231, 221, 195, 0) 72%);
+    pointer-events: none;
+  }
+
+  .holiday-card-illustration {
+    position: relative;
+    width: 100%;
+    max-width: 220px;
+    height: 160px;
+    flex-shrink: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    animation: sunCardDrift 8s ease-in-out infinite;
+  }
+
+  .holiday-card-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    align-items: center;
+    text-align: center;
+  }
+
+  .holiday-card-kicker {
+    display: inline-block;
+    padding: 6px 12px;
+    background: rgba(167, 180, 160, 0.14);
+    border: 1px solid rgba(167, 180, 160, 0.2);
+    font-size: 18px;
+    color: #7f8977;
+    letter-spacing: 4px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .holiday-card-title {
+    font-size: 34px;
+    color: #5b544d;
+    font-weight: 500;
+    letter-spacing: 4px;
+    line-height: 1.35;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .holiday-card-desc {
+    font-size: 22px;
+    color: #7b736a;
+    line-height: 1.7;
+    letter-spacing: 1px;
+    font-family: 'Noto Serif SC', serif;
+  }
+}
+
 .holiday-preview-btn {
   position: relative;
   z-index: 1;
@@ -255,6 +343,17 @@
 @keyframes inkBreath {
   0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
   50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes sunCardDrift {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holiday-sun-card .holiday-card-illustration {
+    animation: none;
+  }
 }
 
 // 实时收益区域包裹

@@ -18,6 +18,9 @@ import {
   type CnDayType,
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
+import holidayGameSvg from './assets/holiday-game.svg'
+import holidayRunSvg from './assets/holiday-run.svg'
+import holidaySunSvg from './assets/holiday-sun.svg'
 import './index.scss'
 
 const DEFAULT_BK_SETTINGS: BookkeepingSettings = {
@@ -25,6 +28,32 @@ const DEFAULT_BK_SETTINGS: BookkeepingSettings = {
   showMonthlyBar: true,
   showMonthlyPie: true,
 }
+
+const HOLIDAY_CARD_VARIANTS = [
+  {
+    key: 'sun',
+    kicker: '休 日 中',
+    title: '今日不计收益',
+    desc: '风轻日暖，适合发呆、散步，和慢慢晒太阳。',
+    illustration: holidaySunSvg,
+  },
+  {
+    key: 'game',
+    kicker: '休 日 中',
+    title: '今天适合通关',
+    desc: '把提醒静音一会儿，沙发、掌机和下午的光刚刚好。',
+    illustration: holidayGameSvg,
+  },
+  {
+    key: 'run',
+    kicker: '休 日 中',
+    title: '今天适合跑步',
+    desc: '不用赶进度，沿着树影慢跑一会儿，呼吸会先轻下来。',
+    illustration: holidayRunSvg,
+  },
+] as const
+
+const pickRandomHolidayCardIndex = () => Math.floor(Math.random() * HOLIDAY_CARD_VARIANTS.length)
 
 export default function Index() {
   // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
@@ -72,6 +101,7 @@ export default function Index() {
   const [datePickerValue, setDatePickerValue] = useState(() => new Date().toISOString().split('T')[0])
   const [numberKeyboardVisible, setNumberKeyboardVisible] = useState(false)
   const [numberKeyboardValue, setNumberKeyboardValue] = useState('')
+  const [holidayCardIndex, setHolidayCardIndex] = useState(() => pickRandomHolidayCardIndex())
 
   const openDatePicker = useCallback((value: string, onConfirm: (date: string) => void) => {
     datePickerConfirmRef.current = onConfirm
@@ -173,6 +203,16 @@ export default function Index() {
   }, [currentDateStr])
 
   const isHolidayMode = forceHolidayPreview || cnDayType === 'holiday'
+  const prevHolidayModeRef = useRef(isHolidayMode)
+
+  useEffect(() => {
+    if (isHolidayMode && !prevHolidayModeRef.current) {
+      setHolidayCardIndex(pickRandomHolidayCardIndex())
+    }
+    prevHolidayModeRef.current = isHolidayMode
+  }, [isHolidayMode])
+
+  const holidayCard = HOLIDAY_CARD_VARIANTS[holidayCardIndex]
 
   // 计算 timeInfo（纯函数，依赖 tick 触发）
   const timeInfo = useMemo(() => {
@@ -385,16 +425,30 @@ export default function Index() {
                 <Text className='hero-target'>目標 ¥{config.monthlySalary.toLocaleString()}</Text>
               </View>
 
-              {/* 实时收益 — 水墨 */}
-              <View className='live-earning'>
-                <View className='live-glow' />
-                <Text className='live-label'>今 日 收 益</Text>
-                <View className='live-amount-wrap'>
-                  <Text className='live-currency'>¥</Text>
-                  <AnimatedNumber className='live-amount' value={timeInfo.todayEarnedStr} />
+              {/* 实时收益 / 放假态 */}
+              {timeInfo.isHoliday ? (
+                <View className='holiday-sun-card'>
+                  <View
+                    className='holiday-card-illustration'
+                    style={{ backgroundImage: `url(${holidayCard.illustration})` }}
+                  />
+                  <View className='holiday-card-content'>
+                    <Text className='holiday-card-kicker'>{holidayCard.kicker}</Text>
+                    <Text className='holiday-card-title'>{holidayCard.title}</Text>
+                    <Text className='holiday-card-desc'>{holidayCard.desc}</Text>
+                  </View>
                 </View>
-                <Text className='live-rate'>+¥{timeInfo.isHoliday ? '0.000000' : secondSalary.toFixed(6)} / 秒</Text>
-              </View>
+              ) : (
+                <View className='live-earning'>
+                  <View className='live-glow' />
+                  <Text className='live-label'>今 日 收 益</Text>
+                  <View className='live-amount-wrap'>
+                    <Text className='live-currency'>¥</Text>
+                    <AnimatedNumber className='live-amount' value={timeInfo.todayEarnedStr} />
+                  </View>
+                  <Text className='live-rate'>+¥{secondSalary.toFixed(6)} / 秒</Text>
+                </View>
+              )}
 
               <View
                 className={`holiday-preview-btn ${forceHolidayPreview ? 'active' : ''}`}
