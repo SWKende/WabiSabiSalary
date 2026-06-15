@@ -5,6 +5,7 @@ import AnimatedNumber from '../../components/AnimatedNumber'
 import CustomNavBar from '../../components/CustomNavBar'
 import SettingRow from '../../components/SettingRow'
 import BookkeepingPage from '../../components/Bookkeeping'
+import DatePicker from '../../components/DatePicker'
 import type { BookkeepingSettings } from '../../components/Bookkeeping'
 import { DEFAULT_CONFIG, SalaryConfig } from '../../constants/salary'
 import { formatMoney2, formatMoney4 } from '../../utils/format'
@@ -55,6 +56,26 @@ export default function Index() {
       return DEFAULT_BK_SETTINGS
     }
   })
+
+  const datePickerConfirmRef = useRef<((date: string) => void) | null>(null)
+  const [datePickerVisible, setDatePickerVisible] = useState(false)
+  const [datePickerValue, setDatePickerValue] = useState(() => new Date().toISOString().split('T')[0])
+
+  const openDatePicker = useCallback((value: string, onConfirm: (date: string) => void) => {
+    datePickerConfirmRef.current = onConfirm
+    setDatePickerValue(value)
+    setDatePickerVisible(true)
+  }, [])
+
+  const closeDatePicker = useCallback(() => {
+    setDatePickerVisible(false)
+  }, [])
+
+  const confirmDatePicker = useCallback((date: string) => {
+    const fn = datePickerConfirmRef.current
+    if (fn) fn(date)
+    setDatePickerVisible(false)
+  }, [])
 
   // 用 ref 存储实时数据，避免每秒 setState 导致整个组件树重渲染
   const timeInfoRef = useRef({
@@ -402,7 +423,7 @@ export default function Index() {
         {/* 第二页：记账 */}
         <SwiperItem>
           <ScrollView scrollY className='page-scroll'>
-            <BookkeepingPage bkSettings={bkSettings} />
+            <BookkeepingPage bkSettings={bkSettings} openDatePicker={openDatePicker} />
           </ScrollView>
         </SwiperItem>
       </Swiper>
@@ -552,6 +573,13 @@ export default function Index() {
           </View>
         </View>
       )}
+
+      <DatePicker
+        visible={datePickerVisible}
+        value={datePickerValue}
+        onConfirm={confirmDatePicker}
+        onCancel={closeDatePicker}
+      />
     </View>
   )
 }

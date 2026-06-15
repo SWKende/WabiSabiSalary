@@ -1,5 +1,5 @@
 import { View, Text } from '@tarojs/components'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import './index.scss'
 
 interface DatePickerProps {
@@ -24,6 +24,14 @@ export default function DatePicker({ visible, value, onConfirm, onCancel }: Date
     return d.getMonth() + 1
   })
   const [selectedDate, setSelectedDate] = useState(value || today)
+
+  useEffect(() => {
+    if (!visible) return
+    const d = value ? new Date(value) : new Date()
+    setViewYear(d.getFullYear())
+    setViewMonth(d.getMonth() + 1)
+    setSelectedDate(value || today)
+  }, [visible, value, today])
 
   // 生成日历网格
   const days = useMemo(() => {
@@ -110,37 +118,39 @@ export default function DatePicker({ visible, value, onConfirm, onCancel }: Date
           </View>
         </View>
 
-        {/* 星期标签行 */}
-        <View className='dp-weekdays'>
-          {weekLabels.map(label => (
-            <Text key={label} className='dp-weekday'>{label}</Text>
-          ))}
-        </View>
+        <View className='dp-body'>
+          {/* 星期标签行 */}
+          <View className='dp-weekdays'>
+            {weekLabels.map(label => (
+              <Text key={label} className='dp-weekday'>{label}</Text>
+            ))}
+          </View>
 
-        {/* 日期网格 */}
-        <View className='dp-grid'>
-          {days.map((item, i) => {
-            if (item.day === 0) {
-              return <View key={`empty-${i}`} className='dp-day dp-day-empty' />
-            }
-            const isSelected = item.dateStr === selectedDate
-            const className = [
-              'dp-day',
-              item.disabled ? 'dp-day-disabled' : '',
-              isSelected ? 'dp-day-selected' : '',
-              item.isToday && !isSelected ? 'dp-day-today' : '',
-            ].filter(Boolean).join(' ')
+          {/* 日期网格 */}
+          <View className='dp-grid'>
+            {days.map((item, i) => {
+              if (item.day === 0) {
+                return <View key={`empty-${i}`} className='dp-day dp-day-empty' />
+              }
+              const isSelected = item.dateStr === selectedDate
+              const className = [
+                'dp-day',
+                item.disabled ? 'dp-day-disabled' : '',
+                isSelected ? 'dp-day-selected' : '',
+                item.isToday && !isSelected ? 'dp-day-today' : '',
+              ].filter(Boolean).join(' ')
 
-            return (
-              <View
-                key={item.dateStr}
-                className={className}
-                onClick={() => !item.disabled && setSelectedDate(item.dateStr)}
-              >
-                <Text className='dp-day-text'>{item.day}</Text>
-              </View>
-            )
-          })}
+              return (
+                <View
+                  key={item.dateStr}
+                  className={className}
+                  onClick={() => !item.disabled && setSelectedDate(item.dateStr)}
+                >
+                  <Text className='dp-day-text'>{item.day}</Text>
+                </View>
+              )
+            })}
+          </View>
         </View>
 
         {/* 底部按钮 */}

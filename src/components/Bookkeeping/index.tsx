@@ -1,7 +1,6 @@
 import { View, Text, Input, ScrollView } from '@tarojs/components'
 import { useState, useMemo } from 'react'
 import Taro from '@tarojs/taro'
-import DatePicker from '../DatePicker'
 import MonthlyBarChart from '../MonthlyBarChart'
 import MonthlyPieChart from '../MonthlyPieChart'
 import './index.scss'
@@ -33,11 +32,16 @@ function migrateRecord(r: any): BookkeepingRecord {
 }
 
 // 记账页面组件
-export default function BookkeepingPage({ bkSettings }: { bkSettings: BookkeepingSettings }) {
+export default function BookkeepingPage({
+  bkSettings,
+  openDatePicker,
+}: {
+  bkSettings: BookkeepingSettings
+  openDatePicker: (value: string, onConfirm: (date: string) => void) => void
+}) {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
-  const [showDatePicker, setShowDatePicker] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
@@ -195,7 +199,10 @@ export default function BookkeepingPage({ bkSettings }: { bkSettings: Bookkeepin
             {/* 日期选择器 */}
             <View className='date-row'>
               <Text className='date-label'>日期</Text>
-              <View className='date-picker' onClick={() => setShowDatePicker(true)}>
+              <View
+                className='date-picker'
+                onClick={() => openDatePicker(selectedDate, (date) => setSelectedDate(date))}
+              >
                 <Text className='date-value'>{selectedDate}</Text>
                 <Text className='date-arrow'>›</Text>
               </View>
@@ -305,16 +312,6 @@ export default function BookkeepingPage({ bkSettings }: { bkSettings: Bookkeepin
           ))}
         </View>
       )}
-      {/* 自定义日期选择器 */}
-      <DatePicker
-        visible={showDatePicker}
-        value={selectedDate}
-        onConfirm={(date) => {
-          setSelectedDate(date)
-          setShowDatePicker(false)
-        }}
-        onCancel={() => setShowDatePicker(false)}
-      />
     </View>
   )
 }
