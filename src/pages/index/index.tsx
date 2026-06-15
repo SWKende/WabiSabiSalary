@@ -10,6 +10,13 @@ import NumberKeyboard from '../../components/NumberKeyboard'
 import type { BookkeepingSettings } from '../../components/Bookkeeping'
 import { DEFAULT_CONFIG, SalaryConfig } from '../../constants/salary'
 import { formatMoney2, formatMoney4 } from '../../utils/format'
+import {
+  classifyCnDate,
+  ensureCnHolidayDataset,
+  readCnHolidayDatasetSync,
+  toYYYYMMDD,
+  type CnDayType,
+} from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
 import './index.scss'
 
@@ -49,6 +56,7 @@ export default function Index() {
   const [showSettings, setShowSettings] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [showBkSettings, setShowBkSettings] = useState(false)
+  const [forceHolidayPreview, setForceHolidayPreview] = useState(false)
   const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
     try {
       const saved = Taro.getStorageSync('bookkeeping_settings')
@@ -119,6 +127,13 @@ export default function Index() {
   const [tick, setTick] = useState(0)
   const lastSecondRef = useRef(-1)
 
+  const [cnDayType, setCnDayType] = useState<CnDayType>(() => {
+    const today = toYYYYMMDD(new Date())
+    return classifyCnDate(today, readCnHolidayDatasetSync())
+  })
+
+  const currentDateStr = useMemo(() => toYYYYMMDD(new Date()), [tick])
+
   // 派生计算
   const dailySalary = useMemo(() => config.monthlySalary / config.workDaysPerMonth, [config])
   const hourlySalary = useMemo(() => dailySalary / config.workHoursPerDay, [dailySalary, config.workHoursPerDay])
@@ -139,6 +154,26 @@ export default function Index() {
     return () => clearInterval(timer)
   }, [])
 
+  useEffect(() => {
+    let cancelled = false
+    const now = new Date()
+    const years = [now.getFullYear(), now.getFullYear() + 1, now.getFullYear() + 2]
+
+    setCnDayType(classifyCnDate(currentDateStr, readCnHolidayDatasetSync()))
+
+    ;(async () => {
+      const dataset = await ensureCnHolidayDataset({ years })
+      if (cancelled) return
+      setCnDayType(classifyCnDate(currentDateStr, dataset))
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [currentDateStr])
+
+  const isHolidayMode = forceHolidayPreview || cnDayType === 'holiday'
+
   // 计算 timeInfo（纯函数，依赖 tick 触发）
   const timeInfo = useMemo(() => {
     const { monthlySalary, workDaysPerMonth, workHoursPerDay, workStartHour, workEndHour, payday } = config
@@ -150,14 +185,17 @@ export default function Index() {
     const minute = now.getMinutes()
     const second = now.getSeconds()
 
-    const isWorking = hour >= workStartHour && hour < workEndHour
+    const isHoliday = isHolidayMode
+    const isWorking = !isHoliday && hour >= workStartHour && hour < workEndHour
 
     let todayEarned = 0
-    if (hour >= workEndHour) {
-      todayEarned = dailySalary
-    } else if (hour >= workStartHour) {
-      const workedSeconds = (hour - workStartHour) * 3600 + minute * 60 + second
-      todayEarned = workedSeconds * secondSalary
+    if (!isHoliday) {
+      if (hour >= workEndHour) {
+        todayEarned = dailySalary
+      } else if (hour >= workStartHour) {
+        const workedSeconds = (hour - workStartHour) * 3600 + minute * 60 + second
+        todayEarned = workedSeconds * secondSalary
+      }
     }
 
     let monthEarned = 0
@@ -172,9 +210,11 @@ export default function Index() {
       monthEarned = workedDays * dailySalary + todayEarned
     }
 
-    const workProgress = isWorking
-      ? (((hour - workStartHour) * 3600 + minute * 60 + second) / (workHoursPerDay * 3600)) * 100
-      : hour >= workEndHour ? 100 : 0
+    const workProgress = isHoliday
+      ? 0
+      : isWorking
+        ? (((hour - workStartHour) * 3600 + minute * 60 + second) / (workHoursPerDay * 3600)) * 100
+        : hour >= workEndHour ? 100 : 0
 
     let nextPayday: Date
     if (day >= payday) {
@@ -190,12 +230,13 @@ export default function Index() {
       todayEarnedStr: formatMoney4(todayEarned),
       monthEarnedStr: formatMoney2(monthEarned),
       workProgress,
+      isHoliday,
       paydayDays: Math.floor(secondsToPayday / 86400),
       paydayHours: Math.floor((secondsToPayday % 86400) / 3600),
       paydayMinutes: Math.floor((secondsToPayday % 3600) / 60),
       paydaySeconds: secondsToPayday % 60,
     }
-  }, [tick, config, dailySalary, secondSalary])
+  }, [tick, config, dailySalary, secondSalary, isHolidayMode])
 
   // 保存配置
   const saveConfig = useCallback((newConfig: SalaryConfig) => {
@@ -307,7 +348,7 @@ export default function Index() {
       {/* 自定义导航栏（适配胶囊按钮） */}
       <CustomNavBar
         timeStr={timeInfo.timeStr}
-        isWorking={timeInfo.isWorking}
+        status={timeInfo.isHoliday ? 'holiday' : timeInfo.isWorking ? 'working' : 'resting'}
         capsuleRight={navLayout.capsuleRight}
         hasCapsule={navLayout.hasCapsule}
       />
@@ -352,7 +393,17 @@ export default function Index() {
                   <Text className='live-currency'>¥</Text>
                   <AnimatedNumber className='live-amount' value={timeInfo.todayEarnedStr} />
                 </View>
-                <Text className='live-rate'>+¥{secondSalary.toFixed(6)} / 秒</Text>
+                <Text className='live-rate'>+¥{timeInfo.isHoliday ? '0.000000' : secondSalary.toFixed(6)} / 秒</Text>
+              </View>
+
+              <View
+                className={`holiday-preview-btn ${forceHolidayPreview ? 'active' : ''}`}
+                onClick={() => setForceHolidayPreview((prev) => !prev)}
+              >
+                <Text className='holiday-preview-btn-icon'>{forceHolidayPreview ? '◉' : '◎'}</Text>
+                <Text className='holiday-preview-btn-text'>
+                  {forceHolidayPreview ? '恢复正常状态' : '一键展示放假状态'}
+                </Text>
               </View>
 
               {/* 薪资明细 — 卷轴 */}

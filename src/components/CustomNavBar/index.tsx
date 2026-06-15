@@ -5,7 +5,7 @@ import './index.scss'
 
 interface CustomNavBarProps {
   timeStr: string
-  isWorking: boolean
+  status: 'working' | 'resting' | 'holiday'
   capsuleRight: number
   hasCapsule: boolean
 }
@@ -13,7 +13,7 @@ interface CustomNavBarProps {
 // 自定义导航栏 — 适配微信小程序胶囊按钮
 export default function CustomNavBar({
   timeStr,
-  isWorking,
+  status,
   capsuleRight,
   hasCapsule,
 }: CustomNavBarProps) {
@@ -51,9 +51,12 @@ export default function CustomNavBar({
         }}
       >
         {!hasCapsule && <Text className='status-time'>{timeStr}</Text>}
-        <View className={`status-badge ${isWorking ? 'working' : 'resting'}`}>
+        <View className={`status-badge ${status}`}>
           <View className='status-dot' />
-          <Text className='status-text'>{isWorking ? '稼働中' : '休憩中'}</Text>
+          {status === 'holiday' && <Text className='status-icon'>🏖</Text>}
+          <Text className='status-text'>
+            {status === 'working' ? '稼働中' : status === 'holiday' ? '放假中' : '休憩中'}
+          </Text>
         </View>
       </View>
     </View>

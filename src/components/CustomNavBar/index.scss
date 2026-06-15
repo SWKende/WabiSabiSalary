@@ -51,6 +51,12 @@
     animation: dotBreath 4s ease-in-out infinite;
   }
 
+  .status-icon {
+    font-size: 26px;
+    line-height: 1;
+    transform: translateY(-1px);
+  }
+
   &.working {
     background: rgba(122, 140, 110, 0.08);
     border: 1px solid rgba(122, 140, 110, 0.15);
@@ -68,6 +74,17 @@
 
     .status-dot {
       background: #b85450;
+      animation: none;
+    }
+  }
+
+  &.holiday {
+    background: rgba(214, 74, 70, 0.16);
+    border: 1px solid rgba(214, 74, 70, 0.22);
+    color: #d64a46;
+
+    .status-dot {
+      background: #d64a46;
       animation: none;
     }
   }
