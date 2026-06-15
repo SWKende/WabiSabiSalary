@@ -6,6 +6,7 @@ import CustomNavBar from '../../components/CustomNavBar'
 import SettingRow from '../../components/SettingRow'
 import BookkeepingPage from '../../components/Bookkeeping'
 import DatePicker from '../../components/DatePicker'
+import NumberKeyboard from '../../components/NumberKeyboard'
 import type { BookkeepingSettings } from '../../components/Bookkeeping'
 import { DEFAULT_CONFIG, SalaryConfig } from '../../constants/salary'
 import { formatMoney2, formatMoney4 } from '../../utils/format'
@@ -58,8 +59,11 @@ export default function Index() {
   })
 
   const datePickerConfirmRef = useRef<((date: string) => void) | null>(null)
+  const amountKeyboardChangeRef = useRef<((value: string) => void) | null>(null)
   const [datePickerVisible, setDatePickerVisible] = useState(false)
   const [datePickerValue, setDatePickerValue] = useState(() => new Date().toISOString().split('T')[0])
+  const [numberKeyboardVisible, setNumberKeyboardVisible] = useState(false)
+  const [numberKeyboardValue, setNumberKeyboardValue] = useState('')
 
   const openDatePicker = useCallback((value: string, onConfirm: (date: string) => void) => {
     datePickerConfirmRef.current = onConfirm
@@ -76,6 +80,27 @@ export default function Index() {
     if (fn) fn(date)
     setDatePickerVisible(false)
   }, [])
+
+  const openAmountKeyboard = useCallback((value: string, onChange: (value: string) => void) => {
+    amountKeyboardChangeRef.current = onChange
+    setNumberKeyboardValue(value)
+    setNumberKeyboardVisible(true)
+  }, [])
+
+  const closeAmountKeyboard = useCallback(() => {
+    setNumberKeyboardVisible(false)
+  }, [])
+
+  const changeAmountKeyboardValue = useCallback((value: string) => {
+    setNumberKeyboardValue(value)
+    const fn = amountKeyboardChangeRef.current
+    if (fn) fn(value)
+  }, [])
+
+  const confirmAmountKeyboard = useCallback((value: string) => {
+    changeAmountKeyboardValue(value)
+    setNumberKeyboardVisible(false)
+  }, [changeAmountKeyboardValue])
 
   // 用 ref 存储实时数据，避免每秒 setState 导致整个组件树重渲染
   const timeInfoRef = useRef({
@@ -423,7 +448,11 @@ export default function Index() {
         {/* 第二页：记账 */}
         <SwiperItem>
           <ScrollView scrollY className='page-scroll'>
-            <BookkeepingPage bkSettings={bkSettings} openDatePicker={openDatePicker} />
+            <BookkeepingPage
+              bkSettings={bkSettings}
+              openDatePicker={openDatePicker}
+              openAmountKeyboard={openAmountKeyboard}
+            />
           </ScrollView>
         </SwiperItem>
       </Swiper>
@@ -579,6 +608,14 @@ export default function Index() {
         value={datePickerValue}
         onConfirm={confirmDatePicker}
         onCancel={closeDatePicker}
+      />
+
+      <NumberKeyboard
+        visible={numberKeyboardVisible}
+        value={numberKeyboardValue}
+        onChange={changeAmountKeyboardValue}
+        onConfirm={confirmAmountKeyboard}
+        onCancel={closeAmountKeyboard}
       />
     </View>
   )

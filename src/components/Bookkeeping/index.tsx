@@ -35,9 +35,11 @@ function migrateRecord(r: any): BookkeepingRecord {
 export default function BookkeepingPage({
   bkSettings,
   openDatePicker,
+  openAmountKeyboard,
 }: {
   bkSettings: BookkeepingSettings
   openDatePicker: (value: string, onConfirm: (date: string) => void) => void
+  openAmountKeyboard: (value: string, onChange: (value: string) => void) => void
 }) {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
@@ -156,15 +158,12 @@ export default function BookkeepingPage({
             </View>
             <View className='amount-row'>
               <Text className='amount-symbol'>¥</Text>
-              <Input
-                className={`amount-input ${amount ? 'has-value' : 'is-empty'}`}
-                type='digit'
-                placeholder='請輸入金額'
-                placeholderStyle='font-size: 28px; color: #a89878;'
-                placeholderClass='bk-amount-placeholder'
-                value={amount}
-                onInput={(e) => setAmount(e.detail.value)}
-              />
+              <View
+                className={`amount-display ${amount ? 'has-value' : 'is-empty'}`}
+                onClick={() => openAmountKeyboard(amount, setAmount)}
+              >
+                <Text className='amount-display-text'>{amount || '請輸入金額'}</Text>
+              </View>
             </View>
 
             <View className='category-section'>

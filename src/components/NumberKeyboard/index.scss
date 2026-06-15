@@ -1,0 +1,138 @@
+.nk-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 450;
+  background: rgba(44, 44, 44, 0.24);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: nkFadeIn 0.22s ease;
+}
+
+@keyframes nkFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.nk-panel {
+  width: 100%;
+  background: #faf8f4;
+  border-radius: 18px 18px 0 0;
+  border-top: 1px solid rgba(44, 44, 44, 0.08);
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  animation: nkSlideUp 0.26s ease;
+}
+
+@keyframes nkSlideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.nk-handle {
+  width: 72px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(44, 44, 44, 0.12);
+  margin: 0 auto 18px;
+}
+
+.nk-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.nk-title {
+  font-size: 22px;
+  color: #8a8279;
+  letter-spacing: 3px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.nk-preview {
+  font-size: 40px;
+  color: #2c2c2c;
+  font-weight: 500;
+  line-height: 1;
+  font-family: 'Shippori Mincho B1', serif;
+  max-width: 70%;
+  text-align: right;
+  word-break: break-all;
+}
+
+.nk-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.nk-key {
+  min-height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f0e8;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 8px;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    background: #ece5d8;
+  }
+
+  &.nk-key-delete {
+    background: rgba(44, 44, 44, 0.06);
+  }
+}
+
+.nk-key-text {
+  font-size: 32px;
+  color: #2c2c2c;
+  font-family: 'Shippori Mincho B1', serif;
+  line-height: 1;
+}
+
+.nk-footer {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.nk-btn {
+  flex: 1;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: transform 0.2s ease, background 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.nk-btn-cancel {
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  background: transparent;
+}
+
+.nk-btn-confirm {
+  background: #2c2c2c;
+  border: 1px solid #2c2c2c;
+
+  .nk-btn-text {
+    color: #faf8f4;
+  }
+}
+
+.nk-btn-text {
+  font-size: 26px;
+  color: #5c5650;
+  letter-spacing: 4px;
+  font-family: 'Noto Serif SC', serif;
+}
