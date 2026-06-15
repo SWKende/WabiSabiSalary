@@ -28,6 +28,9 @@
     "dev:jd": "npm run build:jd -- --watch",
     "dev:harmony-hybrid": "npm run build:harmony-hybrid -- --watch"
   },
+  "overrides": {
+    "enhanced-resolve": "5.16.0"
+  },
   "browserslist": [
     "last 3 versions",
     "Android >= 4.1",
