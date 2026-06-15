@@ -157,10 +157,11 @@ export default function BookkeepingPage({
             <View className='amount-row'>
               <Text className='amount-symbol'>¥</Text>
               <Input
-                className='amount-input'
+                className={`amount-input ${amount ? 'has-value' : 'is-empty'}`}
                 type='digit'
                 placeholder='請輸入金額'
                 placeholderStyle='font-size: 28px; color: #a89878;'
+                placeholderClass='bk-amount-placeholder'
                 value={amount}
                 onInput={(e) => setAmount(e.detail.value)}
               />
