@@ -85,7 +85,6 @@ export default function Index() {
   const [showSettings, setShowSettings] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [showBkSettings, setShowBkSettings] = useState(false)
-  const [forceHolidayPreview, setForceHolidayPreview] = useState(false)
   const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
     try {
       const saved = Taro.getStorageSync('bookkeeping_settings')
@@ -202,7 +201,7 @@ export default function Index() {
     }
   }, [currentDateStr])
 
-  const isHolidayMode = forceHolidayPreview || cnDayType === 'holiday'
+  const isHolidayMode = cnDayType === 'holiday'
   const prevHolidayModeRef = useRef(isHolidayMode)
 
   useEffect(() => {
@@ -449,16 +448,6 @@ export default function Index() {
                   <Text className='live-rate'>+¥{secondSalary.toFixed(6)} / 秒</Text>
                 </View>
               )}
-
-              <View
-                className={`holiday-preview-btn ${forceHolidayPreview ? 'active' : ''}`}
-                onClick={() => setForceHolidayPreview((prev) => !prev)}
-              >
-                <Text className='holiday-preview-btn-icon'>{forceHolidayPreview ? '◉' : '◎'}</Text>
-                <Text className='holiday-preview-btn-text'>
-                  {forceHolidayPreview ? '恢复正常状态' : '一键展示放假状态'}
-                </Text>
-              </View>
 
               {/* 薪资明细 — 卷轴 */}
               <View

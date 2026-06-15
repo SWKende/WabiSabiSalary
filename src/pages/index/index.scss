@@ -305,41 +305,6 @@
   }
 }
 
-.holiday-preview-btn {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
-  background: rgba(214, 74, 70, 0.08);
-  border: 1px solid rgba(214, 74, 70, 0.16);
-  border-radius: 2px;
-  transition: all 0.25s ease;
-
-  &:active,
-  &.active {
-    background: rgba(214, 74, 70, 0.14);
-    border-color: rgba(214, 74, 70, 0.28);
-  }
-
-  .holiday-preview-btn-icon {
-    font-size: 24px;
-    color: #d64a46;
-    line-height: 1;
-  }
-
-  .holiday-preview-btn-text {
-    font-size: 24px;
-    color: #d64a46;
-    font-family: 'Noto Serif SC', serif;
-    letter-spacing: 3px;
-    font-weight: 500;
-  }
-}
-
 @keyframes inkBreath {
   0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
   50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.05); }
