@@ -29,6 +29,36 @@ const DEFAULT_BK_SETTINGS: BookkeepingSettings = {
   showMonthlyPie: true,
 }
 
+const HOME_PAGE_STORAGE_KEY = 'home_page_preference'
+
+type HomePage = 0 | 1
+
+const resolveHomePagePreference = (value: unknown): HomePage | null => {
+  if (value === 0 || value === 'salary') return 0
+  if (value === 1 || value === 'bookkeeping') return 1
+  return null
+}
+
+const getInitialHomePageState = () => {
+  try {
+    const saved = Taro.getStorageSync(HOME_PAGE_STORAGE_KEY)
+    const preferredPage = resolveHomePagePreference(saved)
+    if (preferredPage !== null) {
+      return {
+        currentPage: preferredPage,
+        showLaunchScreen: false,
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+
+  return {
+    currentPage: 0 as HomePage,
+    showLaunchScreen: true,
+  }
+}
+
 const HOLIDAY_CARD_VARIANTS = [
   {
     key: 'sun',
@@ -56,6 +86,8 @@ const HOLIDAY_CARD_VARIANTS = [
 const pickRandomHolidayCardIndex = () => Math.floor(Math.random() * HOLIDAY_CARD_VARIANTS.length)
 
 export default function Index() {
+  const initialHomePageState = getInitialHomePageState()
+
   // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
   const navLayout = useMemo(() => {
     try {
@@ -83,7 +115,8 @@ export default function Index() {
   })
   const [showDetail, setShowDetail] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
-  const [currentPage, setCurrentPage] = useState(0)
+  const [currentPage, setCurrentPage] = useState<HomePage>(initialHomePageState.currentPage)
+  const [showLaunchScreen, setShowLaunchScreen] = useState(initialHomePageState.showLaunchScreen)
   const [showBkSettings, setShowBkSettings] = useState(false)
   const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
     try {
@@ -101,6 +134,31 @@ export default function Index() {
   const [numberKeyboardVisible, setNumberKeyboardVisible] = useState(false)
   const [numberKeyboardValue, setNumberKeyboardValue] = useState('')
   const [holidayCardIndex, setHolidayCardIndex] = useState(() => pickRandomHolidayCardIndex())
+
+  const syncHomePagePreference = useCallback(() => {
+    try {
+      const saved = Taro.getStorageSync(HOME_PAGE_STORAGE_KEY)
+      const preferredPage = resolveHomePagePreference(saved)
+      if (preferredPage === null) {
+        setShowLaunchScreen(true)
+      } else {
+        setCurrentPage(preferredPage)
+        setShowLaunchScreen(false)
+      }
+    } catch {
+      setShowLaunchScreen(true)
+    }
+  }, [])
+
+  const handleSelectHomePage = useCallback((page: HomePage) => {
+    setCurrentPage(page)
+    setShowLaunchScreen(false)
+    try {
+      Taro.setStorageSync(HOME_PAGE_STORAGE_KEY, page === 0 ? 'salary' : 'bookkeeping')
+    } catch {
+      /* ignore */
+    }
+  }, [])
 
   const openDatePicker = useCallback((value: string, onConfirm: (date: string) => void) => {
     datePickerConfirmRef.current = onConfirm
@@ -212,6 +270,14 @@ export default function Index() {
   }, [isHolidayMode])
 
   const holidayCard = HOLIDAY_CARD_VARIANTS[holidayCardIndex]
+
+  useEffect(() => {
+    syncHomePagePreference()
+  }, [syncHomePagePreference])
+
+  Taro.useDidShow(() => {
+    syncHomePagePreference()
+  })
 
   // 计算 timeInfo（纯函数，依赖 tick 触发）
   const timeInfo = useMemo(() => {
@@ -382,6 +448,50 @@ export default function Index() {
     return wh - navH - indicatorH
   }, [])
 
+  if (showLaunchScreen) {
+    return (
+      <View className='salary-app-root launch-screen-root'>
+        <View className='launch-screen'>
+          <View className='launch-screen__halo launch-screen__halo--top' />
+          <View className='launch-screen__halo launch-screen__halo--bottom' />
+          <View className='launch-screen__content'>
+            <Text className='launch-screen__eyebrow'>Trae Salary</Text>
+            <Text className='launch-screen__title'>选择你想先进入的首页</Text>
+            <Text className='launch-screen__desc'>
+              首次进入先做一次选择，之后会自动进入你设定的首页。
+            </Text>
+
+            <View
+              className='launch-screen__option'
+              onClick={() => handleSelectHomePage(0)}
+            >
+              <View className='launch-screen__optionHeader'>
+                <Text className='launch-screen__optionTitle'>每秒工资</Text>
+                <Text className='launch-screen__optionBadge'>默认推荐</Text>
+              </View>
+              <Text className='launch-screen__optionText'>
+                进入实时工资页，先看今天已经赚了多少、距离发薪日还有多久。
+              </Text>
+            </View>
+
+            <View
+              className='launch-screen__option launch-screen__option--secondary'
+              onClick={() => handleSelectHomePage(1)}
+            >
+              <View className='launch-screen__optionHeader'>
+                <Text className='launch-screen__optionTitle'>记账页</Text>
+                <Text className='launch-screen__optionBadge'>持久记忆</Text>
+              </View>
+              <Text className='launch-screen__optionText'>
+                进入记账首页，后续再次打开小程序也会优先从记账页开始。
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    )
+  }
+
   return (
     <View className='salary-app-root'>
       {/* 自定义导航栏（适配胶囊按钮） */}
@@ -397,7 +507,7 @@ export default function Index() {
         className='page-swiper'
         indicatorDots={false}
         current={currentPage}
-        onChange={(e) => setCurrentPage(e.detail.current)}
+        onChange={(e) => setCurrentPage((e.detail.current === 1 ? 1 : 0) as HomePage)}
       >
         {/* 第一页：工资时钟 */}
         <SwiperItem>

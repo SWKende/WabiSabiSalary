@@ -1,0 +1,56 @@
+[09:04:37.711] Server listening on port 59641, PID 49627
+[09:04:37.763] readProjectFiles, Found 49 files to read.
+[09:04:37.784] Starting PAI Cloud Dev...
+[09:04:39.016] [PAI SDK] createCloudSession response: {
+  "code": 0,
+  "msg": "success",
+  "sandboxId": "vefaas-f0vkicge-pyw70jixna-d8oa29g2032lkmoq21n0-sandbox",
+  "endpoint": "https://sd62opo6oqou1ckhsuo00.apigateway-cn-beijing.volceapi.com"
+}
+[09:04:39.210] [PAI SDK] cloudServer.start called, appId: pai-preview-trae-ff44564b
+[09:04:44.306] [Preview Server] Frontend connected, clients size = 1
+[09:05:18.435] [PAI SDK] Received event: log {"content":"\n> taro-demo@1.0.0 dev:h5\n> npm run build:h5 -- --watch\n\n","timestamp":1781571918580}
+[09:05:18.537] [PAI SDK] Received event: log {"content":"\n> taro-demo@1.0.0 build:h5\n> taro build --type h5 --watch\n\n","timestamp":1781571918684}
+[09:05:18.881] [PAI SDK] Received event: log {"content":"👽 Taro v4.2.0\n\n","timestamp":1781571919027}
+[09:05:19.568] [PAI SDK] Received event: log {"content":"Tips:\n1. 建议开启持久化缓存功能，能有效提升二次编译速度，详情请参考: https://docs.taro.zone/docs/config-detail#cache。\n\n\n","timestamp":1781571919714}
+[09:05:20.427] [PAI SDK] Received event: compile_error [{"filename":"","lineNumber":0,"description":"[stderr： ]\n\nTypeError: options.roots.map is not a function","timestamp":1781571920572}]
+[09:05:20.438] [PAI SDK] Received event: log {"content":"依赖预编译失败，已经为您跳过预编译步骤，但是编译速度可能会受到影响。\n","timestamp":1781571920576}
+[09:05:20.609] [PAI SDK] Received event: compile_error [{"filename":"","lineNumber":0,"description":"[stderr： ]\n\nValidationError: Invalid options object. Progress Plugin has been initialized using an options object that does not match the API schema.\n - options should be one of these:\n   object { activeModules?, dependencies?, dependenciesCount?, entries?, handler?, modules?, modulesCount?, percentBy?, profile?, progressBar? } | function\n   Details:\n    * options has an unknown property 'name'. These properties are valid:\n      object { activeModules?, dependencies?, dependenciesCount?, entries?, handler?, modules?, modulesCount?, percentBy?, profile?, progressBar? }\n      -> Options object for the ProgressPlugin.\n    * options has an unknown property 'color'. These properties are valid:\n      object { activeModules?, dependencies?, dependenciesCount?, entries?, handler?, modules?, modulesCount?, percentBy?, profile?, progressBar? }\n      -> Options object for the ProgressPlugin.\n    * options has an unknown property 'reporters'. These properties are valid:\n      object { activeModules?, dependencies?, dependenciesCount?, entries?, handler?, modules?, modulesCount?, percentBy?, profile?, progressBar? }\n      -> Options object for the ProgressPlugin.\n    * options has an unknown property 'reporter'. These properties are valid:\n      object { activeModules?, dependencies?, dependenciesCount?, entries?, handler?, modules?, modulesCount?, percentBy?, profile?, progressBar? }\n      -> Options object for the ProgressPlugin.\n    * options has an unknown property 'basic'. These properties are valid:\n      object { activeModules?, dependencies?, dependenciesCount?, entries?, handler?, modules?, modulesCount?, percentBy?, profile?, progressBar? }\n      -> Options object for the ProgressPlugin.\n    * options has an unknown property 'fancy'. These properties are valid:\n      object { activeModules?, dependencies?, dependenciesCount?, entries?, handler?, modules?, modulesCount?, percentBy?, profile?, progressBar? }\n      -> Options object for the ProgressPlugin.","timestamp":1781571920754}]
+[09:05:20.641] [PAI SDK] Received event: log {"content":"Cloud Server exited","timestamp":1781571920788}
+[09:05:20.641] [PAI SDK] cloudServer.start response: {
+  "status": "error",
+  "msg": "Cloud Server exited.",
+  "hash": "pai-preview-trae-ff44564b"
+}
+[09:07:17.726] File change detected. Updating...
+[09:07:17.741] readProjectFiles, Found 49 files to read.
+[09:07:17.761] Files read. Count: 49
+[09:07:17.762] Calling pai.updateCloudDev...
+[09:07:17.763] [PAI SDK] cloudServer.update called, appId: pai-preview-trae-ff44564b
+[09:07:18.036] [PAI SDK] Received event: reload {"url":"aipa://pai-preview-trae-ff44564b.aipa-cloud.bytedance.net?type=pai","timestamp":1781572038181}
+[09:07:18.036] [PAI SDK] CloudServer received reload event: {"url":"aipa://pai-preview-trae-ff44564b.aipa-cloud.bytedance.net?type=pai","timestamp":1781572038181}
+[09:07:18.036] [PAI SDK] reload, url = https://sd62opo6oqou1ckhsuo00.apigateway-cn-beijing.volceapi.com/?faasInstanceName=vefaas-f0vkicge-pyw70jixna-d8oa29g2032lkmoq21n0-sandbox&hash=pai-preview-trae-ff44564b
+[09:07:18.037] [PAI SDK] cloudServer.update response: {
+  "status": "running",
+  "reload": false,
+  "hash": "pai-preview-trae-ff44564b"
+}
+[09:07:18.037] Update success (pai.updateCloudDev returned)
+[09:07:27.792] Received update request via HTTP
+[09:07:29.793] File change detected. Updating...
+[09:07:29.804] readProjectFiles, Found 49 files to read.
+[09:07:29.820] Files read. Count: 49
+[09:07:29.821] Calling pai.updateCloudDev...
+[09:07:29.822] [PAI SDK] cloudServer.update called, appId: pai-preview-trae-ff44564b
+[09:07:30.100] [PAI SDK] Received event: reload {"url":"aipa://pai-preview-trae-ff44564b.aipa-cloud.bytedance.net?type=pai","timestamp":1781572050249}
+[09:07:30.101] [PAI SDK] CloudServer received reload event: {"url":"aipa://pai-preview-trae-ff44564b.aipa-cloud.bytedance.net?type=pai","timestamp":1781572050249}
+[09:07:30.102] [PAI SDK] reload, url = https://sd62opo6oqou1ckhsuo00.apigateway-cn-beijing.volceapi.com/?faasInstanceName=vefaas-f0vkicge-pyw70jixna-d8oa29g2032lkmoq21n0-sandbox&hash=pai-preview-trae-ff44564b
+[09:07:30.102] [PAI SDK] cloudServer.update response: {
+  "status": "running",
+  "reload": false,
+  "hash": "pai-preview-trae-ff44564b"
+}
+[09:07:30.103] Update success (pai.updateCloudDev returned)
+[09:07:33.267] [Preview Server] Frontend disconnected, clients size = 1
+[09:07:33.317] [Preview Server] Frontend connected, clients size = 1
+[09:07:33.317] Sending cached status to new connection, lastStatusMessage = {"event":"status_change","message":{"url":"https://sd62opo6oqou1ckhsuo00.apigateway-cn-beijing.volceapi.com/?faasInstanceName=vefaas-f0vkicge-pyw70jixna-d8oa29g2032lkmoq21n0-sandbox&hash=pai-preview-trae-ff44564b","schema":"aipa://preview?type=pai&aipa_id=pai-preview-trae-ff44564b&uuid=91e98c42-de29-4532-8540-7d4832be13f0","status":"running","framework":"taro"}}
