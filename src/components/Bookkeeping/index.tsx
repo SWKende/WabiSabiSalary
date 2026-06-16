@@ -258,14 +258,16 @@ export default function BookkeepingPage({
           <View className='chart-bars'>
             {chartData.days.map((day, i) => (
               <View key={i} className='chart-bar-col'>
-                <Text className='bar-value'>{day.total > 0 ? day.total.toFixed(0) : ''}</Text>
                 <View className='bar-track'>
-                  <View
-                    className={`bar-fill ${chartType}`}
-                    style={{
-                      height: chartData.maxVal > 0 ? `${(day.total / chartData.maxVal) * 100}%` : '0%',
-                    }}
-                  />
+                  <View className='bar-stack'>
+                    <Text className='bar-value'>{day.total > 0 ? day.total.toFixed(0) : ''}</Text>
+                    <View
+                      className={`bar-fill ${chartType}`}
+                      style={{
+                        height: chartData.maxVal > 0 ? `${(day.total / chartData.maxVal) * 100}%` : '0%',
+                      }}
+                    />
+                  </View>
                 </View>
                 <Text className='bar-label'>{day.label}</Text>
               </View>
