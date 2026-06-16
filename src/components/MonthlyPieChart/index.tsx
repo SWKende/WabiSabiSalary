@@ -1,6 +1,7 @@
 import { View, Text } from '@tarojs/components'
 import { useState, useMemo } from 'react'
 import type { BookkeepingRecord } from '../Bookkeeping'
+import { isRecordInMonth } from '../../utils/format'
 import './index.scss'
 
 interface MonthlyPieChartProps {
@@ -34,10 +35,7 @@ export default function MonthlyPieChart({ records }: MonthlyPieChartProps) {
     const year = now.getFullYear()
     const month = now.getMonth()
 
-    const monthRecords = records.filter((r) => {
-      const d = new Date(r.time)
-      return d.getMonth() === month && d.getFullYear() === year && r.type === chartType
-    })
+    const monthRecords = records.filter((r) => isRecordInMonth(r.time, year, month) && r.type === chartType)
 
     const categoryMap = new Map<string, number>()
     monthRecords.forEach((r) => {

@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react'
 import Taro from '@tarojs/taro'
 import MonthlyBarChart from '../MonthlyBarChart'
 import MonthlyPieChart from '../MonthlyPieChart'
+import { createRecordTime, formatLocalDate, formatRecordTime, isRecordInMonth, isRecordOnDate } from '../../utils/format'
 import './index.scss'
 
 // 记账设置类型
@@ -43,7 +44,7 @@ export default function BookkeepingPage({
 }) {
   const [amount, setAmount] = useState('')
   const [note, setNote] = useState('')
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0])
+  const [selectedDate, setSelectedDate] = useState(() => formatLocalDate(new Date()))
   const [showForm, setShowForm] = useState(false)
   const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
@@ -72,7 +73,7 @@ export default function BookkeepingPage({
       amount,
       note: note || category,
       category,
-      time: new Date(selectedDate + 'T12:00:00').toISOString(),
+      time: createRecordTime(selectedDate),
     }
     const updated = [newRecord, ...records]
     setRecords(updated)
@@ -83,7 +84,7 @@ export default function BookkeepingPage({
     }
     setAmount('')
     setNote('')
-    setSelectedDate(new Date().toISOString().split('T')[0])
+    setSelectedDate(formatLocalDate(new Date()))
     setShowForm(false)
     Taro.showToast({ title: '已記錄', icon: 'success' })
   }
@@ -101,8 +102,7 @@ export default function BookkeepingPage({
   const monthTotal = useMemo(() => {
     const now = new Date()
     const monthRecords = records.filter((r) => {
-      const d = new Date(r.time)
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()
+      return isRecordInMonth(r.time, now.getFullYear(), now.getMonth())
     })
     const income = monthRecords
       .filter((r) => r.type === 'income')
@@ -121,10 +121,10 @@ export default function BookkeepingPage({
     for (let i = 6; i >= 0; i--) {
       const d = new Date()
       d.setDate(d.getDate() - i)
-      const dateStr = d.toISOString().split('T')[0]
+      const dateStr = formatLocalDate(d)
       const label = `${d.getMonth() + 1}/${d.getDate()}`
       const dayTotal = records
-        .filter((r) => r.type === chartType && r.time.startsWith(dateStr))
+        .filter((r) => r.type === chartType && isRecordOnDate(r.time, dateStr))
         .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
       days.push({ date: dateStr, label, total: dayTotal })
     }
@@ -297,7 +297,7 @@ export default function BookkeepingPage({
                 </View>
                 <View className='record-info'>
                   <Text className='record-note'>{record.note}</Text>
-                  <Text className='record-time'>{record.time}</Text>
+                  <Text className='record-time'>{formatRecordTime(record.time)}</Text>
                 </View>
               </View>
               <View className='record-right'>

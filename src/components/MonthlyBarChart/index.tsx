@@ -1,6 +1,7 @@
 import { View, Text } from '@tarojs/components'
 import { useState, useMemo } from 'react'
 import type { BookkeepingRecord } from '../Bookkeeping'
+import { isRecordOnDate } from '../../utils/format'
 import './index.scss'
 
 interface MonthlyBarChartProps {
@@ -20,7 +21,7 @@ export default function MonthlyBarChart({ records }: MonthlyBarChartProps) {
     for (let d = 1; d <= daysInMonth; d++) {
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
       const dayTotal = records
-        .filter((r) => r.type === chartType && r.time.startsWith(dateStr))
+        .filter((r) => r.type === chartType && isRecordOnDate(r.time, dateStr))
         .reduce((sum, r) => sum + (parseFloat(r.amount) || 0), 0)
 
       days.push({
@@ -31,12 +32,18 @@ export default function MonthlyBarChart({ records }: MonthlyBarChartProps) {
       })
     }
 
-    const maxVal = Math.max(...days.map((d) => d.total), 1)
-    return { days, maxVal, daysInMonth }
+    const rawMaxVal = Math.max(...days.map((d) => d.total), 0)
+    const maxValueIndex = rawMaxVal > 0 ? days.findIndex((d) => d.total === rawMaxVal) : -1
+    return {
+      days,
+      rawMaxVal,
+      scaleMaxVal: rawMaxVal > 0 ? rawMaxVal : 1,
+      maxValueIndex,
+      daysInMonth,
+    }
   }, [records, chartType])
 
-  const allZero = chartData.days.every((d) => d.total === 0)
-  const maxValueIndex = chartData.days.findIndex((d) => d.total === chartData.maxVal && d.total > 0)
+  const allZero = chartData.rawMaxVal === 0
 
   return (
     <View className='chart-section monthly-chart'>
@@ -60,9 +67,9 @@ export default function MonthlyBarChart({ records }: MonthlyBarChartProps) {
 
       <View className='chart-body'>
         <View className='chart-y-axis'>
-          <Text className='y-label'>{chartData.maxVal > 0 ? chartData.maxVal.toFixed(0) : '0'}</Text>
+          <Text className='y-label'>{chartData.rawMaxVal > 0 ? chartData.rawMaxVal.toFixed(0) : '0'}</Text>
           <Text className='y-label'>
-            {chartData.maxVal > 0 ? (chartData.maxVal / 2).toFixed(0) : '0'}
+            {chartData.rawMaxVal > 0 ? (chartData.rawMaxVal / 2).toFixed(0) : '0'}
           </Text>
           <Text className='y-label'>0</Text>
         </View>
@@ -71,13 +78,13 @@ export default function MonthlyBarChart({ records }: MonthlyBarChartProps) {
           {chartData.days.map((day, index) => (
             <View key={day.day} className='chart-bar-col monthly-bar-col'>
               <Text className='bar-value monthly-bar-value'>
-                {index === maxValueIndex ? day.total.toFixed(0) : ''}
+                {index === chartData.maxValueIndex ? day.total.toFixed(0) : ''}
               </Text>
               <View className='bar-track monthly-bar-track'>
                 <View
                   className={`bar-fill monthly-bar-fill ${chartType}`}
                   style={{
-                    height: chartData.maxVal > 0 ? `${(day.total / chartData.maxVal) * 100}%` : '0%',
+                    height: `${(day.total / chartData.scaleMaxVal) * 100}%`,
                   }}
                 />
               </View>

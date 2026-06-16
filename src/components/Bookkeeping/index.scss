@@ -383,6 +383,9 @@
   overflow: hidden;
 
   .toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 16px;
     background: transparent;
     transition: all 0.3s ease;
@@ -396,7 +399,9 @@
     }
 
     .toggle-text {
+      display: block;
       font-size: 22px;
+      line-height: 1;
       color: #8a8279;
       font-family: 'Noto Serif SC', serif;
       letter-spacing: 2px;
