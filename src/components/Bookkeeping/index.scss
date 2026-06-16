@@ -429,7 +429,7 @@
 .chart-bars {
   flex: 1;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: flex-end;
   padding-bottom: 28px;
   position: relative;
@@ -462,7 +462,7 @@
   }
 
   .bar-track {
-    width: 20px;
+    width: 12px;
     flex: 1;
     display: flex;
     align-items: flex-end;
