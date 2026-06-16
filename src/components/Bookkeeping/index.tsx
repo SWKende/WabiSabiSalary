@@ -46,6 +46,7 @@ export default function BookkeepingPage({
   const [note, setNote] = useState('')
   const [selectedDate, setSelectedDate] = useState(() => formatLocalDate(new Date()))
   const [showForm, setShowForm] = useState(false)
+  const [recordPendingDelete, setRecordPendingDelete] = useState<BookkeepingRecord | null>(null)
   const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
 
@@ -97,6 +98,21 @@ export default function BookkeepingPage({
     } catch {
       /* ignore */
     }
+  }
+
+  const openDeleteConfirm = (record: BookkeepingRecord) => {
+    setRecordPendingDelete(record)
+  }
+
+  const closeDeleteConfirm = () => {
+    setRecordPendingDelete(null)
+  }
+
+  const confirmDelete = () => {
+    if (!recordPendingDelete) return
+    handleDelete(recordPendingDelete.id)
+    setRecordPendingDelete(null)
+    Taro.showToast({ title: '已删除', icon: 'success' })
   }
 
   const monthTotal = useMemo(() => {
@@ -306,12 +322,34 @@ export default function BookkeepingPage({
                 <Text className={`record-amount ${record.type === 'income' ? 'positive' : 'negative'}`}>
                   {record.type === 'income' ? '+' : '-'}¥{record.amount}
                 </Text>
-                <View className='record-delete' onClick={() => handleDelete(record.id)}>
+                <View className='record-delete' onClick={() => openDeleteConfirm(record)}>
                   <Text className='record-delete-icon'>×</Text>
                 </View>
               </View>
             </View>
           ))}
+        </View>
+      )}
+
+      {recordPendingDelete && (
+        <View className='record-confirm-overlay' onClick={closeDeleteConfirm}>
+          <View className='record-confirm-dialog' onClick={(e) => e.stopPropagation()}>
+            <Text className='record-confirm-title'>确认删除</Text>
+            <Text className='record-confirm-desc'>
+              将删除“{recordPendingDelete.note || recordPendingDelete.category}”
+            </Text>
+            <Text className='record-confirm-meta'>
+              {recordPendingDelete.type === 'income' ? '+' : '-'}¥{recordPendingDelete.amount} · {formatRecordTime(recordPendingDelete.time)}
+            </Text>
+            <View className='record-confirm-actions'>
+              <View className='record-confirm-btn is-cancel' onClick={closeDeleteConfirm}>
+                <Text className='record-confirm-btn-text'>取消</Text>
+              </View>
+              <View className='record-confirm-btn is-danger' onClick={confirmDelete}>
+                <Text className='record-confirm-btn-text'>删除</Text>
+              </View>
+            </View>
+          </View>
         </View>
       )}
     </View>
