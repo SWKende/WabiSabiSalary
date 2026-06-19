@@ -18,9 +18,9 @@ import {
   type CnDayType,
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
-import holidayGameSvg from './assets/holiday-game.png'
-import holidayRunSvg from './assets/holiday-run.png'
-import holidaySunSvg from './assets/holiday-sun.png'
+import holidayGameSvg from './assets/holiday-game.svg'
+import holidayRunSvg from './assets/holiday-run.svg'
+import holidaySunSvg from './assets/holiday-sun.svg'
 import './index.scss'
 
 const DEFAULT_BK_SETTINGS: BookkeepingSettings = {
