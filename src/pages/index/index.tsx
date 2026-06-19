@@ -117,6 +117,7 @@ export default function Index() {
   const [showSettings, setShowSettings] = useState(false)
   const [currentPage, setCurrentPage] = useState<HomePage>(initialHomePageState.currentPage)
   const [showLaunchScreen, setShowLaunchScreen] = useState(initialHomePageState.showLaunchScreen)
+  const [launchExiting, setLaunchExiting] = useState(false)
   const [showBkSettings, setShowBkSettings] = useState(false)
   const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
     try {
@@ -152,12 +153,16 @@ export default function Index() {
 
   const handleSelectHomePage = useCallback((page: HomePage) => {
     setCurrentPage(page)
-    setShowLaunchScreen(false)
+    setLaunchExiting(true)
     try {
       Taro.setStorageSync(HOME_PAGE_STORAGE_KEY, page === 0 ? 'salary' : 'bookkeeping')
     } catch {
       /* ignore */
     }
+    setTimeout(() => {
+      setShowLaunchScreen(false)
+      setLaunchExiting(false)
+    }, 650)
   }, [])
 
   const openDatePicker = useCallback((value: string, onConfirm: (date: string) => void) => {
@@ -447,143 +452,6 @@ export default function Index() {
     const indicatorH = 36
     return wh - navH - indicatorH
   }, [])
-
-  if (showLaunchScreen) {
-    return (
-      <View className='salary-app-root launch-screen-root'>
-        {/* 上半：每秒工资 */}
-        <View className='launch-panel launch-panel--top' onClick={() => handleSelectHomePage(0)}>
-          <View className='launch-panel__preview'>
-            <View className='launch-mock-salary'>
-              <View className='mock-hero'>
-                <Text className='mock-hero-label'>今 月 已 赚</Text>
-                <View className='mock-hero-amount'>
-                  <Text className='mock-currency'>¥</Text>
-                  <Text className='mock-number'>3,750</Text>
-                </View>
-                <View className='mock-progress'><View className='mock-progress-fill' /></View>
-                <Text className='mock-target'>目標 ¥5,000</Text>
-              </View>
-              <View className='mock-live'>
-                <Text className='mock-live-label'>今 日 收 益</Text>
-                <Text className='mock-live-amount'>¥ 127.08</Text>
-              </View>
-              <View className='mock-card mock-card--detail'>
-                <Text className='mock-card-title'>薪 賄 明 細</Text>
-                <View className='mock-card-line' />
-              </View>
-              <View className='mock-card mock-card--progress'>
-                <Text className='mock-card-title'>今日進度</Text>
-                <View className='mock-card-bar'><View className='mock-card-bar-fill' /></View>
-              </View>
-            </View>
-          </View>
-          <View className='launch-panel__overlay'>
-            <Text className='launch-panel__badge'>默认推荐</Text>
-            <Text className='launch-panel__title'>每秒工资</Text>
-            <Text className='launch-panel__desc'>实时查看今天赚了多少、距离发薪日还有多久</Text>
-            <View className='launch-panel__enter'>
-              <Text className='launch-panel__enter-text'>点击进入</Text>
-              <Text className='launch-panel__enter-arrow'>→</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* 分割线 */}
-        <View className='launch-divider' />
-
-        {/* 下半：记账页 */}
-        <View className='launch-panel launch-panel--bottom' onClick={() => handleSelectHomePage(1)}>
-          <View className='launch-panel__preview'>
-            <View className='launch-mock-bk'>
-              <View className='mock-bk-header'>
-                <Text className='mock-bk-title'>記 帳</Text>
-                <View className='mock-bk-summary'>
-                  <Text className='mock-bk-summary-label'>本月收支</Text>
-                  <Text className='mock-bk-summary-val'>+2,485</Text>
-                </View>
-              </View>
-              <View className='mock-bk-pen'>
-                <Text className='mock-bk-pen-text'>記 一 筆</Text>
-              </View>
-              <View className='mock-bk-chips'>
-                <Text className='mock-bk-chip mock-bk-chip--active'>餐飲</Text>
-                <Text className='mock-bk-chip'>交通</Text>
-                <Text className='mock-bk-chip'>購物</Text>
-                <Text className='mock-bk-chip'>娛樂</Text>
-              </View>
-              <View className='mock-bk-list'>
-                <View className='mock-bk-row'>
-                  <View className='mock-bk-dot mock-bk-dot--food' />
-                  <Text className='mock-bk-name'>午餐</Text>
-                  <Text className='mock-bk-val'>-35</Text>
-                </View>
-                <View className='mock-bk-row'>
-                  <View className='mock-bk-dot mock-bk-dot--transport' />
-                  <Text className='mock-bk-name'>交通</Text>
-                  <Text className='mock-bk-val'>-12</Text>
-                </View>
-                <View className='mock-bk-row'>
-                  <View className='mock-bk-dot mock-bk-dot--income' />
-                  <Text className='mock-bk-name'>工资</Text>
-                  <Text className='mock-bk-val mock-bk-val--income'>+5,000</Text>
-                </View>
-              </View>
-              {/* 图表区域 */}
-              <View className='mock-bk-charts'>
-                <View className='mock-bk-chart-card'>
-                  <Text className='mock-bk-chart-title'>近7日支出</Text>
-                  <View className='mock-bk-chart'>
-                    {[45, 70, 30, 85, 55, 40, 60].map((h, i) => (
-                      <View key={i} className='mock-bk-bar' style={{ height: `${h}%` }} />
-                    ))}
-                  </View>
-                  <View className='mock-bk-chart-labels'>
-                    <Text className='mock-bk-chart-label'>13</Text>
-                    <Text className='mock-bk-chart-label'>14</Text>
-                    <Text className='mock-bk-chart-label'>15</Text>
-                    <Text className='mock-bk-chart-label'>16</Text>
-                    <Text className='mock-bk-chart-label'>17</Text>
-                    <Text className='mock-bk-chart-label'>18</Text>
-                    <Text className='mock-bk-chart-label'>19</Text>
-                  </View>
-                </View>
-                <View className='mock-bk-chart-card'>
-                  <Text className='mock-bk-chart-title'>月度分類</Text>
-                  <View className='mock-bk-pie-row'>
-                    <View className='mock-bk-pie' />
-                    <View className='mock-bk-pie-legend'>
-                      <View className='mock-bk-legend-item'>
-                        <View className='mock-bk-legend-dot mock-bk-legend-dot--a' />
-                        <Text className='mock-bk-legend-text'>餐飲</Text>
-                      </View>
-                      <View className='mock-bk-legend-item'>
-                        <View className='mock-bk-legend-dot mock-bk-legend-dot--b' />
-                        <Text className='mock-bk-legend-text'>交通</Text>
-                      </View>
-                      <View className='mock-bk-legend-item'>
-                        <View className='mock-bk-legend-dot mock-bk-legend-dot--c' />
-                        <Text className='mock-bk-legend-text'>購物</Text>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
-          <View className='launch-panel__overlay'>
-            <Text className='launch-panel__badge'>持久记忆</Text>
-            <Text className='launch-panel__title'>记账页</Text>
-            <Text className='launch-panel__desc'>再次打开小程序也会优先从记账页开始</Text>
-            <View className='launch-panel__enter'>
-              <Text className='launch-panel__enter-text'>点击进入</Text>
-              <Text className='launch-panel__enter-arrow'>→</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-    )
-  }
 
   return (
     <View className='salary-app-root'>
@@ -914,6 +782,141 @@ export default function Index() {
         onConfirm={confirmAmountKeyboard}
         onCancel={closeAmountKeyboard}
       />
+
+      {/* 启动页覆盖层（毛玻璃上滑退场） */}
+      {(showLaunchScreen || launchExiting) && (
+        <View className={`launch-screen-root ${launchExiting ? 'launch-screen-root--exit' : ''}`}>
+          {/* 上半：每秒工资 */}
+          <View className='launch-panel launch-panel--top' onClick={() => handleSelectHomePage(0)}>
+            <View className='launch-panel__preview'>
+              <View className='launch-mock-salary'>
+                <View className='mock-hero'>
+                  <Text className='mock-hero-label'>今 月 已 赚</Text>
+                  <View className='mock-hero-amount'>
+                    <Text className='mock-currency'>¥</Text>
+                    <Text className='mock-number'>3,750</Text>
+                  </View>
+                  <View className='mock-progress'><View className='mock-progress-fill' /></View>
+                  <Text className='mock-target'>目標 ¥5,000</Text>
+                </View>
+                <View className='mock-live'>
+                  <Text className='mock-live-label'>今 日 收 益</Text>
+                  <Text className='mock-live-amount'>¥ 127.08</Text>
+                </View>
+                <View className='mock-card mock-card--detail'>
+                  <Text className='mock-card-title'>薪 賄 明 細</Text>
+                  <View className='mock-card-line' />
+                </View>
+                <View className='mock-card mock-card--progress'>
+                  <Text className='mock-card-title'>今日進度</Text>
+                  <View className='mock-card-bar'><View className='mock-card-bar-fill' /></View>
+                </View>
+              </View>
+            </View>
+            <View className='launch-panel__overlay'>
+              <Text className='launch-panel__badge'>默认推荐</Text>
+              <Text className='launch-panel__title'>每秒工资</Text>
+              <Text className='launch-panel__desc'>实时查看今天赚了多少、距离发薪日还有多久</Text>
+              <View className='launch-panel__enter'>
+                <Text className='launch-panel__enter-text'>点击进入</Text>
+                <Text className='launch-panel__enter-arrow'>→</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* 分割线 */}
+          <View className='launch-divider' />
+
+          {/* 下半：记账页 */}
+          <View className='launch-panel launch-panel--bottom' onClick={() => handleSelectHomePage(1)}>
+            <View className='launch-panel__preview'>
+              <View className='launch-mock-bk'>
+                <View className='mock-bk-header'>
+                  <Text className='mock-bk-title'>記 帳</Text>
+                  <View className='mock-bk-summary'>
+                    <Text className='mock-bk-summary-label'>本月收支</Text>
+                    <Text className='mock-bk-summary-val'>+2,485</Text>
+                  </View>
+                </View>
+                <View className='mock-bk-pen'>
+                  <Text className='mock-bk-pen-text'>記 一 筆</Text>
+                </View>
+                <View className='mock-bk-chips'>
+                  <Text className='mock-bk-chip mock-bk-chip--active'>餐飲</Text>
+                  <Text className='mock-bk-chip'>交通</Text>
+                  <Text className='mock-bk-chip'>購物</Text>
+                  <Text className='mock-bk-chip'>娛樂</Text>
+                </View>
+                <View className='mock-bk-list'>
+                  <View className='mock-bk-row'>
+                    <View className='mock-bk-dot mock-bk-dot--food' />
+                    <Text className='mock-bk-name'>午餐</Text>
+                    <Text className='mock-bk-val'>-35</Text>
+                  </View>
+                  <View className='mock-bk-row'>
+                    <View className='mock-bk-dot mock-bk-dot--transport' />
+                    <Text className='mock-bk-name'>交通</Text>
+                    <Text className='mock-bk-val'>-12</Text>
+                  </View>
+                  <View className='mock-bk-row'>
+                    <View className='mock-bk-dot mock-bk-dot--income' />
+                    <Text className='mock-bk-name'>工资</Text>
+                    <Text className='mock-bk-val mock-bk-val--income'>+5,000</Text>
+                  </View>
+                </View>
+                <View className='mock-bk-charts'>
+                  <View className='mock-bk-chart-card'>
+                    <Text className='mock-bk-chart-title'>近7日支出</Text>
+                    <View className='mock-bk-chart'>
+                      {[45, 70, 30, 85, 55, 40, 60].map((h, i) => (
+                        <View key={i} className='mock-bk-bar' style={{ height: `${h}%` }} />
+                      ))}
+                    </View>
+                    <View className='mock-bk-chart-labels'>
+                      <Text className='mock-bk-chart-label'>13</Text>
+                      <Text className='mock-bk-chart-label'>14</Text>
+                      <Text className='mock-bk-chart-label'>15</Text>
+                      <Text className='mock-bk-chart-label'>16</Text>
+                      <Text className='mock-bk-chart-label'>17</Text>
+                      <Text className='mock-bk-chart-label'>18</Text>
+                      <Text className='mock-bk-chart-label'>19</Text>
+                    </View>
+                  </View>
+                  <View className='mock-bk-chart-card'>
+                    <Text className='mock-bk-chart-title'>月度分類</Text>
+                    <View className='mock-bk-pie-row'>
+                      <View className='mock-bk-pie' />
+                      <View className='mock-bk-pie-legend'>
+                        <View className='mock-bk-legend-item'>
+                          <View className='mock-bk-legend-dot mock-bk-legend-dot--a' />
+                          <Text className='mock-bk-legend-text'>餐飲</Text>
+                        </View>
+                        <View className='mock-bk-legend-item'>
+                          <View className='mock-bk-legend-dot mock-bk-legend-dot--b' />
+                          <Text className='mock-bk-legend-text'>交通</Text>
+                        </View>
+                        <View className='mock-bk-legend-item'>
+                          <View className='mock-bk-legend-dot mock-bk-legend-dot--c' />
+                          <Text className='mock-bk-legend-text'>購物</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+            <View className='launch-panel__overlay'>
+              <Text className='launch-panel__badge'>持久记忆</Text>
+              <Text className='launch-panel__title'>记账页</Text>
+              <Text className='launch-panel__desc'>再次打开小程序也会优先从记账页开始</Text>
+              <View className='launch-panel__enter'>
+                <Text className='launch-panel__enter-text'>点击进入</Text>
+                <Text className='launch-panel__enter-arrow'>→</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }
