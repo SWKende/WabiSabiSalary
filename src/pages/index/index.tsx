@@ -482,6 +482,10 @@ export default function Index() {
             <Text className='launch-panel__badge'>默认推荐</Text>
             <Text className='launch-panel__title'>每秒工资</Text>
             <Text className='launch-panel__desc'>实时查看今天赚了多少、距离发薪日还有多久</Text>
+            <View className='launch-panel__enter'>
+              <Text className='launch-panel__enter-text'>点击进入</Text>
+              <Text className='launch-panel__enter-arrow'>→</Text>
+            </View>
           </View>
         </View>
 
@@ -571,6 +575,10 @@ export default function Index() {
             <Text className='launch-panel__badge'>持久记忆</Text>
             <Text className='launch-panel__title'>记账页</Text>
             <Text className='launch-panel__desc'>再次打开小程序也会优先从记账页开始</Text>
+            <View className='launch-panel__enter'>
+              <Text className='launch-panel__enter-text'>点击进入</Text>
+              <Text className='launch-panel__enter-arrow'>→</Text>
+            </View>
           </View>
         </View>
       </View>

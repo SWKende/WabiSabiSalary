@@ -60,7 +60,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: blur(3px);
+  filter: blur(4.5px);
   transform: scale(1.06);
   transition: filter 0.4s ease, transform 0.4s ease;
   pointer-events: none;
@@ -74,11 +74,23 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 20px 32px;
-  background: rgba(245, 240, 232, 0.52);
+  padding: 24px 36px 20px;
+  background: rgba(250, 248, 244, 0.68);
+  border: 1px solid rgba(200, 185, 154, 0.35);
   border-radius: 20px;
-  backdrop-filter: blur(4px);
-  transition: background 0.4s ease;
+  box-shadow: 0 4px 20px rgba(44, 44, 44, 0.06), 0 1px 4px rgba(44, 44, 44, 0.04);
+  backdrop-filter: blur(6px);
+  animation: overlayFloat 5s ease-in-out infinite;
+}
+
+// 下半卡片错开 2.5s，形成上下交替浮动
+.launch-panel--bottom .launch-panel__overlay {
+  animation-delay: -2.5s;
+}
+
+@keyframes overlayFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
 .launch-panel__badge {
@@ -98,7 +110,6 @@
   font-weight: 600;
   letter-spacing: 6px;
   font-family: 'Noto Serif SC', serif;
-  transition: letter-spacing 0.4s ease;
 }
 
 .launch-panel__desc {
@@ -109,6 +120,29 @@
   letter-spacing: 1px;
   max-width: 320px;
   font-family: 'Noto Serif SC', serif;
+}
+
+.launch-panel__enter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 8px 20px;
+  background: rgba(44, 44, 44, 0.06);
+  border-radius: 999px;
+}
+
+.launch-panel__enter-text {
+  font-size: 18px;
+  color: #5c5650;
+  letter-spacing: 3px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.launch-panel__enter-arrow {
+  font-size: 20px;
+  color: #a89878;
+  line-height: 1;
 }
 
 // ========== 缩略预览：工资页 ==========
