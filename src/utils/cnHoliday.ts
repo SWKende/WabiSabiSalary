@@ -98,30 +98,40 @@ export async function ensureCnHolidayDataset(params?: {
   const base = params?.baseDate ?? new Date()
   const years = params?.years ?? [base.getFullYear(), base.getFullYear() + 1, base.getFullYear() + 2]
 
+  // 1. 优先读本地缓存
   const cached = readCnHolidayDatasetSync()
   if (isCoveringYears(cached, years)) return cached!
 
-  const missingYears = years.filter((y) => !cached?.years.includes(y))
+  // 2. 将内置 fallback 数据与缓存合并，覆盖所需年份则直接使用（无需网络）
+  const fb = safeParseDataset({ ...fallbackData, source: 'fallback' })
+  const merged: CnHolidayDataset = safeParseDataset({
+    years: uniqSorted([...(cached?.years ?? []), ...(fb?.years ?? [])]).map((x) => Number(x)),
+    holidays: uniqSorted([...(cached?.holidays ?? []), ...(fb?.holidays ?? [])]),
+    workdays: uniqSorted([...(cached?.workdays ?? []), ...(fb?.workdays ?? [])]),
+    fetchedAt: new Date().toISOString(),
+    source: fb?.source ?? 'fallback',
+  })!
+
+  if (isCoveringYears(merged, years)) {
+    writeCnHolidayDatasetSync(merged)
+    return merged
+  }
+
+  // 3. 本地数据不足时，才尝试外部 API（失败不影响功能）
+  const missingYears = years.filter((y) => !merged.years.includes(y))
   try {
     const fetched = await Promise.all(missingYears.map(fetchYearFromProvider))
-    const merged: CnHolidayDataset = safeParseDataset({
-      years: uniqSorted([...(cached?.years ?? []), ...years]).map((x) => Number(x)),
-      holidays: uniqSorted([...(cached?.holidays ?? []), ...fetched.flatMap((x) => x.holidays)]),
-      workdays: uniqSorted([...(cached?.workdays ?? []), ...fetched.flatMap((x) => x.workdays)]),
+    const enhanced: CnHolidayDataset = safeParseDataset({
+      years: uniqSorted([...merged.years, ...missingYears]).map((x) => Number(x)),
+      holidays: uniqSorted([...merged.holidays, ...fetched.flatMap((x) => x.holidays)]),
+      workdays: uniqSorted([...merged.workdays, ...fetched.flatMap((x) => x.workdays)]),
       fetchedAt: new Date().toISOString(),
       source: 'remote',
     })!
-    writeCnHolidayDatasetSync(merged)
-    return merged
+    writeCnHolidayDatasetSync(enhanced)
+    return enhanced
   } catch {
-    if (cached) return { ...cached, source: 'cache' }
-    const fb = safeParseDataset({ ...fallbackData, source: 'fallback' }) || {
-      years: [],
-      holidays: [],
-      workdays: [],
-      fetchedAt: new Date(0).toISOString(),
-      source: 'fallback' as const,
-    }
-    return fb
+    // API 失败，返回本地数据（已包含当前所需年份）
+    return merged
   }
 }
