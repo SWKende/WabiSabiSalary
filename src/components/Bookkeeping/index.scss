@@ -50,7 +50,12 @@
 // 记账表单卡片
 .bookkeeping-form {
   margin-bottom: 28px;
-  animation: formFadeIn 0.3s ease;
+  animation: formFadeIn 0.3s ease forwards;
+
+  // 动画播完后移除 animation，防止 Taro setData 触发重播
+  &.is-anim-done {
+    animation: none;
+  }
 
   .form-card {
     background: #faf8f4;

@@ -1,5 +1,5 @@
 import { View, Text, Input, ScrollView } from '@tarojs/components'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useCallback, useEffect, memo } from 'react'
 import Taro from '@tarojs/taro'
 import MonthlyBarChart from '../MonthlyBarChart'
 import MonthlyPieChart from '../MonthlyPieChart'
@@ -33,7 +33,7 @@ function migrateRecord(r: any): BookkeepingRecord {
 }
 
 // 记账页面组件
-export default function BookkeepingPage({
+function BookkeepingPageInner({
   bkSettings,
   openDatePicker,
   openAmountKeyboard,
@@ -46,6 +46,33 @@ export default function BookkeepingPage({
   const [note, setNote] = useState('')
   const [selectedDate, setSelectedDate] = useState(() => formatLocalDate(new Date()))
   const [showForm, setShowForm] = useState(false)
+  const [formAnimDone, setFormAnimDone] = useState(false)
+  const formAnimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // 动画播完后移除 animation 属性，防止 Taro setData 触发重播
+  const handleFormAnimEnd = useCallback(() => {
+    setFormAnimDone(true)
+    if (formAnimTimerRef.current) {
+      clearTimeout(formAnimTimerRef.current)
+      formAnimTimerRef.current = null
+    }
+  }, [])
+
+  // 重置动画状态（关闭表单后再打开时需要）
+  const openForm = useCallback(() => {
+    setFormAnimDone(false)
+    setShowForm(true)
+    // setTimeout 兜底：若 onAnimationEnd 未触发，350ms 后标记完成
+    if (formAnimTimerRef.current) clearTimeout(formAnimTimerRef.current)
+    formAnimTimerRef.current = setTimeout(() => setFormAnimDone(true), 350)
+  }, [])
+
+  // 组件卸载时清理定时器
+  useEffect(() => {
+    return () => {
+      if (formAnimTimerRef.current) clearTimeout(formAnimTimerRef.current)
+    }
+  }, [])
   const [recordPendingDelete, setRecordPendingDelete] = useState<BookkeepingRecord | null>(null)
   const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
@@ -163,11 +190,14 @@ export default function BookkeepingPage({
 
       {/* 记忆笔按钮 / 表单卡片 */}
       {!showForm ? (
-        <View className='memory-pen-btn' onClick={() => setShowForm(true)}>
+        <View className='memory-pen-btn' onClick={openForm}>
           <Text className='memory-pen-text'>記 一 筆</Text>
         </View>
       ) : (
-        <View className='bookkeeping-form'>
+        <View
+          className={`bookkeeping-form${formAnimDone ? ' is-anim-done' : ''}`}
+          onAnimationEnd={handleFormAnimEnd}
+        >
           <View className='form-card'>
             <View className='form-close-btn' onClick={() => setShowForm(false)}>
               <Text className='form-close-icon'>✕</Text>
@@ -336,7 +366,7 @@ export default function BookkeepingPage({
           <View className='record-confirm-dialog' onClick={(e) => e.stopPropagation()}>
             <Text className='record-confirm-title'>确认删除</Text>
             <Text className='record-confirm-desc'>
-              将删除“{recordPendingDelete.note || recordPendingDelete.category}”
+              将删除"{recordPendingDelete.note || recordPendingDelete.category}"
             </Text>
             <Text className='record-confirm-meta'>
               {recordPendingDelete.type === 'income' ? '+' : '-'}¥{recordPendingDelete.amount} · {formatRecordTime(recordPendingDelete.time)}
@@ -355,3 +385,6 @@ export default function BookkeepingPage({
     </View>
   )
 }
+
+const BookkeepingPage = memo(BookkeepingPageInner)
+export default BookkeepingPage

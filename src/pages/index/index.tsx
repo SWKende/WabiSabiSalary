@@ -191,16 +191,17 @@ export default function Index() {
     setNumberKeyboardVisible(false)
   }, [])
 
+  // 仅更新键盘预览值，不同步到记账页（避免重渲染触发卡片动画重播）
   const changeAmountKeyboardValue = useCallback((value: string) => {
     setNumberKeyboardValue(value)
-    const fn = amountKeyboardChangeRef.current
-    if (fn) fn(value)
   }, [])
 
+  // 确认时才将最终值同步到记账页
   const confirmAmountKeyboard = useCallback((value: string) => {
-    changeAmountKeyboardValue(value)
+    const fn = amountKeyboardChangeRef.current
+    if (fn) fn(value)
     setNumberKeyboardVisible(false)
-  }, [changeAmountKeyboardValue])
+  }, [])
 
   // 用 ref 存储实时数据，避免每秒 setState 导致整个组件树重渲染
   const timeInfoRef = useRef({
