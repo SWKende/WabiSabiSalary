@@ -22,133 +22,451 @@
 }
 
 .launch-screen-root {
-  justify-content: center;
+  flex-direction: column;
+  justify-content: stretch;
 }
 
-.launch-screen {
-  position: relative;
+// 分割线
+.launch-divider {
+  width: 60%;
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(200, 185, 154, 0.25) 30%,
+    rgba(200, 185, 154, 0.25) 70%,
+    transparent 100%
+  );
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+// 上下分屏面板
+.launch-panel {
   flex: 1;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 20px;
   overflow: hidden;
 }
 
-.launch-screen__halo {
+// 预览层（放大 + 虚化）
+.launch-panel__preview {
   position: absolute;
-  border-radius: 50%;
-  filter: blur(12px);
-  opacity: 0.7;
+  inset: -20px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: blur(3px);
+  transform: scale(1.06);
+  transition: filter 0.4s ease, transform 0.4s ease;
   pointer-events: none;
 }
 
-.launch-screen__halo--top {
-  top: -80px;
-  right: -30px;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle, rgba(200, 185, 154, 0.55) 0%, rgba(200, 185, 154, 0) 72%);
-}
-
-.launch-screen__halo--bottom {
-  bottom: -110px;
-  left: -50px;
-  width: 260px;
-  height: 260px;
-  background: radial-gradient(circle, rgba(122, 140, 110, 0.18) 0%, rgba(122, 140, 110, 0) 74%);
-}
-
-.launch-screen__content {
+// 文字叠层
+.launch-panel__overlay {
   position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 420px;
-  padding: 36px 24px 28px;
-  background: rgba(250, 248, 244, 0.92);
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 18px;
-  box-shadow: 0 18px 48px rgba(44, 44, 44, 0.08);
-  box-sizing: border-box;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 32px;
+  background: rgba(245, 240, 232, 0.52);
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+  transition: background 0.4s ease;
 }
 
-.launch-screen__eyebrow {
-  display: block;
-  margin-bottom: 12px;
+.launch-panel__badge {
+  padding: 5px 14px;
+  background: rgba(200, 185, 154, 0.18);
+  border: 1px solid rgba(200, 185, 154, 0.3);
+  border-radius: 999px;
   font-size: 18px;
-  letter-spacing: 4px;
-  color: #8a8279;
-  text-transform: uppercase;
+  color: #8a7e6c;
+  letter-spacing: 2px;
+  font-family: 'Noto Serif SC', serif;
 }
 
-.launch-screen__title {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 34px;
-  line-height: 1.4;
+.launch-panel__title {
+  font-size: 42px;
   color: #2c2c2c;
   font-weight: 600;
+  letter-spacing: 6px;
+  font-family: 'Noto Serif SC', serif;
+  transition: letter-spacing 0.4s ease;
 }
 
-.launch-screen__desc {
-  display: block;
-  margin-bottom: 28px;
-  font-size: 24px;
-  line-height: 1.7;
+.launch-panel__desc {
+  font-size: 22px;
   color: #736c63;
+  text-align: center;
+  line-height: 1.6;
+  letter-spacing: 1px;
+  max-width: 320px;
+  font-family: 'Noto Serif SC', serif;
 }
 
-.launch-screen__option {
+// ========== 缩略预览：工资页 ==========
+.launch-mock-salary {
+  width: 100%;
+  height: 100%;
+  padding: 40px 64px;
+  box-sizing: border-box;
+  background: #f5f0e8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+
+.mock-hero {
+  text-align: center;
+  padding: 8px 0 16px;
+}
+
+.mock-hero-label {
+  display: block;
+  font-size: 16px;
+  color: #8a8279;
+  letter-spacing: 8px;
+  margin-bottom: 10px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-hero-amount {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+.mock-currency {
+  font-size: 18px;
+  color: #a89878;
+  margin-top: 6px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-number {
+  font-size: 44px;
+  font-weight: 600;
+  color: #2c2c2c;
+  font-family: 'Shippori Mincho B1', serif;
+  line-height: 1;
+}
+
+.mock-progress {
+  width: 120px;
+  height: 2px;
+  background: rgba(44, 44, 44, 0.08);
+  margin: 0 auto 6px;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.mock-progress-fill {
+  width: 65%;
+  height: 100%;
+  background: #c8b99a;
+}
+
+.mock-target {
+  font-size: 14px;
+  color: #8a8279;
+  letter-spacing: 3px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-live {
+  text-align: center;
+  padding: 20px;
+  background: #faf8f4;
+  border: 1px solid rgba(44, 44, 44, 0.06);
+  border-radius: 2px;
+}
+
+.mock-live-label {
+  display: block;
+  font-size: 14px;
+  color: #8a8279;
+  letter-spacing: 6px;
+  margin-bottom: 8px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-live-amount {
+  font-size: 28px;
+  color: #2c2c2c;
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 500;
+}
+
+.mock-card {
+  padding: 14px 16px;
+  background: #faf8f4;
+  border: 1px solid rgba(44, 44, 44, 0.06);
+  border-radius: 2px;
+}
+
+.mock-card-title {
+  display: block;
+  font-size: 16px;
+  color: #2c2c2c;
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-card-line {
+  height: 2px;
+  width: 70%;
+  background: rgba(44, 44, 44, 0.06);
+  border-radius: 1px;
+}
+
+.mock-card-bar {
+  height: 3px;
+  background: #ece5d8;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.mock-card-bar-fill {
+  width: 55%;
+  height: 100%;
+  background: #c8b99a;
+}
+
+// ========== 缩略预览：记账页 ==========
+.launch-mock-bk {
+  width: 100%;
+  height: 100%;
+  padding: 40px 64px;
+  box-sizing: border-box;
+  background: #f5f0e8;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+}
+
+.mock-bk-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 4px 10px;
+  border-bottom: 1px solid rgba(44, 44, 44, 0.06);
+}
+
+.mock-bk-title {
+  font-size: 22px;
+  color: #2c2c2c;
+  font-weight: 500;
+  letter-spacing: 6px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-bk-summary {
+  text-align: right;
+}
+
+.mock-bk-summary-label {
+  display: block;
+  font-size: 12px;
+  color: #8a8279;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-bk-summary-val {
+  font-size: 20px;
+  color: #7a8c6e;
+  font-family: 'Shippori Mincho B1', serif;
+  font-weight: 500;
+}
+
+.mock-bk-pen {
+  padding: 12px 0;
+  text-align: center;
+  background: #faf8f4;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: 2px;
+}
+
+.mock-bk-pen-text {
+  font-size: 16px;
+  color: #5c5650;
+  letter-spacing: 6px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-bk-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.mock-bk-chip {
+  padding: 5px 12px;
+  font-size: 13px;
+  color: #736c63;
+  background: rgba(200, 185, 154, 0.12);
+  border: 1px solid rgba(200, 185, 154, 0.2);
+  border-radius: 999px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-bk-chip--active {
+  background: rgba(200, 185, 154, 0.3);
+  border-color: rgba(200, 185, 154, 0.45);
+  color: #5c5650;
+}
+
+.mock-bk-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 22px 18px;
-  margin-bottom: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.84) 0%, rgba(244, 239, 230, 0.96) 100%);
-  border: 1px solid rgba(200, 185, 154, 0.4);
-  border-radius: 16px;
-  transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  &:active {
-    transform: scale(0.98);
-    border-color: rgba(122, 140, 110, 0.48);
-  }
 }
 
-.launch-screen__option--secondary {
-  border-color: rgba(122, 140, 110, 0.22);
-}
-
-.launch-screen__optionHeader {
+.mock-bk-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 4px;
+}
+
+.mock-bk-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mock-bk-dot--food { background: #b85450; }
+.mock-bk-dot--transport { background: #c8b99a; }
+.mock-bk-dot--other { background: #7a8c6e; }
+.mock-bk-dot--income { background: #a89878; }
+
+.mock-bk-name {
+  flex: 1;
+  font-size: 16px;
+  color: #5c5650;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-bk-val {
+  font-size: 17px;
+  color: #2c2c2c;
+  font-family: 'Shippori Mincho B1', serif;
+}
+
+.mock-bk-val--income {
+  color: #7a8c6e;
+}
+
+.mock-bk-charts {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.mock-bk-chart-card {
+  flex: 1;
+  padding: 12px 14px;
+  background: #faf8f4;
+  border: 1px solid rgba(44, 44, 44, 0.06);
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mock-bk-chart-title {
+  font-size: 13px;
+  color: #8a8279;
+  letter-spacing: 2px;
+  font-family: 'Noto Serif SC', serif;
+}
+
+.mock-bk-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 60px;
+}
+
+.mock-bk-bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  background: rgba(200, 185, 154, 0.5);
+  min-height: 4px;
+}
+
+.mock-bk-chart-labels {
+  display: flex;
+  gap: 6px;
+}
+
+.mock-bk-chart-label {
+  flex: 1;
+  text-align: center;
+  font-size: 10px;
+  color: #a39d95;
+  font-family: 'Shippori Mincho B1', serif;
+}
+
+.mock-bk-pie-row {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 
-.launch-screen__optionTitle {
-  font-size: 30px;
-  color: #2c2c2c;
-  font-weight: 600;
-}
-
-.launch-screen__optionBadge {
+.mock-bk-pie {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   flex-shrink: 0;
-  padding: 6px 10px;
-  background: rgba(200, 185, 154, 0.2);
-  border-radius: 999px;
-  font-size: 18px;
-  color: #7a6e5c;
+  background: conic-gradient(
+    #b85450 0% 35%,
+    #c8b99a 35% 55%,
+    #7a8c6e 55% 75%,
+    #a89878 75% 100%
+  );
 }
 
-.launch-screen__optionText {
-  font-size: 22px;
-  line-height: 1.7;
-  color: #6b655d;
+.mock-bk-pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mock-bk-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mock-bk-legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.mock-bk-legend-dot--a { background: #b85450; }
+.mock-bk-legend-dot--b { background: #c8b99a; }
+.mock-bk-legend-dot--c { background: #7a8c6e; }
+
+.mock-bk-legend-text {
+  font-size: 12px;
+  color: #736c63;
+  font-family: 'Noto Serif SC', serif;
 }
 
 // Swiper 容器
