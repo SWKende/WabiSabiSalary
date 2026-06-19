@@ -497,7 +497,10 @@ export default function Index() {
 
               {/* 实时收益 / 放假态 */}
               {timeInfo.isHoliday ? (
-                <View className='holiday-sun-card'>
+                <View
+                  className='holiday-sun-card'
+                  onClick={() => setHolidayCardIndex((prev) => (prev + 1) % HOLIDAY_CARD_VARIANTS.length)}
+                >
                   <View
                     className='holiday-card-illustration'
                     style={{ backgroundImage: `url(${holidayCard.illustration})` }}

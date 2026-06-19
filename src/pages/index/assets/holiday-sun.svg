@@ -1,35 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" fill="none">
   <defs>
-    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#f3e7c9" />
-      <stop offset="100%" stop-color="#e3d6b6" />
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f8ecd0" />
+      <stop offset="70%" stop-color="#f0e0b8" stop-opacity=".6" />
+      <stop offset="100%" stop-color="#f0e0b8" stop-opacity="0" />
     </radialGradient>
   </defs>
-  <ellipse cx="164" cy="172" rx="106" ry="30" fill="#e7ddd0" />
-  <circle cx="238" cy="54" r="28" fill="url(#sun)" />
-  <g stroke="#d8c8a3" stroke-linecap="round" stroke-width="4" opacity=".85">
-    <path d="M238 13v13" />
-    <path d="M238 95v13" />
-    <path d="M197 54h13" />
-    <path d="M279 54h13" />
-    <path d="M210 26l9 9" />
-    <path d="M257 73l9 9" />
-    <path d="M210 82l9-9" />
-    <path d="M257 35l9-9" />
+  <!-- 地面 -->
+  <ellipse cx="160" cy="182" rx="120" ry="26" fill="#e6ddd1" />
+  <!-- 太阳光晕（大） -->
+  <circle cx="244" cy="56" r="44" fill="url(#sunGlow)" />
+  <!-- 太阳本体 -->
+  <circle cx="244" cy="56" r="24" fill="#f0e2b8" />
+  <!-- 太阳光芒 -->
+  <g stroke="#d4bf96" stroke-linecap="round" stroke-width="3" opacity=".75">
+    <path d="M244 22v10" /><path d="M244 84v10" />
+    <path d="M210 56h10" /><path d="M268 56h10" />
+    <path d="M220 32l7 7" /><path d="M261 73l7 7" />
+    <path d="M220 80l7-7" /><path d="M261 39l7-7" />
   </g>
-  <g fill="#eef0eb">
-    <ellipse cx="92" cy="62" rx="24" ry="14" />
-    <ellipse cx="116" cy="62" rx="22" ry="16" />
-    <ellipse cx="136" cy="65" rx="14" ry="11" />
+  <!-- 云朵 -->
+  <g fill="#f0f2ed" opacity=".85">
+    <ellipse cx="72" cy="52" rx="18" ry="11" />
+    <ellipse cx="92" cy="50" rx="22" ry="14" />
+    <ellipse cx="112" cy="54" rx="14" ry="10" />
   </g>
-  <g stroke="#91867a" stroke-linecap="round" stroke-linejoin="round" stroke-width="6">
-    <path d="M84 156h116" />
-    <path d="M110 156l26-46h56" />
-    <path d="M188 110l18 46" />
+  <!-- 躺椅/躺垫 -->
+  <path d="M80 166 L120 146 L228 146 L240 166" stroke="#a89e92" stroke-width="5" stroke-linecap="round" fill="none" />
+  <!-- 椅腿 -->
+  <path d="M92 166 L86 180" stroke="#a89e92" stroke-width="4" stroke-linecap="round" />
+  <path d="M230 166 L236 180" stroke="#a89e92" stroke-width="4" stroke-linecap="round" />
+  <path d="M160 146 L160 180" stroke="#a89e92" stroke-width="4" stroke-linecap="round" />
+  <!-- 躺着的人（仰卧放松姿态） -->
+  <g stroke="#6b6359" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 头（靠在椅背） -->
+    <circle cx="108" cy="132" r="12" fill="#d4c8b8" stroke="none" />
+    <!-- 躯干（平躺） -->
+    <path d="M120 136 L192 136" stroke-width="10" />
+    <!-- 左手自然下垂 -->
+    <path d="M136 136 L130 156" stroke-width="6" />
+    <!-- 右手搭在肚子上 -->
+    <path d="M168 136 L174 148" stroke-width="6" />
+    <!-- 双腿放松伸直 -->
+    <path d="M192 136 L216 140" stroke-width="7" />
+    <path d="M192 136 L212 148" stroke-width="7" />
   </g>
-  <g fill="#b7aea2">
-    <path d="M144 112c8-11 20-16 34-16 13 0 24 5 32 16-8 12-19 18-33 18s-25-6-33-18Z" />
-    <ellipse cx="136" cy="116" rx="12" ry="10" />
-    <path d="M150 124c8 10 15 15 22 15 12 0 22-7 34-22l10 10c-15 20-30 30-47 30-14 0-26-8-37-23l18-10Z" />
+  <!-- 脚 -->
+  <ellipse cx="220" cy="142" rx="8" ry="4" fill="#8a8178" />
+  <ellipse cx="216" cy="150" rx="8" ry="4" fill="#8a8178" />
+  <!-- 小草（生命感） -->
+  <g stroke="#b8c4a8" stroke-linecap="round" stroke-width="2.5" opacity=".7">
+    <path d="M60 182 L56 168" />
+    <path d="M66 182 L68 170" />
+    <path d="M270 180 L266 168" />
+    <path d="M278 180 L282 170" />
+  </g>
+  <!-- zzz 睡眠符号 -->
+  <g fill="none" stroke="#b8aea0" stroke-linecap="round" stroke-width="2.5" opacity=".6">
+    <path d="M124 108 L132 108 L124 116 L132 116" />
+    <path d="M136 98 L142 98 L136 104 L142 104" />
+    <path d="M146 90 L150 90 L146 94 L150 94" />
   </g>
 </svg>

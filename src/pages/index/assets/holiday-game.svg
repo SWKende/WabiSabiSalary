@@ -1,25 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" fill="none">
-  <ellipse cx="162" cy="174" rx="102" ry="26" fill="#e7ddd0" />
-  <g fill="#edf0ea">
-    <ellipse cx="96" cy="60" rx="24" ry="14" />
-    <ellipse cx="118" cy="60" rx="22" ry="16" />
-    <ellipse cx="138" cy="63" rx="14" ry="11" />
+  <!-- 地面 -->
+  <ellipse cx="160" cy="180" rx="110" ry="24" fill="#e6ddd1" />
+  <!-- 云朵 -->
+  <g fill="#f0f2ed" opacity=".85">
+    <ellipse cx="80" cy="48" rx="18" ry="11" />
+    <ellipse cx="98" cy="46" rx="22" ry="14" />
+    <ellipse cx="118" cy="50" rx="14" ry="10" />
   </g>
-  <circle cx="244" cy="52" r="24" fill="#eee0bd" opacity=".9" />
-  <rect x="88" y="98" width="144" height="74" rx="34" fill="#c8c1b4" />
-  <rect x="104" y="112" width="112" height="46" rx="16" fill="#5d5750" />
-  <rect x="118" y="122" width="84" height="26" rx="8" fill="#918a81" />
-  <g fill="#e8dfcf">
-    <circle cx="126" cy="135" r="6" />
-    <circle cx="194" cy="129" r="7" />
-    <circle cx="208" cy="141" r="7" />
+  <!-- 太阳 -->
+  <circle cx="248" cy="42" r="20" fill="#eee2c0" opacity=".85" />
+  <g stroke="#d4c29e" stroke-linecap="round" stroke-width="2.5" opacity=".6">
+    <path d="M248 14v8" /><path d="M248 64v8" />
+    <path d="M220 42h8" /><path d="M268 42h8" />
   </g>
-  <g stroke="#e8dfcf" stroke-linecap="round" stroke-width="5">
-    <path d="M146 135h20" />
-    <path d="M156 125v20" />
+  <!-- 掌机主体（圆润的横向手柄造型） -->
+  <rect x="76" y="92" width="168" height="80" rx="40" fill="#b8b0a3" />
+  <rect x="76" y="92" width="168" height="80" rx="40" fill="none" stroke="#9c9488" stroke-width="2" />
+  <!-- 屏幕 -->
+  <rect x="114" y="104" width="92" height="56" rx="6" fill="#3d3832" />
+  <!-- 屏幕内容（像素风小人物） -->
+  <g fill="#a8d8a0">
+    <rect x="124" y="120" width="8" height="16" rx="1" />
+    <rect x="136" y="124" width="8" height="12" rx="1" />
+    <rect x="148" y="118" width="8" height="18" rx="1" />
+    <rect x="160" y="122" width="8" height="14" rx="1" />
+    <rect x="172" y="128" width="8" height="8" rx="1" />
+    <rect x="184" y="126" width="8" height="10" rx="1" />
   </g>
-  <g stroke="#a9a194" stroke-linecap="round" stroke-width="4" opacity=".9">
-    <path d="M108 100c-12 8-18 18-18 32" />
-    <path d="M212 100c12 8 18 18 18 32" />
+  <!-- 屏幕高光 -->
+  <rect x="114" y="104" width="92" height="56" rx="6" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" />
+  <!-- 左侧摇杆 -->
+  <circle cx="98" cy="124" r="12" fill="#8a8278" />
+  <circle cx="98" cy="124" r="7" fill="#6e665d" />
+  <circle cx="96" cy="122" r="2" fill="rgba(255,255,255,0.2)" />
+  <!-- 右侧四个按钮 -->
+  <circle cx="222" cy="114" r="6" fill="#8a8278" />
+  <circle cx="234" cy="126" r="6" fill="#8a8278" />
+  <circle cx="210" cy="126" r="6" fill="#8a8278" />
+  <circle cx="222" cy="138" r="6" fill="#8a8278" />
+  <!-- 按钮高光 -->
+  <g fill="rgba(255,255,255,0.18)">
+    <circle cx="221" cy="113" r="2" />
+    <circle cx="233" cy="125" r="2" />
+    <circle cx="209" cy="125" r="2" />
+    <circle cx="221" cy="137" r="2" />
   </g>
+  <!-- 左右握把弧线 -->
+  <path d="M76 112 C60 120 58 140 76 152" stroke="#9c9488" stroke-width="3" stroke-linecap="round" fill="none" />
+  <path d="M244 112 C260 120 262 140 244 152" stroke="#9c9488" stroke-width="3" stroke-linecap="round" fill="none" />
+  <!-- 底部小细节：充电口 -->
+  <rect x="152" y="170" width="16" height="4" rx="2" fill="#9c9488" />
 </svg>

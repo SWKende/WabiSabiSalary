@@ -1,28 +1,59 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" fill="none">
   <defs>
     <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#f1e5c5" />
-      <stop offset="100%" stop-color="#e1d4b1" />
+      <stop offset="0%" stop-color="#f5e9ca" />
+      <stop offset="100%" stop-color="#e8dbb8" />
     </radialGradient>
   </defs>
-  <ellipse cx="160" cy="176" rx="108" ry="24" fill="#e6ddd1" />
-  <circle cx="244" cy="52" r="24" fill="url(#sun)" />
-  <path d="M72 166c30-10 56-14 80-14 26 0 56 4 96 14" stroke="#d3cabd" stroke-linecap="round" stroke-width="6" />
-  <g fill="#eef0eb">
-    <ellipse cx="92" cy="64" rx="22" ry="13" />
-    <ellipse cx="112" cy="64" rx="20" ry="15" />
-    <ellipse cx="130" cy="66" rx="13" ry="10" />
+  <!-- 地面 -->
+  <ellipse cx="160" cy="182" rx="118" ry="22" fill="#e6ddd1" />
+  <!-- 太阳 -->
+  <circle cx="252" cy="46" r="22" fill="url(#sun)" />
+  <g stroke="#d4c29e" stroke-linecap="round" stroke-width="3" opacity=".7">
+    <path d="M252 14v10" /><path d="M252 72v10" />
+    <path d="M220 46h10" /><path d="M274 46h10" />
+    <path d="M230 24l7 7" /><path d="M267 61l7 7" />
+    <path d="M230 68l7-7" /><path d="M267 31l7-7" />
   </g>
-  <circle cx="160" cy="84" r="12" fill="#bdb3a7" />
-  <g stroke="#897f73" stroke-linecap="round" stroke-linejoin="round" stroke-width="7">
-    <path d="M160 98l-16 28 22 18" />
-    <path d="M154 110l30 12" />
-    <path d="M166 144l-30 22" />
-    <path d="M168 144l36 8 20-18" />
+  <!-- 云朵 -->
+  <g fill="#f0f2ed" opacity=".9">
+    <ellipse cx="78" cy="56" rx="20" ry="12" />
+    <ellipse cx="98" cy="54" rx="24" ry="15" />
+    <ellipse cx="118" cy="58" rx="15" ry="10" />
   </g>
-  <g stroke="#d7c6a1" stroke-linecap="round" stroke-width="4" opacity=".85">
-    <path d="M204 88l12 3" />
-    <path d="M210 104l12 1" />
-    <path d="M206 120l12-2" />
+  <!-- 跑步人物：前倾躯干 + 动态摆臂 + 蹬地姿态 -->
+  <g stroke="#6b6359" stroke-linecap="round" stroke-linejoin="round">
+    <!-- 头 -->
+    <circle cx="172" cy="68" r="13" fill="#d4c8b8" stroke="none" />
+    <!-- 躯干（前倾） -->
+    <path d="M172 82 L164 132" stroke-width="9" />
+    <!-- 后摆臂（右臂向后） -->
+    <path d="M168 94 L190 80" stroke-width="7" />
+    <path d="M190 80 L200 88" stroke-width="6" />
+    <!-- 前摆臂（左臂向前） -->
+    <path d="M168 94 L148 108" stroke-width="7" />
+    <path d="M148 108 L140 100" stroke-width="6" />
+    <!-- 前腿（右腿抬起，膝盖弯曲） -->
+    <path d="M164 132 L144 158" stroke-width="8" />
+    <path d="M144 158 L130 178" stroke-width="7" />
+    <!-- 后腿（左腿蹬地伸直） -->
+    <path d="M164 132 L196 160" stroke-width="8" />
+    <path d="M196 160 L212 178" stroke-width="7" />
+  </g>
+  <!-- 脚 -->
+  <ellipse cx="126" cy="180" rx="10" ry="4" fill="#8a8178" />
+  <ellipse cx="214" cy="180" rx="9" ry="4" fill="#8a8178" />
+  <!-- 速度线（动态感） -->
+  <g stroke="#c8b99a" stroke-linecap="round" stroke-width="3" opacity=".65">
+    <path d="M228 96 L248 94" />
+    <path d="M226 114 L250 113" />
+    <path d="M224 132 L246 132" />
+    <path d="M222 150 L242 151" />
+  </g>
+  <!-- 地面尘土微粒 -->
+  <g fill="#d4c8b8" opacity=".5">
+    <circle cx="140" cy="184" r="2.5" />
+    <circle cx="150" cy="186" r="1.8" />
+    <circle cx="162" cy="185" r="2" />
   </g>
 </svg>
