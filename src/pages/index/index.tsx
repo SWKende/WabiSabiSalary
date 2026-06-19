@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Swiper, SwiperItem, Switch } from '@tarojs/components'
+import { View, Text, Image, ScrollView, Swiper, SwiperItem, Switch } from '@tarojs/components'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Taro from '@tarojs/taro'
 import AnimatedNumber from '../../components/AnimatedNumber'
@@ -18,9 +18,9 @@ import {
   type CnDayType,
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
-import holidayGameSvg from './assets/holiday-game.svg'
-import holidayRunSvg from './assets/holiday-run.svg'
-import holidaySunSvg from './assets/holiday-sun.svg'
+import holidayGameSvg from './assets/holiday-game.png'
+import holidayRunSvg from './assets/holiday-run.png'
+import holidaySunSvg from './assets/holiday-sun.png'
 import './index.scss'
 
 const DEFAULT_BK_SETTINGS: BookkeepingSettings = {
@@ -501,9 +501,10 @@ export default function Index() {
                   className='holiday-sun-card'
                   onClick={() => setHolidayCardIndex((prev) => (prev + 1) % HOLIDAY_CARD_VARIANTS.length)}
                 >
-                  <View
+                  <Image
                     className='holiday-card-illustration'
-                    style={{ backgroundImage: `url(${holidayCard.illustration})` }}
+                    src={holidayCard.illustration}
+                    mode='aspectFit'
                   />
                   <View className='holiday-card-content'>
                     <Text className='holiday-card-kicker'>{holidayCard.kicker}</Text>
