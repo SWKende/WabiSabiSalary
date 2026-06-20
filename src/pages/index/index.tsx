@@ -729,10 +729,12 @@ export default function Index() {
 
                 {/* 近7日柱状图 */}
                 <View className='bk-setting-row'>
-                  <View className='mini-bar-chart'>
-                    {[40, 70, 50, 90, 60].map((h, i) => (
-                      <View key={i} className='mini-bar' style={{ height: `${h}%` }} />
-                    ))}
+                  <View className='mini-chart-card'>
+                    <View className='mini-bar-chart'>
+                      {[40, 70, 50, 90, 60].map((h, i) => (
+                        <View key={i} className='mini-bar' style={{ height: `${h}%` }} />
+                      ))}
+                    </View>
                   </View>
                   <Text className='bk-setting-label'>近7日柱狀圖</Text>
                   <Switch
@@ -744,10 +746,12 @@ export default function Index() {
 
                 {/* 月度柱状图 */}
                 <View className='bk-setting-row'>
-                  <View className='mini-bar-chart mini-bar-monthly'>
-                    {[30, 60, 45, 80, 55, 70, 40].map((h, i) => (
-                      <View key={i} className='mini-bar' style={{ height: `${h}%` }} />
-                    ))}
+                  <View className='mini-chart-card'>
+                    <View className='mini-bar-chart mini-bar-monthly'>
+                      {[30, 60, 45, 80, 55, 70, 40].map((h, i) => (
+                        <View key={i} className='mini-bar' style={{ height: `${h}%` }} />
+                      ))}
+                    </View>
                   </View>
                   <Text className='bk-setting-label'>月度柱狀圖</Text>
                   <Switch
@@ -759,7 +763,11 @@ export default function Index() {
 
                 {/* 月度饼状图 */}
                 <View className='bk-setting-row'>
-                  <View className='mini-pie-chart' />
+                  <View className='mini-chart-card'>
+                    <View className='mini-pie-chart'>
+                      <View className='mini-pie-circle' />
+                    </View>
+                  </View>
                   <Text className='bk-setting-label'>月度餅狀圖</Text>
                   <Switch
                     checked={bkSettings.showMonthlyPie}

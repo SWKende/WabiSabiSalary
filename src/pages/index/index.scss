@@ -1278,35 +1278,53 @@
   letter-spacing: 2px;
 }
 
+// 迷你图表缩略图 — 统一圆角卡片
+.mini-chart-card {
+  width: 64px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(44, 44, 44, 0.04);
+  border-radius: 10px;
+  border: 1px solid rgba(44, 44, 44, 0.06);
+}
+
 // 迷你柱状图缩略图
 .mini-bar-chart {
-  width: 48px;
-  height: 32px;
+  width: 34px;
+  height: 22px;
   display: flex;
   align-items: flex-end;
-  gap: 3px;
-  flex-shrink: 0;
+  gap: 2px;
 
   .mini-bar {
     flex: 1;
     border-radius: 1px 1px 0 0;
-    background: rgba(184, 84, 80, 0.4);
+    background: rgba(184, 84, 80, 0.45);
   }
 
   &.mini-bar-monthly {
-    gap: 2px;
+    gap: 1.5px;
 
     .mini-bar {
-      background: rgba(200, 185, 154, 0.5);
+      background: rgba(200, 185, 154, 0.6);
     }
   }
 }
 
 // 迷你饼状图缩略图
 .mini-pie-chart {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: conic-gradient(#b85450 0% 35%, #c8b99a 35% 55%, #7a8c6e 55% 75%, #a89878 75% 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .mini-pie-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: conic-gradient(#b85450 0% 35%, #c8b99a 35% 55%, #7a8c6e 55% 75%, #a89878 75% 100%);
+    box-shadow: 0 0 0 1px rgba(44, 44, 44, 0.04);
+  }
 }
