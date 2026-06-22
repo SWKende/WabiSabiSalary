@@ -1,59 +1,67 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220">
   <defs>
-    <radialGradient id="sun" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#f5e9ca" />
-      <stop offset="100%" stop-color="#e8dbb8" />
+    <radialGradient id="sunR" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#f5e9ca"/>
+      <stop offset="100%" stop-color="#e8dbb8"/>
     </radialGradient>
   </defs>
-  <!-- 地面 -->
-  <ellipse cx="160" cy="182" rx="118" ry="22" fill="#e6ddd1" />
-  <!-- 太阳 -->
-  <circle cx="252" cy="46" r="22" fill="url(#sun)" />
-  <g stroke="#d4c29e" stroke-linecap="round" stroke-width="3" opacity=".7">
-    <path d="M252 14v10" /><path d="M252 72v10" />
-    <path d="M220 46h10" /><path d="M274 46h10" />
-    <path d="M230 24l7 7" /><path d="M267 61l7 7" />
-    <path d="M230 68l7-7" /><path d="M267 31l7-7" />
-  </g>
-  <!-- 云朵 -->
-  <g fill="#f0f2ed" opacity=".9">
-    <ellipse cx="78" cy="56" rx="20" ry="12" />
-    <ellipse cx="98" cy="54" rx="24" ry="15" />
-    <ellipse cx="118" cy="58" rx="15" ry="10" />
-  </g>
-  <!-- 跑步人物：前倾躯干 + 动态摆臂 + 蹬地姿态 -->
-  <g stroke="#6b6359" stroke-linecap="round" stroke-linejoin="round">
-    <!-- 头 -->
-    <circle cx="172" cy="68" r="13" fill="#d4c8b8" stroke="none" />
-    <!-- 躯干（前倾） -->
-    <path d="M172 82 L164 132" stroke-width="9" />
-    <!-- 后摆臂（右臂向后） -->
-    <path d="M168 94 L190 80" stroke-width="7" />
-    <path d="M190 80 L200 88" stroke-width="6" />
-    <!-- 前摆臂（左臂向前） -->
-    <path d="M168 94 L148 108" stroke-width="7" />
-    <path d="M148 108 L140 100" stroke-width="6" />
-    <!-- 前腿（右腿抬起，膝盖弯曲） -->
-    <path d="M164 132 L144 158" stroke-width="8" />
-    <path d="M144 158 L130 178" stroke-width="7" />
-    <!-- 后腿（左腿蹬地伸直） -->
-    <path d="M164 132 L196 160" stroke-width="8" />
-    <path d="M196 160 L212 178" stroke-width="7" />
-  </g>
-  <!-- 脚 -->
-  <ellipse cx="126" cy="180" rx="10" ry="4" fill="#8a8178" />
-  <ellipse cx="214" cy="180" rx="9" ry="4" fill="#8a8178" />
-  <!-- 速度线（动态感） -->
-  <g stroke="#c8b99a" stroke-linecap="round" stroke-width="3" opacity=".65">
-    <path d="M228 96 L248 94" />
-    <path d="M226 114 L250 113" />
-    <path d="M224 132 L246 132" />
-    <path d="M222 150 L242 151" />
-  </g>
-  <!-- 地面尘土微粒 -->
-  <g fill="#d4c8b8" opacity=".5">
-    <circle cx="140" cy="184" r="2.5" />
-    <circle cx="150" cy="186" r="1.8" />
-    <circle cx="162" cy="185" r="2" />
-  </g>
+
+  <path d="M0 110 Q80 92 160 100 Q240 108 320 96 L320 130 L0 130 Z" fill="#c8d0c8" opacity="0.5"/>
+  <path d="M0 130 Q90 118 180 126 Q250 130 320 120 L320 150 L0 150 Z" fill="#dcd5c7" opacity="0.85"/>
+
+  <circle cx="50" cy="40" r="14" fill="url(#sunR)" opacity="0.85"/>
+  <path d="M50 18 L50 26" stroke="#d4c29e" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+  <path d="M50 54 L50 62" stroke="#d4c29e" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+  <path d="M28 40 L36 40" stroke="#d4c29e" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+  <path d="M64 40 L72 40" stroke="#d4c29e" stroke-width="1.6" stroke-linecap="round" opacity="0.55"/>
+
+  <path d="M232 38 Q236 34 240 38 Q244 34 248 38" stroke="#a89e92" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.65"/>
+  <path d="M252 30 Q255 27 258 30 Q261 27 264 30" stroke="#a89e92" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M268 42 Q271 39 274 42 Q277 39 280 42" stroke="#a89e92" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.55"/>
+
+  <path d="M30 168 L30 116" stroke="#8d9b8a" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/>
+  <ellipse cx="30" cy="106" rx="18" ry="12" fill="#a7b4a0" opacity="0.7"/>
+  <ellipse cx="20" cy="114" rx="9" ry="6" fill="#a7b4a0" opacity="0.65"/>
+  <ellipse cx="40" cy="114" rx="9" ry="6" fill="#a7b4a0" opacity="0.65"/>
+
+  <path d="M286 200 L286 84" stroke="#7b6f60" stroke-width="3.4" stroke-linecap="round"/>
+  <ellipse cx="286" cy="68" rx="32" ry="20" fill="#8da08a"/>
+  <ellipse cx="262" cy="84" rx="18" ry="12" fill="#8da08a"/>
+  <ellipse cx="306" cy="82" rx="14" ry="10" fill="#8da08a"/>
+  <ellipse cx="278" cy="60" rx="14" ry="9" fill="#a7b4a0" opacity="0.85"/>
+  <ellipse cx="296" cy="74" rx="10" ry="7" fill="#a7b4a0" opacity="0.7"/>
+
+  <ellipse cx="270" cy="198" rx="50" ry="6" fill="#7b6f60" opacity="0.18"/>
+  <ellipse cx="240" cy="200" rx="14" ry="3" fill="#a89e92" opacity="0.35"/>
+  <ellipse cx="210" cy="202" rx="10" ry="2.5" fill="#a89e92" opacity="0.3"/>
+  <ellipse cx="180" cy="200" rx="8" ry="2" fill="#a89e92" opacity="0.28"/>
+
+  <ellipse cx="156" cy="194" rx="28" ry="5" fill="#7b6f60" opacity="0.18"/>
+
+  <circle cx="156" cy="78" r="13" fill="#d4c8b8"/>
+  <path d="M148 70 Q156 60 164 70 Q166 76 162 78 Q158 72 156 72 Q154 72 150 78 Q146 76 148 70 Z" fill="#5b544d"/>
+
+  <path d="M150 90 Q140 116 144 144 Q146 156 156 156 Q166 156 168 144 Q172 116 162 90 Z" fill="#a89e92"/>
+
+  <path d="M148 102 Q132 110 128 122" stroke="#7b6f60" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="122" r="3.5" fill="#d4c8b8"/>
+  <path d="M164 102 Q178 96 184 84" stroke="#7b6f60" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+  <circle cx="184" cy="84" r="3.5" fill="#d4c8b8"/>
+
+  <path d="M150 152 Q138 168 130 186" stroke="#7b6f60" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="128" cy="190" rx="10" ry="3.6" fill="#5b544d"/>
+  <path d="M162 152 Q176 168 184 186" stroke="#7b6f60" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <ellipse cx="186" cy="190" rx="10" ry="3.6" fill="#5b544d"/>
+
+  <path d="M218 196 Q214 188 220 184 Q226 184 224 192 Q228 188 234 192 Q236 196 230 198 Z" fill="#a89e92"/>
+  <circle cx="232" cy="186" r="2.6" fill="#a89e92"/>
+  <circle cx="232" cy="184" r="0.8" fill="#3d3832"/>
+  <path d="M218 196 L214 200" stroke="#a89e92" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M236 188 Q242 184 240 180" stroke="#a89e92" stroke-width="2" stroke-linecap="round" fill="none"/>
+
+  <path d="M88 80 Q92 78 94 84 Q90 86 88 80 Z" fill="#c8a78a" opacity="0.7"/>
+  <path d="M210 110 Q214 108 216 114 Q212 116 210 110 Z" fill="#b89878" opacity="0.7"/>
+
+  <path d="M90 200 Q150 196 220 200" stroke="#c8bfae" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.45"/>
+  <path d="M70 208 Q150 204 240 208" stroke="#c8bfae" stroke-width="1" stroke-linecap="round" fill="none" opacity="0.4"/>
 </svg>

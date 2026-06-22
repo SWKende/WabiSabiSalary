@@ -1,64 +1,51 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="220" viewBox="0 0 320 220">
   <defs>
-    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#f8ecd0" />
-      <stop offset="70%" stop-color="#f0e0b8" stop-opacity=".6" />
-      <stop offset="100%" stop-color="#f0e0b8" stop-opacity="0" />
+    <radialGradient id="sunGlow" cx="80%" cy="22%" r="40%">
+      <stop offset="0%" stop-color="#f8ecd0"/>
+      <stop offset="60%" stop-color="#f0e0b8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#f0e0b8" stop-opacity="0"/>
     </radialGradient>
   </defs>
-  <!-- 地面 -->
-  <ellipse cx="160" cy="182" rx="120" ry="26" fill="#e6ddd1" />
-  <!-- 太阳光晕（大） -->
-  <circle cx="244" cy="56" r="44" fill="url(#sunGlow)" />
-  <!-- 太阳本体 -->
-  <circle cx="244" cy="56" r="24" fill="#f0e2b8" />
-  <!-- 太阳光芒 -->
-  <g stroke="#d4bf96" stroke-linecap="round" stroke-width="3" opacity=".75">
-    <path d="M244 22v10" /><path d="M244 84v10" />
-    <path d="M210 56h10" /><path d="M268 56h10" />
-    <path d="M220 32l7 7" /><path d="M261 73l7 7" />
-    <path d="M220 80l7-7" /><path d="M261 39l7-7" />
-  </g>
-  <!-- 云朵 -->
-  <g fill="#f0f2ed" opacity=".85">
-    <ellipse cx="72" cy="52" rx="18" ry="11" />
-    <ellipse cx="92" cy="50" rx="22" ry="14" />
-    <ellipse cx="112" cy="54" rx="14" ry="10" />
-  </g>
-  <!-- 躺椅/躺垫 -->
-  <path d="M80 166 L120 146 L228 146 L240 166" stroke="#a89e92" stroke-width="5" stroke-linecap="round" fill="none" />
-  <!-- 椅腿 -->
-  <path d="M92 166 L86 180" stroke="#a89e92" stroke-width="4" stroke-linecap="round" />
-  <path d="M230 166 L236 180" stroke="#a89e92" stroke-width="4" stroke-linecap="round" />
-  <path d="M160 146 L160 180" stroke="#a89e92" stroke-width="4" stroke-linecap="round" />
-  <!-- 躺着的人（仰卧放松姿态） -->
-  <g stroke="#6b6359" stroke-linecap="round" stroke-linejoin="round">
-    <!-- 头（靠在椅背） -->
-    <circle cx="108" cy="132" r="12" fill="#d4c8b8" stroke="none" />
-    <!-- 躯干（平躺） -->
-    <path d="M120 136 L192 136" stroke-width="10" />
-    <!-- 左手自然下垂 -->
-    <path d="M136 136 L130 156" stroke-width="6" />
-    <!-- 右手搭在肚子上 -->
-    <path d="M168 136 L174 148" stroke-width="6" />
-    <!-- 双腿放松伸直 -->
-    <path d="M192 136 L216 140" stroke-width="7" />
-    <path d="M192 136 L212 148" stroke-width="7" />
-  </g>
-  <!-- 脚 -->
-  <ellipse cx="220" cy="142" rx="8" ry="4" fill="#8a8178" />
-  <ellipse cx="216" cy="150" rx="8" ry="4" fill="#8a8178" />
-  <!-- 小草（生命感） -->
-  <g stroke="#b8c4a8" stroke-linecap="round" stroke-width="2.5" opacity=".7">
-    <path d="M60 182 L56 168" />
-    <path d="M66 182 L68 170" />
-    <path d="M270 180 L266 168" />
-    <path d="M278 180 L282 170" />
-  </g>
-  <!-- zzz 睡眠符号 -->
-  <g fill="none" stroke="#b8aea0" stroke-linecap="round" stroke-width="2.5" opacity=".6">
-    <path d="M124 108 L132 108 L124 116 L132 116" />
-    <path d="M136 98 L142 98 L136 104 L142 104" />
-    <path d="M146 90 L150 90 L146 94 L150 94" />
-  </g>
+
+  <path d="M0 146 Q80 122 160 138 Q240 154 320 138 L320 168 L0 168 Z" fill="#c8d0c8" opacity="0.55"/>
+
+  <circle cx="252" cy="48" r="48" fill="url(#sunGlow)"/>
+  <circle cx="252" cy="48" r="18" fill="#f0e2b8"/>
+
+  <path d="M58 44 Q62 40 66 44 Q70 40 74 44" stroke="#a89e92" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M84 36 Q87 33 90 36 Q93 33 96 36" stroke="#a89e92" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.6"/>
+
+  <path d="M0 172 Q80 160 160 168 Q240 176 320 166 L320 196 L0 196 Z" fill="#ece4d4"/>
+
+  <path d="M24 198 Q88 194 152 200 Q216 206 280 200" stroke="#c8bfae" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/>
+  <path d="M40 206 Q104 202 168 208 Q236 214 300 208" stroke="#c8bfae" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.55"/>
+  <path d="M16 214 Q88 210 160 216 Q236 222 308 216" stroke="#c8bfae" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.5"/>
+
+  <path d="M70 184 L70 132" stroke="#7b6f60" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+  <ellipse cx="70" cy="118" rx="24" ry="13" fill="#a7b4a0"/>
+  <ellipse cx="56" cy="124" rx="12" ry="7" fill="#a7b4a0" opacity="0.85"/>
+  <ellipse cx="86" cy="124" rx="12" ry="7" fill="#a7b4a0" opacity="0.85"/>
+  <ellipse cx="78" cy="186" rx="42" ry="5" fill="#b8a99a" opacity="0.22"/>
+
+  <path d="M150 184 Q172 162 200 168 Q220 172 224 184 Z" fill="#b8b0a3"/>
+  <path d="M150 184 Q172 162 200 168 Q220 172 224 184" stroke="#9c9488" stroke-width="1.2" fill="none"/>
+
+  <circle cx="186" cy="142" r="11" fill="#d4c8b8"/>
+  <path d="M183 142 Q186 140.4 189 142" stroke="#7b6f60" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+  <path d="M186 154 L184 172" stroke="#6b6359" stroke-width="9" stroke-linecap="round" fill="none"/>
+  <path d="M183 164 L172 172" stroke="#6b6359" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+  <path d="M184 172 L208 178" stroke="#6b6359" stroke-width="6.5" stroke-linecap="round" fill="none"/>
+  <path d="M184 172 L200 182" stroke="#6b6359" stroke-width="6" stroke-linecap="round" fill="none"/>
+
+  <rect x="238" y="172" width="14" height="11" rx="2" fill="#a89e92"/>
+  <ellipse cx="245" cy="172" rx="7" ry="2" fill="#7b6f60"/>
+  <path d="M242 168 Q245 164 242 160 Q239 156 242 152" stroke="#c8bfae" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <path d="M250 168 Q253 164 250 160" stroke="#c8bfae" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.7"/>
+
+  <path d="M132 92 Q136 90 138 96 Q134 98 132 92 Z" fill="#c8a78a" opacity="0.7"/>
+
+  <path d="M30 192 L26 182" stroke="#a7b4a0" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+  <path d="M38 192 L42 183" stroke="#a7b4a0" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+  <path d="M278 192 L274 182" stroke="#a7b4a0" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
+  <path d="M286 192 L290 183" stroke="#a7b4a0" stroke-width="1.8" stroke-linecap="round" opacity="0.65"/>
 </svg>
