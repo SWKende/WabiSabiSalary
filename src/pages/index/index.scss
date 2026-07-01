@@ -1201,6 +1201,44 @@
   margin: 4px 0;
 }
 
+.module-switch {
+  display: flex;
+  gap: 16px;
+}
+
+.module-switch-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 0;
+  border-radius: 2px;
+  border: 1px solid rgba(44, 44, 44, 0.08);
+  background: rgba(44, 44, 44, 0.03);
+  transition: all 0.3s ease;
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .module-switch-text {
+    font-size: 22px;
+    letter-spacing: 4px;
+    color: #8a8279;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+  }
+
+  &.active {
+    background: rgba(200, 185, 154, 0.22);
+    border-color: rgba(200, 185, 154, 0.55);
+
+    .module-switch-text {
+      color: #2c2c2c;
+    }
+  }
+}
+
 // 面板底部按钮
 .settings-footer {
   display: flex;

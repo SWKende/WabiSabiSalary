@@ -1,4 +1,4 @@
-import { View, Text, Image, ScrollView, Swiper, SwiperItem, Switch } from '@tarojs/components'
+import { View, Text, Image, ScrollView, Switch } from '@tarojs/components'
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Taro from '@tarojs/taro'
 import AnimatedNumber from '../../components/AnimatedNumber'
@@ -16,6 +16,7 @@ import {
   readCnHolidayDatasetSync,
   toYYYYMMDD,
   type CnDayType,
+  type CnHolidayDataset,
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
 import holidayGameSvg from './assets/holiday-game.svg'
@@ -85,6 +86,34 @@ const HOLIDAY_CARD_VARIANTS = [
 
 const pickRandomHolidayCardIndex = () => Math.floor(Math.random() * HOLIDAY_CARD_VARIANTS.length)
 
+const resolveWorkHoursPerDay = (workStartHour: number, workEndHour: number) => {
+  const raw = workEndHour - workStartHour
+  const hours = raw > 0 ? raw : raw + 24
+  return Math.max(1, Math.min(24, hours))
+}
+
+const isWeekend = (d: Date) => {
+  const w = d.getDay()
+  return w === 0 || w === 6
+}
+
+const resolveIsWorkday = (d: Date, dataset: CnHolidayDataset | null) => {
+  const type = classifyCnDate(toYYYYMMDD(d), dataset)
+  if (type === 'workday') return true
+  if (type === 'holiday') return false
+  return !isWeekend(d)
+}
+
+const countWorkdaysInMonth = (year: number, month: number, dataset: CnHolidayDataset | null) => {
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  let count = 0
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(year, month, day)
+    if (resolveIsWorkday(d, dataset)) count += 1
+  }
+  return Math.max(1, count)
+}
+
 export default function Index() {
   const initialHomePageState = getInitialHomePageState()
 
@@ -151,19 +180,32 @@ export default function Index() {
     }
   }, [])
 
-  const handleSelectHomePage = useCallback((page: HomePage) => {
+  const persistHomePagePreference = useCallback((page: HomePage) => {
     setCurrentPage(page)
-    setLaunchExiting(true)
     try {
       Taro.setStorageSync(HOME_PAGE_STORAGE_KEY, page === 0 ? 'salary' : 'bookkeeping')
     } catch {
       /* ignore */
     }
+  }, [])
+
+  const handleSelectHomePage = useCallback((page: HomePage) => {
+    persistHomePagePreference(page)
+    setLaunchExiting(true)
     setTimeout(() => {
       setShowLaunchScreen(false)
       setLaunchExiting(false)
     }, 650)
-  }, [])
+  }, [persistHomePagePreference])
+
+  const handleSwitchModule = useCallback(
+    (page: HomePage) => {
+      persistHomePagePreference(page)
+      setShowSettings(false)
+      setShowBkSettings(false)
+    },
+    [persistHomePagePreference]
+  )
 
   const openDatePicker = useCallback((value: string, onConfirm: (date: string) => void) => {
     datePickerConfirmRef.current = onConfirm
@@ -220,6 +262,7 @@ export default function Index() {
   const [tick, setTick] = useState(0)
   const lastSecondRef = useRef(-1)
 
+  const [holidayDataset, setHolidayDataset] = useState<CnHolidayDataset | null>(() => readCnHolidayDatasetSync())
   const [cnDayType, setCnDayType] = useState<CnDayType>(() => {
     const today = toYYYYMMDD(new Date())
     return classifyCnDate(today, readCnHolidayDatasetSync())
@@ -227,9 +270,19 @@ export default function Index() {
 
   const currentDateStr = useMemo(() => toYYYYMMDD(new Date()), [tick])
 
+  const workHoursPerDay = useMemo(
+    () => resolveWorkHoursPerDay(config.workStartHour, config.workEndHour),
+    [config.workStartHour, config.workEndHour]
+  )
+
+  const workDaysPerMonth = useMemo(() => {
+    const now = new Date()
+    return countWorkdaysInMonth(now.getFullYear(), now.getMonth(), holidayDataset)
+  }, [currentDateStr, holidayDataset])
+
   // 派生计算
-  const dailySalary = useMemo(() => config.monthlySalary / config.workDaysPerMonth, [config])
-  const hourlySalary = useMemo(() => dailySalary / config.workHoursPerDay, [dailySalary, config.workHoursPerDay])
+  const dailySalary = useMemo(() => config.monthlySalary / workDaysPerMonth, [config.monthlySalary, workDaysPerMonth])
+  const hourlySalary = useMemo(() => dailySalary / workHoursPerDay, [dailySalary, workHoursPerDay])
   const minuteSalary = useMemo(() => hourlySalary / 60, [hourlySalary])
   const secondSalary = useMemo(() => minuteSalary / 60, [minuteSalary])
 
@@ -252,11 +305,14 @@ export default function Index() {
     const now = new Date()
     const years = [now.getFullYear(), now.getFullYear() + 1, now.getFullYear() + 2]
 
-    setCnDayType(classifyCnDate(currentDateStr, readCnHolidayDatasetSync()))
+    const syncDataset = readCnHolidayDatasetSync()
+    setHolidayDataset(syncDataset)
+    setCnDayType(classifyCnDate(currentDateStr, syncDataset))
 
     ;(async () => {
       const dataset = await ensureCnHolidayDataset({ years })
       if (cancelled) return
+      setHolidayDataset(dataset)
       setCnDayType(classifyCnDate(currentDateStr, dataset))
     })()
 
@@ -265,7 +321,8 @@ export default function Index() {
     }
   }, [currentDateStr])
 
-  const isHolidayMode = cnDayType === 'holiday'
+  const isWeekendToday = useMemo(() => isWeekend(new Date()), [currentDateStr])
+  const isHolidayMode = cnDayType === 'holiday' || (cnDayType !== 'workday' && isWeekendToday)
   const prevHolidayModeRef = useRef(isHolidayMode)
 
   useEffect(() => {
@@ -287,7 +344,7 @@ export default function Index() {
 
   // 计算 timeInfo（纯函数，依赖 tick 触发）
   const timeInfo = useMemo(() => {
-    const { monthlySalary, workDaysPerMonth, workHoursPerDay, workStartHour, workEndHour, payday } = config
+    const { workStartHour, workEndHour, payday } = config
     const now = new Date()
     const year = now.getFullYear()
     const month = now.getMonth()
@@ -297,14 +354,19 @@ export default function Index() {
     const second = now.getSeconds()
 
     const isHoliday = isHolidayMode
-    const isWorking = !isHoliday && hour >= workStartHour && hour < workEndHour
+    const crossDay = workEndHour <= workStartHour
+    const startSeconds = workStartHour * 3600
+    const endSeconds = (crossDay ? workEndHour + 24 : workEndHour) * 3600
+    const currentSeconds = hour * 3600 + minute * 60 + second
+    const cursorSeconds = currentSeconds + (crossDay && currentSeconds < startSeconds ? 86400 : 0)
+    const isWorking = !isHoliday && cursorSeconds >= startSeconds && cursorSeconds < endSeconds
 
     let todayEarned = 0
     if (!isHoliday) {
-      if (hour >= workEndHour) {
+      if (cursorSeconds >= endSeconds) {
         todayEarned = dailySalary
-      } else if (hour >= workStartHour) {
-        const workedSeconds = (hour - workStartHour) * 3600 + minute * 60 + second
+      } else if (cursorSeconds >= startSeconds) {
+        const workedSeconds = cursorSeconds - startSeconds
         todayEarned = workedSeconds * secondSalary
       }
     }
@@ -324,8 +386,8 @@ export default function Index() {
     const workProgress = isHoliday
       ? 0
       : isWorking
-        ? (((hour - workStartHour) * 3600 + minute * 60 + second) / (workHoursPerDay * 3600)) * 100
-        : hour >= workEndHour ? 100 : 0
+        ? ((Math.max(0, cursorSeconds - startSeconds) / (workHoursPerDay * 3600)) * 100)
+        : cursorSeconds >= endSeconds ? 100 : 0
 
     let nextPayday: Date
     if (day >= payday) {
@@ -347,7 +409,7 @@ export default function Index() {
       paydayMinutes: Math.floor((secondsToPayday % 3600) / 60),
       paydaySeconds: secondsToPayday % 60,
     }
-  }, [tick, config, dailySalary, secondSalary, isHolidayMode])
+  }, [tick, config, dailySalary, secondSalary, isHolidayMode, workHoursPerDay])
 
   // 保存配置
   const saveConfig = useCallback((newConfig: SalaryConfig) => {
@@ -363,8 +425,6 @@ export default function Index() {
   type EditForm = { [K in keyof SalaryConfig]: string }
   const [editForm, setEditForm] = useState<EditForm>(() => ({
     monthlySalary: String(config.monthlySalary),
-    workDaysPerMonth: String(config.workDaysPerMonth),
-    workHoursPerDay: String(config.workHoursPerDay),
     workStartHour: String(config.workStartHour),
     workEndHour: String(config.workEndHour),
     payday: String(config.payday),
@@ -373,8 +433,6 @@ export default function Index() {
   const openSettings = useCallback(() => {
     setEditForm({
       monthlySalary: String(config.monthlySalary),
-      workDaysPerMonth: String(config.workDaysPerMonth),
-      workHoursPerDay: String(config.workHoursPerDay),
       workStartHour: String(config.workStartHour),
       workEndHour: String(config.workEndHour),
       payday: String(config.payday),
@@ -414,8 +472,6 @@ export default function Index() {
     }
     const parsed: SalaryConfig = {
       monthlySalary: n(editForm.monthlySalary) ?? DEFAULT_CONFIG.monthlySalary,
-      workDaysPerMonth: Math.max(1, n(editForm.workDaysPerMonth) ?? DEFAULT_CONFIG.workDaysPerMonth),
-      workHoursPerDay: Math.max(1, n(editForm.workHoursPerDay) ?? DEFAULT_CONFIG.workHoursPerDay),
       workStartHour: Math.max(0, Math.min(24, n(editForm.workStartHour) ?? DEFAULT_CONFIG.workStartHour)),
       workEndHour: Math.max(0, Math.min(24, n(editForm.workEndHour) ?? DEFAULT_CONFIG.workEndHour)),
       payday: Math.max(1, Math.min(28, n(editForm.payday) ?? DEFAULT_CONFIG.payday)),
@@ -427,8 +483,6 @@ export default function Index() {
   const resetSettings = useCallback(() => {
     setEditForm({
       monthlySalary: String(DEFAULT_CONFIG.monthlySalary),
-      workDaysPerMonth: String(DEFAULT_CONFIG.workDaysPerMonth),
-      workHoursPerDay: String(DEFAULT_CONFIG.workHoursPerDay),
       workStartHour: String(DEFAULT_CONFIG.workStartHour),
       workEndHour: String(DEFAULT_CONFIG.workEndHour),
       payday: String(DEFAULT_CONFIG.payday),
@@ -437,22 +491,6 @@ export default function Index() {
 
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
   const endStr = `${String(config.workEndHour).padStart(2, '0')}:00`
-
-  // 计算 Swiper 高度（视口 - 导航栏 - 指示器）
-  const scrollHeight = useMemo(() => {
-    const windowInfo = getWindowInfo()
-    const wh = (windowInfo as any).windowHeight ?? 812
-    let navH = windowInfo.statusBarHeight ?? 20
-    try {
-      const rect = Taro.getMenuButtonBoundingClientRect()
-      if (rect && rect.width > 0) navH = rect.bottom + 4
-      else navH += 44
-    } catch {
-      navH += 44
-    }
-    const indicatorH = 36
-    return wh - navH - indicatorH
-  }, [])
 
   return (
     <View className='salary-app-root'>
@@ -464,174 +502,138 @@ export default function Index() {
         hasCapsule={navLayout.hasCapsule}
       />
 
-      {/* 双页滑动容器 */}
-      <Swiper
-        className='page-swiper'
-        indicatorDots={false}
-        current={currentPage}
-        onChange={(e) => setCurrentPage((e.detail.current === 1 ? 1 : 0) as HomePage)}
-      >
-        {/* 第一页：工资时钟 */}
-        <SwiperItem>
-          <ScrollView scrollY className='page-scroll'>
-            <View className='salary-app'>
-              {/* 主金额 — 留白呼吸 */}
-              <View className='hero-section'>
-                <Text className='hero-label'>今 月 已 赚</Text>
-                <View className='hero-amount'>
-                  <Text className='hero-currency'>¥</Text>
-                  <AnimatedNumber className='hero-number' value={timeInfo.monthEarnedStr} />
+      {currentPage === 0 ? (
+        <ScrollView scrollY className='page-scroll'>
+          <View className='salary-app'>
+            <View className='hero-section'>
+              <Text className='hero-label'>今 月 已 赚</Text>
+              <View className='hero-amount'>
+                <Text className='hero-currency'>¥</Text>
+                <AnimatedNumber className='hero-number' value={timeInfo.monthEarnedStr} />
+              </View>
+              <View className='hero-progress-bg'>
+                <View
+                  className='hero-progress-fill'
+                  style={{
+                    width: `${Math.min(
+                      100,
+                      (parseFloat(timeInfo.monthEarnedStr.replace(/,/g, '')) / config.monthlySalary) * 100
+                    )}%`,
+                  }}
+                />
+              </View>
+              <Text className='hero-target'>目標 ¥{config.monthlySalary.toLocaleString()}</Text>
+            </View>
+
+            {timeInfo.isHoliday ? (
+              <View
+                className='holiday-sun-card'
+                onClick={() => setHolidayCardIndex((prev) => (prev + 1) % HOLIDAY_CARD_VARIANTS.length)}
+              >
+                <Image className='holiday-card-illustration' src={holidayCard.illustration} mode='aspectFit' />
+                <View className='holiday-card-content'>
+                  <Text className='holiday-card-kicker'>{holidayCard.kicker}</Text>
+                  <Text className='holiday-card-title'>{holidayCard.title}</Text>
+                  <Text className='holiday-card-desc'>{holidayCard.desc}</Text>
                 </View>
-                <View className='hero-progress-bg'>
-                  <View
-                    className='hero-progress-fill'
-                    style={{
-                      width: `${Math.min(
-                        100,
-                        (parseFloat(timeInfo.monthEarnedStr.replace(/,/g, '')) / config.monthlySalary) * 100
-                      )}%`,
-                    }}
-                  />
+              </View>
+            ) : (
+              <View className='live-earning'>
+                <View className='live-glow' />
+                <Text className='live-label'>今 日 收 益</Text>
+                <View className='live-amount-wrap'>
+                  <Text className='live-currency'>¥</Text>
+                  <AnimatedNumber className='live-amount' value={timeInfo.todayEarnedStr} />
                 </View>
-                <Text className='hero-target'>目標 ¥{config.monthlySalary.toLocaleString()}</Text>
+                <Text className='live-rate'>+¥{secondSalary.toFixed(6)} / 秒</Text>
+              </View>
+            )}
+
+            <View className={`detail-card ${showDetail ? 'expanded' : ''}`} onClick={() => setShowDetail(!showDetail)}>
+              <View className='detail-header'>
+                <Text className='detail-title'>薪 賄 明 細</Text>
+                <Text className='detail-arrow'>{showDetail ? '▲' : '▼'}</Text>
               </View>
 
-              {/* 实时收益 / 放假态 */}
-              {timeInfo.isHoliday ? (
-                <View
-                  className='holiday-sun-card'
-                  onClick={() => setHolidayCardIndex((prev) => (prev + 1) % HOLIDAY_CARD_VARIANTS.length)}
-                >
-                  <Image
-                    className='holiday-card-illustration'
-                    src={holidayCard.illustration}
-                    mode='aspectFit'
-                  />
-                  <View className='holiday-card-content'>
-                    <Text className='holiday-card-kicker'>{holidayCard.kicker}</Text>
-                    <Text className='holiday-card-title'>{holidayCard.title}</Text>
-                    <Text className='holiday-card-desc'>{holidayCard.desc}</Text>
+              {showDetail && (
+                <View className='detail-body'>
+                  <View className='detail-row'>
+                    <Text className='detail-name'>月薪</Text>
+                    <Text className='detail-value'>¥{config.monthlySalary.toLocaleString()}</Text>
                   </View>
-                </View>
-              ) : (
-                <View className='live-earning'>
-                  <View className='live-glow' />
-                  <Text className='live-label'>今 日 收 益</Text>
-                  <View className='live-amount-wrap'>
-                    <Text className='live-currency'>¥</Text>
-                    <AnimatedNumber className='live-amount' value={timeInfo.todayEarnedStr} />
+                  <View className='detail-row'>
+                    <Text className='detail-name'>日薪</Text>
+                    <Text className='detail-value highlight'>¥{dailySalary.toFixed(2)}</Text>
                   </View>
-                  <Text className='live-rate'>+¥{secondSalary.toFixed(6)} / 秒</Text>
+                  <View className='detail-row'>
+                    <Text className='detail-name'>时薪</Text>
+                    <Text className='detail-value highlight'>¥{hourlySalary.toFixed(4)}</Text>
+                  </View>
+                  <View className='detail-row'>
+                    <Text className='detail-name'>分薪</Text>
+                    <Text className='detail-value highlight'>¥{minuteSalary.toFixed(6)}</Text>
+                  </View>
+                  <View className='detail-row'>
+                    <Text className='detail-name'>秒薪</Text>
+                    <Text className='detail-value gold'>¥{secondSalary.toFixed(8)}</Text>
+                  </View>
                 </View>
               )}
-
-              {/* 薪资明细 — 卷轴 */}
-              <View
-                className={`detail-card ${showDetail ? 'expanded' : ''}`}
-                onClick={() => setShowDetail(!showDetail)}
-              >
-                <View className='detail-header'>
-                  <Text className='detail-title'>薪 賄 明 細</Text>
-                  <Text className='detail-arrow'>{showDetail ? '▲' : '▼'}</Text>
-                </View>
-
-                {showDetail && (
-                  <View className='detail-body'>
-                    <View className='detail-row'>
-                      <Text className='detail-name'>月薪</Text>
-                      <Text className='detail-value'>¥{config.monthlySalary.toLocaleString()}</Text>
-                    </View>
-                    <View className='detail-row'>
-                      <Text className='detail-name'>日薪</Text>
-                      <Text className='detail-value highlight'>¥{dailySalary.toFixed(2)}</Text>
-                    </View>
-                    <View className='detail-row'>
-                      <Text className='detail-name'>时薪</Text>
-                      <Text className='detail-value highlight'>¥{hourlySalary.toFixed(4)}</Text>
-                    </View>
-                    <View className='detail-row'>
-                      <Text className='detail-name'>分薪</Text>
-                      <Text className='detail-value highlight'>¥{minuteSalary.toFixed(6)}</Text>
-                    </View>
-                    <View className='detail-row'>
-                      <Text className='detail-name'>秒薪</Text>
-                      <Text className='detail-value gold'>¥{secondSalary.toFixed(8)}</Text>
-                    </View>
-                  </View>
-                )}
-              </View>
-
-              {/* 工作进度 — 枯山水砂纹 */}
-              <View className='progress-card'>
-                <View className='progress-header'>
-                  <Text className='progress-title'>今日進度</Text>
-                  <Text className='progress-percent'>{timeInfo.workProgress.toFixed(1)}%</Text>
-                </View>
-                <View className='progress-bar-bg'>
-                  <View
-                    className={`progress-bar-fill ${timeInfo.isWorking ? 'active' : ''}`}
-                    style={{ width: `${timeInfo.workProgress}%` }}
-                  />
-                </View>
-                <View className='progress-time'>
-                  <Text className='progress-start'>{startStr}</Text>
-                  <Text className='progress-end'>{endStr}</Text>
-                </View>
-              </View>
-
-              {/* 发薪日倒计时 */}
-              <View className='countdown-card'>
-                <Text className='countdown-title'>次 回 給 与 日</Text>
-                <View className='countdown-grid'>
-                  <View className='countdown-item'>
-                    <Text className='countdown-num'>{timeInfo.paydayDays}</Text>
-                    <Text className='countdown-unit'>日</Text>
-                  </View>
-                  <View className='countdown-item'>
-                    <Text className='countdown-num'>{timeInfo.paydayHours}</Text>
-                    <Text className='countdown-unit'>時</Text>
-                  </View>
-                  <View className='countdown-item'>
-                    <Text className='countdown-num'>{timeInfo.paydayMinutes}</Text>
-                    <Text className='countdown-unit'>分</Text>
-                  </View>
-                  <View className='countdown-item'>
-                    <Text className='countdown-num'>{timeInfo.paydaySeconds}</Text>
-                    <Text className='countdown-unit'>秒</Text>
-                  </View>
-                </View>
-              </View>
-
-              {/* 底部 */}
-              <View className='footer-info'>
-                <Text className='footer-text'>
-                  每月{config.payday}日給与 · {startStr}-{endStr}
-                </Text>
-              </View>
-
-              {/* 底部安全区占位 */}
-              <View style={{ height: '60px' }} />
             </View>
-          </ScrollView>
-        </SwiperItem>
 
-        {/* 第二页：记账 */}
-        <SwiperItem>
-          <ScrollView scrollY className='page-scroll'>
-            <BookkeepingPage
-              bkSettings={bkSettings}
-              openDatePicker={openDatePicker}
-              openAmountKeyboard={openAmountKeyboard}
-            />
-          </ScrollView>
-        </SwiperItem>
-      </Swiper>
+            <View className='progress-card'>
+              <View className='progress-header'>
+                <Text className='progress-title'>今日進度</Text>
+                <Text className='progress-percent'>{timeInfo.workProgress.toFixed(1)}%</Text>
+              </View>
+              <View className='progress-bar-bg'>
+                <View
+                  className={`progress-bar-fill ${timeInfo.isWorking ? 'active' : ''}`}
+                  style={{ width: `${timeInfo.workProgress}%` }}
+                />
+              </View>
+              <View className='progress-time'>
+                <Text className='progress-start'>{startStr}</Text>
+                <Text className='progress-end'>{endStr}</Text>
+              </View>
+            </View>
 
-      {/* 页面指示器 */}
-      <View className='page-indicator'>
-        <View className={`indicator-dot ${currentPage === 0 ? 'active' : ''}`} />
-        <View className={`indicator-dot ${currentPage === 1 ? 'active' : ''}`} />
-      </View>
+            <View className='countdown-card'>
+              <Text className='countdown-title'>次 回 給 与 日</Text>
+              <View className='countdown-grid'>
+                <View className='countdown-item'>
+                  <Text className='countdown-num'>{timeInfo.paydayDays}</Text>
+                  <Text className='countdown-unit'>日</Text>
+                </View>
+                <View className='countdown-item'>
+                  <Text className='countdown-num'>{timeInfo.paydayHours}</Text>
+                  <Text className='countdown-unit'>時</Text>
+                </View>
+                <View className='countdown-item'>
+                  <Text className='countdown-num'>{timeInfo.paydayMinutes}</Text>
+                  <Text className='countdown-unit'>分</Text>
+                </View>
+                <View className='countdown-item'>
+                  <Text className='countdown-num'>{timeInfo.paydaySeconds}</Text>
+                  <Text className='countdown-unit'>秒</Text>
+                </View>
+              </View>
+            </View>
+
+            <View className='footer-info'>
+              <Text className='footer-text'>
+                每月{config.payday}日給与 · {startStr}-{endStr}
+              </Text>
+            </View>
+
+            <View style={{ height: '60px' }} />
+          </View>
+        </ScrollView>
+      ) : (
+        <ScrollView scrollY className='page-scroll'>
+          <BookkeepingPage bkSettings={bkSettings} openDatePicker={openDatePicker} openAmountKeyboard={openAmountKeyboard} />
+        </ScrollView>
+      )}
 
       {/* 浮动设置按钮 */}
       <View
@@ -654,24 +656,32 @@ export default function Index() {
 
             <View className='settings-body'>
               <View className='settings-section'>
+                <Text className='settings-section-title'>模 塊</Text>
+                <View className='module-switch'>
+                  <View
+                    className={`module-switch-btn ${currentPage === 0 ? 'active' : ''}`}
+                    onClick={() => handleSwitchModule(0)}
+                  >
+                    <Text className='module-switch-text'>工 資</Text>
+                  </View>
+                  <View
+                    className={`module-switch-btn ${currentPage === 1 ? 'active' : ''}`}
+                    onClick={() => handleSwitchModule(1)}
+                  >
+                    <Text className='module-switch-text'>記 帳</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View className='settings-divider' />
+
+              <View className='settings-section'>
                 <Text className='settings-section-title'>薪 賄</Text>
                 <SettingRow
                   label='月薪'
                   value={editForm.monthlySalary}
                   onChange={(v) => setEditForm({ ...editForm, monthlySalary: v })}
                   suffix='元'
-                />
-                <SettingRow
-                  label='月工作天数'
-                  value={editForm.workDaysPerMonth}
-                  onChange={(v) => setEditForm({ ...editForm, workDaysPerMonth: v })}
-                  suffix='天'
-                />
-                <SettingRow
-                  label='日工作时长'
-                  value={editForm.workHoursPerDay}
-                  onChange={(v) => setEditForm({ ...editForm, workHoursPerDay: v })}
-                  suffix='时'
                 />
               </View>
 
@@ -724,6 +734,26 @@ export default function Index() {
             </View>
 
             <View className='settings-body'>
+              <View className='settings-section'>
+                <Text className='settings-section-title'>模 塊</Text>
+                <View className='module-switch'>
+                  <View
+                    className={`module-switch-btn ${currentPage === 0 ? 'active' : ''}`}
+                    onClick={() => handleSwitchModule(0)}
+                  >
+                    <Text className='module-switch-text'>工 資</Text>
+                  </View>
+                  <View
+                    className={`module-switch-btn ${currentPage === 1 ? 'active' : ''}`}
+                    onClick={() => handleSwitchModule(1)}
+                  >
+                    <Text className='module-switch-text'>記 帳</Text>
+                  </View>
+                </View>
+              </View>
+
+              <View className='settings-divider' />
+
               <View className='settings-section'>
                 <Text className='settings-section-title'>圖表顯示</Text>
 

@@ -74,7 +74,7 @@ function BookkeepingPageInner({
     }
   }, [])
   const [recordPendingDelete, setRecordPendingDelete] = useState<BookkeepingRecord | null>(null)
-  const expenseCategories = ['餐飲', '交通', '購物', '娛樂', '居住', '通訊', '醫療', '教育']
+  const expenseCategories = ['餐飲', '交通', '購物', '数码', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
 
   const [activeType, setActiveType] = useState<'expense' | 'income'>('expense')

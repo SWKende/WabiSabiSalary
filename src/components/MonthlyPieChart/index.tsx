@@ -13,6 +13,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   '餐飲': '#b85450',
   '交通': '#c8b99a',
   '購物': '#7a8c6e',
+  '数码': '#8f7c5b',
   '娛樂': '#a89878',
   '居住': '#5c5650',
   '通訊': '#d4a574',
