@@ -144,10 +144,13 @@ export default function Index() {
   })
   const [showDetail, setShowDetail] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [settingsClosing, setSettingsClosing] = useState(false)
   const [currentPage, setCurrentPage] = useState<HomePage>(initialHomePageState.currentPage)
+  const [moduleOpacity, setModuleOpacity] = useState(1)
   const [showLaunchScreen, setShowLaunchScreen] = useState(initialHomePageState.showLaunchScreen)
   const [launchExiting, setLaunchExiting] = useState(false)
   const [showBkSettings, setShowBkSettings] = useState(false)
+  const [bkSettingsClosing, setBkSettingsClosing] = useState(false)
   const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
     try {
       const saved = Taro.getStorageSync('bookkeeping_settings')
@@ -198,13 +201,59 @@ export default function Index() {
     }, 650)
   }, [persistHomePagePreference])
 
+  const moduleSwitchTimerRef = useRef<{
+    closeTimer: ReturnType<typeof setTimeout> | null
+    fadeOutTimer: ReturnType<typeof setTimeout> | null
+    switchTimer: ReturnType<typeof setTimeout> | null
+    fadeInTimer: ReturnType<typeof setTimeout> | null
+  }>({ closeTimer: null, fadeOutTimer: null, switchTimer: null, fadeInTimer: null })
+
+  useEffect(() => {
+    return () => {
+      const timers = moduleSwitchTimerRef.current
+      if (timers.closeTimer) clearTimeout(timers.closeTimer)
+      if (timers.fadeOutTimer) clearTimeout(timers.fadeOutTimer)
+      if (timers.switchTimer) clearTimeout(timers.switchTimer)
+      if (timers.fadeInTimer) clearTimeout(timers.fadeInTimer)
+    }
+  }, [])
+
   const handleSwitchModule = useCallback(
     (page: HomePage) => {
-      persistHomePagePreference(page)
-      setShowSettings(false)
-      setShowBkSettings(false)
+      const FADE_MS = 220
+      const PANEL_CLOSE_MS = 280
+
+      const timers = moduleSwitchTimerRef.current
+      if (timers.closeTimer) clearTimeout(timers.closeTimer)
+      if (timers.fadeOutTimer) clearTimeout(timers.fadeOutTimer)
+      if (timers.switchTimer) clearTimeout(timers.switchTimer)
+      if (timers.fadeInTimer) clearTimeout(timers.fadeInTimer)
+
+      if (showSettings) setSettingsClosing(true)
+      if (showBkSettings) setBkSettingsClosing(true)
+
+      timers.closeTimer = setTimeout(() => {
+        setShowSettings(false)
+        setSettingsClosing(false)
+        setShowBkSettings(false)
+        setBkSettingsClosing(false)
+      }, PANEL_CLOSE_MS)
+
+      if (page === currentPage) return
+
+      timers.fadeOutTimer = setTimeout(() => {
+        setModuleOpacity(0)
+      }, PANEL_CLOSE_MS)
+
+      timers.switchTimer = setTimeout(() => {
+        persistHomePagePreference(page)
+      }, PANEL_CLOSE_MS + FADE_MS)
+
+      timers.fadeInTimer = setTimeout(() => {
+        setModuleOpacity(1)
+      }, PANEL_CLOSE_MS + FADE_MS + 20)
     },
-    [persistHomePagePreference]
+    [persistHomePagePreference, currentPage, showBkSettings, showSettings]
   )
 
   const openDatePicker = useCallback((value: string, onConfirm: (date: string) => void) => {
@@ -437,18 +486,22 @@ export default function Index() {
       workEndHour: String(config.workEndHour),
       payday: String(config.payday),
     })
+    setSettingsClosing(false)
     setShowSettings(true)
   }, [config])
 
   const closeSettings = useCallback(() => {
+    setSettingsClosing(false)
     setShowSettings(false)
   }, [])
 
   const openBkSettings = useCallback(() => {
+    setBkSettingsClosing(false)
     setShowBkSettings(true)
   }, [])
 
   const closeBkSettings = useCallback(() => {
+    setBkSettingsClosing(false)
     setShowBkSettings(false)
   }, [])
 
@@ -502,9 +555,10 @@ export default function Index() {
         hasCapsule={navLayout.hasCapsule}
       />
 
-      {currentPage === 0 ? (
-        <ScrollView scrollY className='page-scroll'>
-          <View className='salary-app'>
+      <View className='module-container' style={{ opacity: moduleOpacity }}>
+        {currentPage === 0 ? (
+          <ScrollView scrollY className='page-scroll'>
+            <View className='salary-app'>
             <View className='hero-section'>
               <Text className='hero-label'>今 月 已 赚</Text>
               <View className='hero-amount'>
@@ -627,13 +681,18 @@ export default function Index() {
             </View>
 
             <View style={{ height: '60px' }} />
-          </View>
-        </ScrollView>
-      ) : (
-        <ScrollView scrollY className='page-scroll'>
-          <BookkeepingPage bkSettings={bkSettings} openDatePicker={openDatePicker} openAmountKeyboard={openAmountKeyboard} />
-        </ScrollView>
-      )}
+            </View>
+          </ScrollView>
+        ) : (
+          <ScrollView scrollY className='page-scroll'>
+            <BookkeepingPage
+              bkSettings={bkSettings}
+              openDatePicker={openDatePicker}
+              openAmountKeyboard={openAmountKeyboard}
+            />
+          </ScrollView>
+        )}
+      </View>
 
       {/* 浮动设置按钮 */}
       <View
@@ -646,7 +705,7 @@ export default function Index() {
       {/* 设置面板遮罩 */}
       {showSettings && (
         <View className='settings-overlay' onClick={closeSettings}>
-          <View className='settings-panel' onClick={(e) => e.stopPropagation()}>
+          <View className={`settings-panel ${settingsClosing ? 'closing' : ''}`} onClick={(e) => e.stopPropagation()}>
             <View className='settings-header'>
               <Text className='settings-title'>設 定</Text>
               <View className='settings-close' onClick={closeSettings}>
@@ -725,7 +784,7 @@ export default function Index() {
       {/* 记账设置面板 */}
       {showBkSettings && (
         <View className='settings-overlay' onClick={closeBkSettings}>
-          <View className='settings-panel' onClick={(e) => e.stopPropagation()}>
+          <View className={`settings-panel ${bkSettingsClosing ? 'closing' : ''}`} onClick={(e) => e.stopPropagation()}>
             <View className='settings-header'>
               <Text className='settings-title'>記帳設定</Text>
               <View className='settings-close' onClick={closeBkSettings}>

@@ -532,6 +532,13 @@
 // SwiperItem 内滚动区域
 .page-scroll {
   height: 100%;
+  flex: 1;
+}
+
+.module-container {
+  flex: 1;
+  width: 100%;
+  transition: opacity 0.22s ease;
 }
 
 // 页面指示器 — 侘寂极简
@@ -1141,6 +1148,15 @@
 @keyframes panelSlideUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+
+@keyframes panelSlideDown {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+
+.settings-panel.closing {
+  animation: panelSlideDown 0.28s ease forwards;
 }
 
 // 面板头部
