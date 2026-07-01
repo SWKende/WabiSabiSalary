@@ -1132,6 +1132,15 @@
   to { opacity: 1; }
 }
 
+@keyframes overlayFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.settings-overlay.closing {
+  animation: overlayFadeOut 0.28s ease forwards;
+}
+
 // 设置面板 — 卷轴从底部展开
 .settings-panel {
   width: 100%;

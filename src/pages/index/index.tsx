@@ -208,6 +208,9 @@ export default function Index() {
     fadeInTimer: ReturnType<typeof setTimeout> | null
   }>({ closeTimer: null, fadeOutTimer: null, switchTimer: null, fadeInTimer: null })
 
+  const settingsCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const bkSettingsCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
   useEffect(() => {
     return () => {
       const timers = moduleSwitchTimerRef.current
@@ -215,6 +218,8 @@ export default function Index() {
       if (timers.fadeOutTimer) clearTimeout(timers.fadeOutTimer)
       if (timers.switchTimer) clearTimeout(timers.switchTimer)
       if (timers.fadeInTimer) clearTimeout(timers.fadeInTimer)
+      if (settingsCloseTimerRef.current) clearTimeout(settingsCloseTimerRef.current)
+      if (bkSettingsCloseTimerRef.current) clearTimeout(bkSettingsCloseTimerRef.current)
     }
   }, [])
 
@@ -480,6 +485,7 @@ export default function Index() {
   }))
 
   const openSettings = useCallback(() => {
+    if (settingsCloseTimerRef.current) clearTimeout(settingsCloseTimerRef.current)
     setEditForm({
       monthlySalary: String(config.monthlySalary),
       workStartHour: String(config.workStartHour),
@@ -491,18 +497,29 @@ export default function Index() {
   }, [config])
 
   const closeSettings = useCallback(() => {
-    setSettingsClosing(false)
-    setShowSettings(false)
+    const PANEL_CLOSE_MS = 280
+    if (settingsCloseTimerRef.current) clearTimeout(settingsCloseTimerRef.current)
+    setSettingsClosing(true)
+    settingsCloseTimerRef.current = setTimeout(() => {
+      setShowSettings(false)
+      setSettingsClosing(false)
+    }, PANEL_CLOSE_MS)
   }, [])
 
   const openBkSettings = useCallback(() => {
+    if (bkSettingsCloseTimerRef.current) clearTimeout(bkSettingsCloseTimerRef.current)
     setBkSettingsClosing(false)
     setShowBkSettings(true)
   }, [])
 
   const closeBkSettings = useCallback(() => {
-    setBkSettingsClosing(false)
-    setShowBkSettings(false)
+    const PANEL_CLOSE_MS = 280
+    if (bkSettingsCloseTimerRef.current) clearTimeout(bkSettingsCloseTimerRef.current)
+    setBkSettingsClosing(true)
+    bkSettingsCloseTimerRef.current = setTimeout(() => {
+      setShowBkSettings(false)
+      setBkSettingsClosing(false)
+    }, PANEL_CLOSE_MS)
   }, [])
 
   const toggleBkSetting = useCallback((key: keyof BookkeepingSettings) => {
@@ -530,8 +547,8 @@ export default function Index() {
       payday: Math.max(1, Math.min(28, n(editForm.payday) ?? DEFAULT_CONFIG.payday)),
     }
     saveConfig(parsed)
-    setShowSettings(false)
-  }, [editForm, saveConfig])
+    closeSettings()
+  }, [editForm, saveConfig, closeSettings])
 
   const resetSettings = useCallback(() => {
     setEditForm({
@@ -704,7 +721,7 @@ export default function Index() {
 
       {/* 设置面板遮罩 */}
       {showSettings && (
-        <View className='settings-overlay' onClick={closeSettings}>
+        <View className={`settings-overlay ${settingsClosing ? 'closing' : ''}`} onClick={closeSettings}>
           <View className={`settings-panel ${settingsClosing ? 'closing' : ''}`} onClick={(e) => e.stopPropagation()}>
             <View className='settings-header'>
               <Text className='settings-title'>設 定</Text>
@@ -783,7 +800,7 @@ export default function Index() {
 
       {/* 记账设置面板 */}
       {showBkSettings && (
-        <View className='settings-overlay' onClick={closeBkSettings}>
+        <View className={`settings-overlay ${bkSettingsClosing ? 'closing' : ''}`} onClick={closeBkSettings}>
           <View className={`settings-panel ${bkSettingsClosing ? 'closing' : ''}`} onClick={(e) => e.stopPropagation()}>
             <View className='settings-header'>
               <Text className='settings-title'>記帳設定</Text>
