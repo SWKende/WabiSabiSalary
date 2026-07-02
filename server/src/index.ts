@@ -3,6 +3,7 @@ import cors from '@fastify/cors'
 import { prisma } from './lib/db.js'
 import { authPlugin } from './plugins/auth.js'
 import { authRoutes } from './routes/auth.js'
+import { configRoutes } from './routes/config.js'
 
 const PORT = Number(process.env.PORT ?? 3000)
 
@@ -16,6 +17,7 @@ export async function buildApp() {
   await app.register(cors, { origin: true })
   await app.register(authPlugin)
   await app.register(authRoutes)
+  await app.register(configRoutes)
 
   app.get('/health', async () => {
     try {
