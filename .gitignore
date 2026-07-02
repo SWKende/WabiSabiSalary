@@ -2,3 +2,4 @@ dist/
 .deploy/
 node_modules/
 .swc/
+data/
