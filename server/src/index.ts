@@ -1,0 +1,1 @@
+console.log('trae-salary-server starting...')

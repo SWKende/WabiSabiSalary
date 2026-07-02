@@ -1,0 +1,36 @@
+{
+  "name": "trae-salary-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@prisma/client": "^5.18.0",
+    "bcrypt": "^5.1.1",
+    "fastify": "^4.28.1",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.14.13",
+    "@types/node-cron": "^3.0.11",
+    "pino-pretty": "^11.2.2",
+    "prisma": "^5.18.0",
+    "supertest-fetch": "^1.5.0",
+    "tsx": "^4.16.5",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  }
+}
