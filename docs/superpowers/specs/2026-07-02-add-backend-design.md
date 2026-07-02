@@ -100,9 +100,10 @@
 ### 仓库目录结构
 
 ```
-trae-salary/
-├── src/                    # 现有小程序代码
-│   ├── api/                # 🆕 后端 API 客户端
+trae-salary/                 ← 单一 git 仓库，三大块清晰分离
+│
+├── client/                  ← 💚 客户端（Taro 微信小程序）
+│   ├── api/                 # 🆕 后端 API 客户端
 │   │   ├── client.ts
 │   │   ├── auth.ts
 │   │   ├── config.ts
@@ -110,16 +111,26 @@ trae-salary/
 │   │   ├── holidays.ts
 │   │   └── types.ts
 │   ├── pages/
-│   │   ├── index/          # ✏️ 改造：本地→云端同步
-│   │   └── login/          # 🆕 登录注册页
+│   │   ├── index/           # ✏️ 改造：本地→云端同步
+│   │   └── login/           # 🆕 登录注册页
 │   ├── components/
-│   │   └── Bookkeeping/    # ✏️ 改造：写入时同步云端
+│   │   └── Bookkeeping/     # ✏️ 改造：写入时同步云端
 │   ├── utils/
-│   │   └── cnHoliday.ts    # ✏️ 改造：从云端拉取
-│   └── constants/
-│       └── cn-holiday-fallback.json  # 🗑️ 删除
+│   │   └── cnHoliday.ts     # ✏️ 改造：从云端拉取
+│   ├── constants/
+│   │   └── cn-holiday-fallback.json  # 🗑️ 删除
+│   ├── app.tsx
+│   ├── app.config.ts
+│   ├── app.scss
+│   ├── app.boot.ts
+│   ├── index.html
+│   ├── project.config.json
+│   ├── babel.config.js
+│   ├── tsconfig.json
+│   ├── package.json
+│   └── (dist/ 等构建产物)
 │
-├── server/                 # 🆕 后端项目
+├── server/                  ← 💙 服务端（Node.js 后端）
 │   ├── src/
 │   │   ├── index.ts
 │   │   ├── routes/
@@ -134,10 +145,8 @@ trae-salary/
 │   │   │   ├── jwt.ts
 │   │   │   ├── password.ts
 │   │   │   └── holidaySync.ts
-│   │   ├── scripts/
-│   │   │   └── (手动同步脚本可选用)
 │   │   └── types/
-│   │       └── shared.ts
+│   │       └── shared.ts    # 共享类型定义
 │   ├── prisma/
 │   │   └── schema.prisma
 │   ├── package.json
@@ -145,12 +154,22 @@ trae-salary/
 │   ├── Dockerfile
 │   └── .env.example
 │
-├── data/                   # 🆕 运行时数据（挂载到容器）
-├── docker-compose.yml      # 🆕
-├── Caddyfile               # 🆕
-├── .env.example            # 🆕
-└── README.md               # ✏️ 改写：含完整部署说明
+├── deploy/                  ← 💜 部署相关
+│   ├── docker-compose.yml
+│   ├── Caddyfile
+│   └── .env.example
+│
+├── docs/                    # 文档（含本 spec）
+│   └── superpowers/specs/
+├── data/                    # 运行时数据（gitignore）
+├── .gitignore
+└── README.md                # ✏️ 改写：含完整部署说明
 ```
+
+**重要约束：**
+- `client/` 和 `server/` 是完全独立的两个项目，各自管理自己的 `package.json` 和 `node_modules`
+- `deploy/` 不包含任何应用代码，只放部署编排文件
+- 共享类型（`BookkeepingEntry` 等）在 `server/src/types/shared.ts` 定义，客户端在 `client/api/types.ts` 复制一份保持同步
 
 ---
 
@@ -362,12 +381,15 @@ GET 默认按 `occurredAt` 倒序，默认 `limit=500`，可选 `from`/`to` 时�
 
 ```
 /opt/trae-salary/
-├── docker-compose.yml
-├── Caddyfile
-├── .env
+├── client/                # 客户端代码（git pull 或 scp 上传）
+├── server/                # 服务端代码
+├── deploy/                # 部署编排
+│   ├── docker-compose.yml
+│   ├── Caddyfile
+│   └── .env               # 由 .env.example 复制而来
 ├── data/
-│   ├── salary.db
-│   ├── caddy_data/        # 证书
+│   ├── salary.db          # SQLite 数据
+│   ├── caddy_data/        # Let's Encrypt 证书
 │   └── caddy_config/
 └── logs/
     ├── app/
@@ -420,12 +442,13 @@ http://your-domain.com {
 
 设置方式（开发）：
 ```bash
-# src/api/client.ts 中读取
+# client/api/client.ts 中读取
 const BASE_URL = process.env.TARO_APP_API_BASE_URL || 'http://localhost:3000'
 ```
 
-Taro 编译时自动将以 `TARO_APP_` 开头的环境变量注入到 `process.env`。生产构建：
+Taro 编译时自动将以 `TARO_APP_` 开头的环境变量注入到 `process.env`。生产构建（在 `client/` 目录下执行）：
 ```bash
+cd client
 TARO_APP_API_BASE_URL=https://salary.example.com npm run build:weapp
 ```
 
@@ -440,10 +463,10 @@ curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker $USER
 # 重新登录
 
-# 3. 上传代码到 /opt/trae-salary
+# 3. 上传代码到 /opt/trae-salary（包含 client/、server/、deploy/ 三个目录）
 
-# 4. 配置
-cd /opt/trae-salary
+# 4. 配置环境变量和域名
+cd /opt/trae-salary/deploy
 cp .env.example .env
 echo "JWT_SECRET=$(openssl rand -hex 32)" >> .env
 nano Caddyfile   # 替换域名
@@ -472,6 +495,7 @@ crontab -e
 
 恢复：
 ```bash
+cd /opt/trae-salary/deploy
 docker compose down
 cp /backup/salary-YYYYMMDD.db /opt/trae-salary/data/salary.db
 docker compose up -d
@@ -481,13 +505,13 @@ docker compose up -d
 
 ## 8. 前端改造
 
-### 8.1 新增 `src/api/` 模块
+### 8.1 新增 `client/api/` 模块
 
 - `client.ts`：fetch 封装 + JWT 注入 + 错误处理 + `ApiError` 类
 - `auth.ts` / `config.ts` / `entries.ts` / `holidays.ts`：按域拆分
-- `types.ts`：与后端共享类型
+- `types.ts`：与后端共享类型（从 `server/src/types/shared.ts` 同步）
 
-### 8.2 新增登录页 `src/pages/login/`
+### 8.2 新增登录页 `client/pages/login/`
 
 - 极简卡片 UI：用户名、密码、登录/注册按钮
 - 注册成功自动登录
@@ -495,16 +519,16 @@ docker compose up -d
 
 ### 8.3 现有页面的改造点
 
-**`src/pages/index/index.tsx`**：
+**`client/pages/index/index.tsx`**：
 - `saveConfig`：先本地后云端，失败标记待重试
 - 启动时如果已登录，调用 `initialSync()`
 - 401 错误处理（清除 token + 跳转）
 
-**`src/components/Bookkeeping/`**：
+**`client/components/Bookkeeping/`**：
 - 添加/修改/删除记账时，先本地后云端
 - 替换本地条目 id 为云端返回 id
 
-**`src/utils/cnHoliday.ts`**：
+**`client/utils/cnHoliday.ts`**：
 - 移除 `cn-holiday-fallback.json` 引用
 - 改为从云端拉取，缓存到 `Taro.Storage`
 
@@ -552,18 +576,20 @@ docker compose up -d
 ## 11. README 大纲
 
 1. 项目介绍 + 功能特性
-2. 项目结构
-3. **本地开发**（前端 + 后端分开说明）
+2. 项目结构（突出 `client/`、`server/`、`deploy/` 三大块）
+3. **本地开发**
+   - 前端：`cd client && npm install && npm run dev:weapp`
+   - 后端：`cd server && npm install && npx prisma migrate dev && npm run dev`
 4. **部署到云服务器**（生产环境，步骤化）
    - 前提条件（服务器、域名、DNS）
    - 安装 Docker
-   - 上传代码
-   - 配置环境变量
-   - 启动
-   - 配置小程序 API 地址
-   - 验证
+   - 上传代码到 `/opt/trae-salary`（含 client/、server/、deploy/）
+   - `cd deploy && cp .env.example .env`，配置 `JWT_SECRET` 和 Caddyfile 域名
+   - `docker compose up -d`
+   - 构建小程序：`cd ../client && TARO_APP_API_BASE_URL=https://你的域名 npm run build:weapp`
+   - 用微信开发者工具上传发布
 5. **运维**（状态查看、重启、升级、备份、恢复、节假日日志）
-6. **常见问题**（忘记密码、数据丢失、换域名、证书失败）
+6. **常见问题**（忘记密码、数据丢失、换域名、证书失败、客户端如何切换 API 地址）
 7. 技术栈列表
 
 ---
