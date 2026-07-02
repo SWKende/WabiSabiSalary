@@ -144,6 +144,7 @@ trae-salary/
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.13",
     "@types/node-cron": "^3.0.11",
+    "pino-pretty": "^11.2.2",
     "prisma": "^5.18.0",
     "supertest-fetch": "^1.5.0",
     "tsx": "^4.16.5",
@@ -651,19 +652,7 @@ git commit -m "feat(server): add Fastify app with health check endpoint"
 - [ ] **Step 1: 创建 server/tests/helpers.ts**
 
 ```typescript
-import Fastify, { FastifyInstance } from 'fastify'
-import cors from '@fastify/cors'
 import { prisma } from '../src/lib/db.js'
-
-export async function buildTestApp(): Promise<FastifyInstance> {
-  process.env.JWT_SECRET = process.env.JWT_SECRET ?? 'test-secret-for-helpers'
-  
-  const app = Fastify({ logger: false })
-  await app.register(cors, { origin: true })
-
-  // 注册 auth 路由（在测试中由具体测试文件负责）
-  return app
-}
 
 export async function cleanDatabase() {
   // 删除顺序：先删依赖方
@@ -671,11 +660,9 @@ export async function cleanDatabase() {
   await prisma.salaryConfig.deleteMany({})
   await prisma.user.deleteMany({})
 }
-
-export async function closeApp(app: FastifyInstance) {
-  await app.close()
-}
 ```
+
+注：测试中用 `buildApp`（从 src/index.js）而非 buildTestApp，所以 helper 只保留数据库清理工具。
 
 ### 子任务 5b: 共享类型
 
@@ -2199,13 +2186,15 @@ git mv tsconfig.json client/tsconfig.json
 git mv index.html client/index.html
 ```
 
-- [ ] **Step 3: 移动根 package.json 到 client/（如果有 scripts）**
+- [ ] **Step 3: 移动根 package.json 到 client/ 并修改 name**
 
 检查根目录是否有 package.json。如果有 scripts 字段（dev:weapp 等），移动：
 
 ```bash
 git mv package.json client/package.json
 ```
+
+移动后立即修改 `client/package.json`，把 `"name": "trae-salary"` 改为 `"name": "trae-salary-client"`（避免和根 workspaces 冲突）。
 
 如果根目录 package.json 仅是 @types 之类辅助用途，可以保留在根。但因为所有前端 npm 脚本都在 client/ 下，移动更清晰。
 
@@ -2246,11 +2235,9 @@ export default defineConfig({
 cd client && npm install
 ```
 
-- [ ] **Step 6: 更新根目录 package.json（最小化）**
+- [ ] **Step 6: 创建根目录 package.json（workspaces 入口）**
 
-如果根目录还有 package.json，改为只包含 workspaces 信息（或删除）。
-
-如果需要保留根目录 package.json 作为 workspaces 入口，创建 `package.json`：
+移动原根 package.json 后，根目录就没有 package.json 了。创建新的根 `package.json` 作为 npm workspaces 入口：
 
 ```json
 {
@@ -2260,6 +2247,8 @@ cd client && npm install
   "workspaces": ["client", "server"]
 }
 ```
+
+并在根目录运行 `npm install`（创建顶层 node_modules 链接）。
 
 - [ ] **Step 7: 验证前端还能开发**
 
