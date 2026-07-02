@@ -1,13 +1,12 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
 import { buildApp } from '../src/index.js'
 import { prisma } from '../src/lib/db.js'
+import { cleanDatabase } from './helpers.js'
 
 const app = await buildApp()
 
 beforeEach(async () => {
-  await prisma.bookkeepingEntry.deleteMany({})
-  await prisma.salaryConfig.deleteMany({})
-  await prisma.user.deleteMany({})
+  await cleanDatabase()
 })
 
 afterAll(async () => {

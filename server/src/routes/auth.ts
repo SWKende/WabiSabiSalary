@@ -9,6 +9,11 @@ const USERNAME_RE = /^[a-zA-Z0-9_]{3,20}$/
 const MIN_PASSWORD = 6
 const MAX_PASSWORD = 32
 
+// Pre-computed dummy bcrypt hash for timing-safe login. Ensures the
+// missing-user branch performs an equivalent bcrypt compare to the
+// real-password branch, preventing username enumeration via timing.
+const DUMMY_HASH_PROMISE = hashPassword('timing-safety-dummy')
+
 export const authRoutes: FastifyPluginAsync = async (app) => {
   // POST /api/auth/register
   app.post('/api/auth/register', async (req, reply) => {
@@ -26,15 +31,18 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
       return reply.code(400).send({ error: { code: 'INVALID_INPUT', message: `密码长度需为 ${MIN_PASSWORD}-${MAX_PASSWORD}` } })
     }
 
-    const exists = await prisma.user.findUnique({ where: { username } })
-    if (exists) {
-      return reply.code(409).send({ error: { code: 'USERNAME_EXISTS', message: '用户名已被占用' } })
-    }
-
     const passwordHash = await hashPassword(password)
-    const user = await prisma.user.create({
-      data: { username, passwordHash },
-    })
+    let user
+    try {
+      user = await prisma.user.create({
+        data: { username, passwordHash },
+      })
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err !== null && 'code' in err && (err as { code: unknown }).code === 'P2002') {
+        return reply.code(409).send({ error: { code: 'USERNAME_EXISTS', message: '用户名已被占用' } })
+      }
+      throw err
+    }
 
     const token = signToken({ userId: user.id, username: user.username })
     const response: AuthResponse = {
@@ -56,6 +64,11 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
 
     const user = await prisma.user.findUnique({ where: { username } })
     if (!user) {
+      // Run a bcrypt compare against a dummy hash to keep timing roughly
+      // equivalent to the real-password branch and prevent username
+      // enumeration via response time.
+      const dummyHash = await DUMMY_HASH_PROMISE
+      await verifyPassword(password, dummyHash)
       return reply.code(401).send({ error: { code: 'INVALID_CREDENTIALS', message: '用户名或密码错误' } })
     }
 
