@@ -1,5 +1,10 @@
-import cron from 'node-cron'
+import { schedule as cronSchedule } from 'node-cron'
 import { prisma } from './db.js'
+
+const CRON_TIMEZONE = process.env.HOLIDAY_CRON_TZ ?? 'Asia/Shanghai'
+const CRON_ENABLED =
+  process.env.ENABLE_HOLIDAY_CRON === 'true' ||
+  process.env.NODE_ENV === 'production'
 
 const REMOTE_BASE = 'https://timor.tech/api/holiday/year'
 
@@ -71,11 +76,19 @@ export async function syncHolidaysIfMissing(years: number[]): Promise<void> {
 }
 
 export function startHolidaySyncCron(): void {
-  cron.schedule('0 3 * * *', async () => {
-    const now = new Date()
-    const years = [now.getFullYear(), now.getFullYear() + 1]
-    console.log(`[holiday-sync] 定时任务触发，检查 ${years.join(', ')}`)
-    await syncHolidaysIfMissing(years)
-  })
-  console.log('[holiday-sync] 定时任务已注册：每天 03:00 检查')
+  if (!CRON_ENABLED) {
+    console.log('[holiday-sync] 定时任务未启用（设置 ENABLE_HOLIDAY_CRON=true 或 NODE_ENV=production 以启用）')
+    return
+  }
+  cronSchedule(
+    '0 3 * * *',
+    async () => {
+      const now = new Date()
+      const years = [now.getFullYear(), now.getFullYear() + 1]
+      console.log(`[holiday-sync] 定时任务触发，检查 ${years.join(', ')}`)
+      await syncHolidaysIfMissing(years)
+    },
+    { timezone: CRON_TIMEZONE }
+  )
+  console.log(`[holiday-sync] 定时任务已注册：每天 03:00 (${CRON_TIMEZONE}) 检查`)
 }

@@ -57,4 +57,33 @@ describe('syncHolidaysIfMissing', () => {
     const row = await prisma.cnHolidayYear.findUnique({ where: { year: 2025 } })
     expect(row).toBeNull()
   })
+
+  it('handles non-OK HTTP status without inserting', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: async () => ({}),
+    })
+    vi.stubGlobal('fetch', mockFetch)
+
+    await expect(syncHolidaysIfMissing([2025])).resolves.toBeUndefined()
+
+    const row = await prisma.cnHolidayYear.findUnique({ where: { year: 2025 } })
+    expect(row).toBeNull()
+  })
+
+  it('handles malformed JSON response without inserting', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => {
+        throw new Error('unexpected token in JSON')
+      },
+    })
+    vi.stubGlobal('fetch', mockFetch)
+
+    await expect(syncHolidaysIfMissing([2025])).resolves.toBeUndefined()
+
+    const row = await prisma.cnHolidayYear.findUnique({ where: { year: 2025 } })
+    expect(row).toBeNull()
+  })
 })
