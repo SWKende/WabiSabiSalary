@@ -1,0 +1,11 @@
+node_modules/
+data/
+tests/
+.env
+dist/
+vitest.config.ts
+coverage/
+*.log
+.git/
+.gitignore
+*.md
