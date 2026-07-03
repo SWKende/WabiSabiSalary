@@ -3,6 +3,12 @@ import { prisma } from '../lib/db.js'
 import { requireAuth } from '../plugins/auth.js'
 import type { BookkeepingEntry, CreateEntryInput } from '../types/shared.js'
 
+function parseLimit(raw: string | undefined): number {
+  const n = Number(raw ?? 500)
+  if (!Number.isFinite(n) || n <= 0) return 500
+  return Math.min(Math.floor(n), 1000)
+}
+
 function serializeEntry(e: {
   id: string
   type: string
@@ -40,7 +46,7 @@ export const entriesRoutes: FastifyPluginAsync = async (app) => {
   // GET /api/entries?from=&to=&limit=
   app.get('/api/entries', { preHandler: requireAuth }, async (req) => {
     const q = req.query as { from?: string; to?: string; limit?: string }
-    const limit = Math.min(Number(q.limit ?? 500), 1000)
+    const limit = parseLimit(q.limit)
     const where: any = { userId: req.user!.id }
     if (q.from || q.to) {
       where.occurredAt = {}
@@ -99,7 +105,12 @@ export const entriesRoutes: FastifyPluginAsync = async (app) => {
       data.amount = body.amount
     }
     if (body.category !== undefined) data.category = body.category
-    if (body.note !== undefined) data.note = body.note
+    if (body.note !== undefined) {
+      if (typeof body.note !== 'string') {
+        return reply.code(400).send({ error: { code: 'INVALID_INPUT', message: 'note 必须为字符串' } })
+      }
+      data.note = body.note
+    }
     if (body.occurredAt !== undefined) {
       if (isNaN(Date.parse(body.occurredAt))) {
         return reply.code(400).send({ error: { code: 'INVALID_INPUT', message: 'occurredAt 非法' } })
