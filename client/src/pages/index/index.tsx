@@ -584,6 +584,12 @@ export default function Index() {
     })
   }, [])
 
+  const handleLogout = useCallback(() => {
+    api.clearToken()
+    closeSettings()
+    Taro.reLaunch({ url: '/pages/login/index' })
+  }, [closeSettings])
+
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
   const endStr = `${String(config.workEndHour).padStart(2, '0')}:00`
 
@@ -812,6 +818,9 @@ export default function Index() {
             </View>
 
             <View className='settings-footer'>
+              <View className='settings-btn settings-btn-logout' onClick={handleLogout}>
+                <Text className='settings-btn-text'>退 出 登 錄</Text>
+              </View>
               <View className='settings-btn settings-btn-reset' onClick={resetSettings}>
                 <Text className='settings-btn-text'>恢 復 默 認</Text>
               </View>

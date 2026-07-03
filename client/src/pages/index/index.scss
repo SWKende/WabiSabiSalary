@@ -1307,6 +1307,19 @@
       }
     }
 
+    &.settings-btn-logout {
+      background: transparent;
+      border: 1px solid rgba(192, 57, 43, 0.25);
+
+      .settings-btn-text {
+        color: #c0392b;
+      }
+
+      &:active {
+        background: rgba(192, 57, 43, 0.08);
+      }
+    }
+
     &.settings-btn-save {
       background: #2c2c2c;
       border: 1px solid #2c2c2c;
