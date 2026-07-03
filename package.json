@@ -2,5 +2,8 @@
   "name": "trae-salary",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["client", "server"]
+  "workspaces": ["client", "server"],
+  "overrides": {
+    "ajv": "^8.17.1"
+  }
 }
