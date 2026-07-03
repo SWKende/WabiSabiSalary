@@ -393,6 +393,15 @@ export default function Index() {
     syncHomePagePreference()
   }, [syncHomePagePreference])
 
+  // 启动时如果已登录，触发一次完整同步（配置 / 记账 / 节假日 / 重试队列）
+  useEffect(() => {
+    if (!api.getToken()) return
+    ;(async () => {
+      const { initialSync } = await import('../../utils/sync')
+      await initialSync()
+    })()
+  }, [])
+
   // 启动时如果已登录，从云端拉取最新工资配置
   useEffect(() => {
     if (!api.getToken()) return
@@ -520,8 +529,9 @@ export default function Index() {
         /* ignore */
       }
     } catch (err) {
-      console.warn('[sync] 工资配置同步失败', err)
-      // TODO: Task 17 加入待重试队列
+      console.warn('[sync] 工资配置同步失败，加入重试队列', err)
+      const { enqueueSync } = await import('../../utils/sync')
+      enqueueSync({ type: 'updateConfig', payload: newConfig })
     }
   }, [])
 

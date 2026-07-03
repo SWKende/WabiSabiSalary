@@ -26,6 +26,8 @@ export default function LoginPage() {
       const fn = mode === 'login' ? login : register
       const res = await fn(username, password)
       setToken(res.token)
+      const { initialSync } = await import('../../utils/sync')
+      await initialSync()
       Taro.reLaunch({ url: '/pages/index/index' })
     } catch (err: any) {
       setError(err?.message ?? '操作失败')

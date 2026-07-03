@@ -163,14 +163,15 @@ function BookkeepingPageInner({
     Taro.showToast({ title: '已記錄', icon: 'success' })
 
     // 云端同步（fire-and-forget）：成功则用服务端 id 替换临时 id
+    const createInput: import('../../api').CreateEntryInput = {
+      type: activeType,
+      amount: parseFloat(amount),
+      category,
+      note: note || category,
+      occurredAt: new Date(`${selectedDate}T12:00:00`).toISOString(),
+    }
     try {
-      const res = await api.createEntry({
-        type: activeType,
-        amount: parseFloat(amount),
-        category,
-        note: note || category,
-        occurredAt: new Date(`${selectedDate}T12:00:00`).toISOString(),
-      })
+      const res = await api.createEntry(createInput)
       const synced = updated.map((r) => (r.id === tempId ? { ...r, id: res.entry.id } : r))
       setRecords(synced)
       try {
@@ -179,8 +180,9 @@ function BookkeepingPageInner({
         /* ignore */
       }
     } catch (err) {
-      console.warn('[sync] 创建记账失败', err)
-      // TODO: Task 17 加入待重试队列
+      console.warn('[sync] 创建记账失败，加入重试队列', err)
+      const { enqueueSync } = await import('../../utils/sync')
+      enqueueSync({ type: 'createEntry', payload: createInput, tempId })
     }
   }
 
@@ -195,7 +197,9 @@ function BookkeepingPageInner({
     try {
       await api.deleteEntry(id)
     } catch (err) {
-      console.warn('[sync] 删除记账失败', err)
+      console.warn('[sync] 删除记账失败，加入重试队列', err)
+      const { enqueueSync } = await import('../../utils/sync')
+      enqueueSync({ type: 'deleteEntry', id })
     }
   }
 
