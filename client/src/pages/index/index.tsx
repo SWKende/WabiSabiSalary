@@ -19,6 +19,7 @@ import {
   type CnHolidayDataset,
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
+import * as api from '../../api'
 import holidayGameSvg from './assets/holiday-game.svg'
 import holidayRunSvg from './assets/holiday-run.svg'
 import holidaySunSvg from './assets/holiday-sun.svg'
@@ -392,6 +393,41 @@ export default function Index() {
     syncHomePagePreference()
   }, [syncHomePagePreference])
 
+  // 启动时如果已登录，从云端拉取最新工资配置
+  useEffect(() => {
+    if (!api.getToken()) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const remote = await api.getConfig()
+        if (cancelled) return
+        type StoredConfig = SalaryConfig & { updatedAt?: string | null }
+        const localStr: StoredConfig | null = (() => {
+          try {
+            return Taro.getStorageSync('salary_config') as StoredConfig | null
+          } catch {
+            return null
+          }
+        })()
+        const localUpdatedAt = localStr?.updatedAt ?? null
+        const remoteUpdatedAt = remote.updatedAt ?? null
+        if (!localStr || (remoteUpdatedAt && (!localUpdatedAt || remoteUpdatedAt > localUpdatedAt))) {
+          setConfig(remote)
+          try {
+            Taro.setStorageSync('salary_config', remote)
+          } catch {
+            /* ignore */
+          }
+        }
+      } catch (err) {
+        console.warn('[sync] 拉取工资配置失败', err)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
   Taro.useDidShow(() => {
     syncHomePagePreference()
   })
@@ -465,13 +501,27 @@ export default function Index() {
     }
   }, [tick, config, dailySalary, secondSalary, isHolidayMode, workHoursPerDay])
 
-  // 保存配置
-  const saveConfig = useCallback((newConfig: SalaryConfig) => {
+  // 保存配置（本地 + 云端）
+  const saveConfig = useCallback(async (newConfig: SalaryConfig) => {
+    // 1. 立即更新本地（保证 UI 响应）
     setConfig(newConfig)
     try {
       Taro.setStorageSync('salary_config', newConfig)
     } catch {
       /* ignore */
+    }
+
+    // 2. 同步到云端
+    try {
+      const updated = await api.updateConfig(newConfig)
+      try {
+        Taro.setStorageSync('salary_config', updated)
+      } catch {
+        /* ignore */
+      }
+    } catch (err) {
+      console.warn('[sync] 工资配置同步失败', err)
+      // TODO: Task 17 加入待重试队列
     }
   }, [])
 
