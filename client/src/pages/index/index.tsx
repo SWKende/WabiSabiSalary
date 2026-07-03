@@ -402,41 +402,6 @@ export default function Index() {
     })()
   }, [])
 
-  // 启动时如果已登录，从云端拉取最新工资配置
-  useEffect(() => {
-    if (!api.getToken()) return
-    let cancelled = false
-    ;(async () => {
-      try {
-        const remote = await api.getConfig()
-        if (cancelled) return
-        type StoredConfig = SalaryConfig & { updatedAt?: string | null }
-        const localStr: StoredConfig | null = (() => {
-          try {
-            return Taro.getStorageSync('salary_config') as StoredConfig | null
-          } catch {
-            return null
-          }
-        })()
-        const localUpdatedAt = localStr?.updatedAt ?? null
-        const remoteUpdatedAt = remote.updatedAt ?? null
-        if (!localStr || (remoteUpdatedAt && (!localUpdatedAt || remoteUpdatedAt > localUpdatedAt))) {
-          setConfig(remote)
-          try {
-            Taro.setStorageSync('salary_config', remote)
-          } catch {
-            /* ignore */
-          }
-        }
-      } catch (err) {
-        console.warn('[sync] 拉取工资配置失败', err)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
   Taro.useDidShow(() => {
     syncHomePagePreference()
   })

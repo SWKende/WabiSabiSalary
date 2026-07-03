@@ -239,5 +239,47 @@ describe('utils/sync', () => {
 
       await expect(initialSync()).resolves.toBeUndefined()
     })
+
+    it('dedupes concurrent initialSync calls (api.getConfig called once)', async () => {
+      const cfg = { monthlySalary: 100, workStartHour: 9, workEndHour: 18, payday: 15, updatedAt: '2026-01-01' }
+      let resolveConfig: (v: any) => void = () => {}
+      ;(api.getConfig as any).mockImplementation(
+        () => new Promise((res) => {
+          resolveConfig = res
+        })
+      )
+      ;(api.listEntries as any).mockResolvedValue({ entries: [] })
+      ;(ensureCnHolidayDataset as any).mockResolvedValue({})
+
+      const p1 = initialSync()
+      const p2 = initialSync()
+      const p3 = initialSync()
+
+      // release the config pull
+      resolveConfig(cfg)
+      await Promise.all([p1, p2, p3])
+
+      expect(api.getConfig).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('concurrent-call de-dupe', () => {
+    it('retryPendingSyncs dedupes concurrent calls', async () => {
+      setStoredQueue([{ type: 'deleteEntry', id: 'q1' }])
+      let resolveDelete: (v: any) => void = () => {}
+      ;(api.deleteEntry as any).mockImplementation(
+        () => new Promise((res) => {
+          resolveDelete = res
+        })
+      )
+
+      const p1 = retryPendingSyncs()
+      const p2 = retryPendingSyncs()
+
+      resolveDelete({ success: true })
+      await Promise.all([p1, p2])
+
+      expect(api.deleteEntry).toHaveBeenCalledTimes(1)
+    })
   })
 })
