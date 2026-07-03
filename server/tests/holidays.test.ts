@@ -77,4 +77,25 @@ describe('GET /api/holidays', () => {
     })
     expect(res.statusCode).toBe(401)
   })
+
+  it('returns multiple years requested via comma-separated list', async () => {
+    const token = await getToken()
+    await prisma.cnHolidayYear.create({
+      data: { year: 2025, holidays: '["20250101"]', workdays: '[]', source: 'test' },
+    })
+    await prisma.cnHolidayYear.create({
+      data: { year: 2026, holidays: '["20260217"]', workdays: '["20260214"]', source: 'test' },
+    })
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/holidays?years=2026,2025',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    expect(res.statusCode).toBe(200)
+    const body = res.json()
+    expect(body.years.length).toBe(2)
+    expect(body.years[0].year).toBe(2025)
+    expect(body.years[1].year).toBe(2026)
+    expect(body.years[1].workdays).toEqual(['20260214'])
+  })
 })

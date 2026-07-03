@@ -27,11 +27,19 @@ export const holidaysRoutes: FastifyPluginAsync = async (app) => {
       orderBy: { year: 'asc' },
     })
 
-    const result: HolidayYearData[] = rows.map((row) => ({
-      year: row.year,
-      holidays: JSON.parse(row.holidays),
-      workdays: JSON.parse(row.workdays),
-    }))
+    const result: HolidayYearData[] = []
+    for (const row of rows) {
+      try {
+        result.push({
+          year: row.year,
+          holidays: JSON.parse(row.holidays),
+          workdays: JSON.parse(row.workdays),
+        })
+      } catch (err) {
+        app.log.error({ err, year: row.year }, 'corrupted holiday data in DB')
+        // Skip the corrupted row rather than failing the whole request
+      }
+    }
 
     return { years: result }
   })
