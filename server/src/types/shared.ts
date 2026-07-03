@@ -13,7 +13,7 @@ export interface SalaryConfig {
   workStartHour: number
   workEndHour: number
   payday: number
-  updatedAt?: string
+  updatedAt: string | null
 }
 
 export type EntryType = 'income' | 'expense'

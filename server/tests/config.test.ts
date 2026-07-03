@@ -38,6 +38,7 @@ describe('GET /api/config', () => {
     expect(body.workStartHour).toBe(9)
     expect(body.workEndHour).toBe(18)
     expect(body.payday).toBe(15)
+    expect(body.updatedAt).toBeNull()
   })
 
   it('returns 401 without token', async () => {

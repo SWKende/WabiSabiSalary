@@ -40,7 +40,7 @@ export const configRoutes: FastifyPluginAsync = async (app) => {
   app.get('/api/config', { preHandler: requireAuth }, async (req) => {
     const existing = await prisma.salaryConfig.findUnique({ where: { userId: req.user!.id } })
     if (existing) return serializeConfig(existing)
-    return { ...DEFAULTS, updatedAt: new Date().toISOString() }
+    return { ...DEFAULTS, updatedAt: null }
   })
 
   app.put('/api/config', { preHandler: requireAuth }, async (req, reply) => {
