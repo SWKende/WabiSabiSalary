@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors'
 import { prisma } from './lib/db.js'
+import { syncHolidaysIfMissing, startHolidaySyncCron } from './lib/holidaySync.js'
 import { authPlugin } from './plugins/auth.js'
 import { authRoutes } from './routes/auth.js'
 import { configRoutes } from './routes/config.js'
@@ -22,6 +23,13 @@ export async function buildApp() {
   await app.register(configRoutes)
   await app.register(entriesRoutes)
   await app.register(holidaysRoutes)
+
+  app.addHook('onReady', async () => {
+    const now = new Date()
+    const years = [now.getFullYear(), now.getFullYear() + 1]
+    await syncHolidaysIfMissing(years)
+    startHolidaySyncCron()
+  })
 
   app.get('/health', async () => {
     try {
