@@ -1,10 +1,14 @@
-your-domain.com {
+# Replace your-domain.com with your actual domain in BOTH placeholders below
+# Caddy will auto-issue a Let's Encrypt cert on first request.
+
+https://your-domain.com {
     reverse_proxy app:3000 {
         header_up Host {host}
         header_up X-Real-IP {remote}
         header_up X-Forwarded-For {remote}
         header_up X-Forwarded-Proto {scheme}
     }
+    encode zstd gzip
     log {
         output file /var/log/caddy/access.log {
             roll_size 10mb
@@ -13,6 +17,7 @@ your-domain.com {
     }
 }
 
+# HTTP → HTTPS 重定向（独立监听 :80）
 http://your-domain.com {
     redir https://{host}{uri} permanent
 }

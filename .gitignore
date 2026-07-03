@@ -3,3 +3,6 @@ dist/
 node_modules/
 .swc/
 data/
+deploy/.env
+deploy/logs/
+!deploy/logs/.gitkeep

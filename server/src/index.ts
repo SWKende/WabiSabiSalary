@@ -45,6 +45,16 @@ export async function buildApp() {
 }
 
 async function main() {
+  // 生产模式下 fail-fast：禁止 placeholder JWT_SECRET
+  if (process.env.NODE_ENV === 'production') {
+    const secret = process.env.JWT_SECRET ?? ''
+    if (!secret || secret === 'replace-with-real-secret') {
+      throw new Error(
+        'JWT_SECRET 未设置或仍为占位符。生产环境请用 `openssl rand -hex 32` 生成并写入 .env'
+      )
+    }
+  }
+
   const app = await buildApp()
   await app.listen({ port: PORT, host: '0.0.0.0' })
   app.log.info(`server listening on :${PORT}`)
