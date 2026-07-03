@@ -5,6 +5,7 @@ import { authPlugin } from './plugins/auth.js'
 import { authRoutes } from './routes/auth.js'
 import { configRoutes } from './routes/config.js'
 import { entriesRoutes } from './routes/entries.js'
+import { holidaysRoutes } from './routes/holidays.js'
 
 const PORT = Number(process.env.PORT ?? 3000)
 
@@ -20,6 +21,7 @@ export async function buildApp() {
   await app.register(authRoutes)
   await app.register(configRoutes)
   await app.register(entriesRoutes)
+  await app.register(holidaysRoutes)
 
   app.get('/health', async () => {
     try {
