@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro'
 import MonthlyBarChart from '../MonthlyBarChart'
 import MonthlyPieChart from '../MonthlyPieChart'
 import { createRecordTime, formatLocalDate, formatRecordTime, isRecordInMonth, isRecordOnDate } from '../../utils/format'
+import * as api from '../../api'
 import './index.scss'
 
 // 记账设置类型
@@ -13,9 +14,9 @@ export interface BookkeepingSettings {
   showMonthlyPie: boolean
 }
 
-// 记账记录类型
+// 记账记录类型（id 为 string：本地临时 'temp-<ts>'，同步后用服务端 cuid）
 export interface BookkeepingRecord {
-  id: number
+  id: string
   type: 'expense' | 'income'
   amount: string
   note: string
@@ -29,6 +30,18 @@ function migrateRecord(r: any): BookkeepingRecord {
   return {
     ...r,
     type: r.category === '收入' || r.category === '収入' ? 'income' : 'expense',
+  }
+}
+
+// 将服务端记账条目转换为本地记录格式
+function apiEntryToRecord(e: import('../../api').BookkeepingEntry): BookkeepingRecord {
+  return {
+    id: e.id,
+    type: e.type,
+    amount: String(e.amount),
+    note: e.note ?? '',
+    category: e.category,
+    time: e.occurredAt.slice(0, 10) + ' 12:00',
   }
 }
 
@@ -73,6 +86,38 @@ function BookkeepingPageInner({
       if (formAnimTimerRef.current) clearTimeout(formAnimTimerRef.current)
     }
   }, [])
+
+  // 启动时如果已登录，从云端拉取最近 90 天的记账
+  useEffect(() => {
+    if (!api.getToken()) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const from = new Date(Date.now() - 90 * 86400 * 1000).toISOString().slice(0, 10)
+        const to = new Date().toISOString().slice(0, 10)
+        const { entries: remoteEntries } = await api.listEntries({ from, to, limit: 500 })
+        if (cancelled) return
+        const remoteIds = new Set(remoteEntries.map((e) => e.id))
+        const localOnly = records.filter(
+          (r) => !remoteIds.has(r.id) && !r.id.startsWith('temp-'),
+        )
+        const merged = [...remoteEntries.map(apiEntryToRecord), ...localOnly]
+        setRecords(merged)
+        try {
+          Taro.setStorageSync('bookkeeping_records', merged)
+        } catch {
+          /* ignore */
+        }
+      } catch (err) {
+        console.warn('[sync] 拉取记账失败', err)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+    // 仅在 mount 时拉取一次；records 依赖读取初始值即可
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const [recordPendingDelete, setRecordPendingDelete] = useState<BookkeepingRecord | null>(null)
   const expenseCategories = ['餐飲', '交通', '購物', '数码', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
@@ -93,10 +138,11 @@ function BookkeepingPageInner({
     setCategory(type === 'expense' ? expenseCategories[0] : incomeCategories[0])
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!amount) return
+    const tempId = `temp-${Date.now()}`
     const newRecord: BookkeepingRecord = {
-      id: Date.now(),
+      id: tempId,
       type: activeType,
       amount,
       note: note || category,
@@ -115,15 +161,41 @@ function BookkeepingPageInner({
     setSelectedDate(formatLocalDate(new Date()))
     setShowForm(false)
     Taro.showToast({ title: '已記錄', icon: 'success' })
+
+    // 云端同步（fire-and-forget）：成功则用服务端 id 替换临时 id
+    try {
+      const res = await api.createEntry({
+        type: activeType,
+        amount: parseFloat(amount),
+        category,
+        note: note || category,
+        occurredAt: new Date(`${selectedDate}T12:00:00`).toISOString(),
+      })
+      const synced = updated.map((r) => (r.id === tempId ? { ...r, id: res.entry.id } : r))
+      setRecords(synced)
+      try {
+        Taro.setStorageSync('bookkeeping_records', synced)
+      } catch {
+        /* ignore */
+      }
+    } catch (err) {
+      console.warn('[sync] 创建记账失败', err)
+      // TODO: Task 17 加入待重试队列
+    }
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: string) => {
     const updated = records.filter((r) => r.id !== id)
     setRecords(updated)
     try {
       Taro.setStorageSync('bookkeeping_records', updated)
     } catch {
       /* ignore */
+    }
+    try {
+      await api.deleteEntry(id)
+    } catch (err) {
+      console.warn('[sync] 删除记账失败', err)
     }
   }
 
