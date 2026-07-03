@@ -16,6 +16,10 @@ export default function LoginPage() {
       setError('请输入用户名和密码')
       return
     }
+    if (username.length < 3 || password.length < 6) {
+      setError('用户名至少 3 位，密码至少 6 位')
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -28,6 +32,13 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const switchMode = () => {
+    setMode(mode === 'login' ? 'register' : 'login')
+    setError(null)
+    setUsername('')
+    setPassword('')
   }
 
   return (
@@ -63,7 +74,7 @@ export default function LoginPage() {
 
         <View className='login-switch'>
           <Text>{mode === 'login' ? '还没有账号？' : '已有账号？'}</Text>
-          <Text className='login-switch__link' onClick={() => setMode(mode === 'login' ? 'register' : 'login')}>
+          <Text className='login-switch__link' onClick={switchMode}>
             {mode === 'login' ? '立即注册' : '立即登录'}
           </Text>
         </View>
