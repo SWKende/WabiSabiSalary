@@ -58,7 +58,8 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
   const { method = 'GET', body, query } = options
   const token = getToken()
   const base = getBaseUrl()
-  const url = new URL(base + path)
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const url = new URL(base + normalizedPath)
   if (query) {
     for (const [k, v] of Object.entries(query)) {
       if (v !== undefined && v !== null && v !== '') {
@@ -67,16 +68,25 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
     }
   }
 
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  }
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const res = await Taro.request({
-    url: url.toString(),
-    method,
-    data: body,
-    header: headers,
-    timeout: 10000,
-  })
+  let res: Awaited<ReturnType<typeof Taro.request>>
+  try {
+    res = await Taro.request({
+      url: url.toString(),
+      method,
+      data: body,
+      header: headers,
+      timeout: 10000,
+    })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    throw new ApiError('NETWORK_ERROR', message || '网络请求失败', 0)
+  }
 
   if (res.statusCode >= 200 && res.statusCode < 300) {
     return res.data as T

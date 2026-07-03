@@ -94,5 +94,25 @@ describe('api/client', () => {
         status: 500,
       })
     })
+
+    it('throws NETWORK_ERROR ApiError when Taro.request rejects', async () => {
+      ;(Taro.request as any).mockRejectedValue(new Error('request:fail'))
+
+      await expect(apiRequest('/api/test')).rejects.toMatchObject({
+        code: 'NETWORK_ERROR',
+        status: 0,
+      })
+    })
+
+    it('skips empty/undefined query params', async () => {
+      ;(Taro.request as any).mockResolvedValue({ statusCode: 200, data: {} })
+      await apiRequest('/api/entries', {
+        query: { from: '', to: '2026-01-01', limit: 10 } as any,
+      })
+      const url = (Taro.request as any).mock.calls[0][0].url as string
+      expect(url).not.toContain('from=')
+      expect(url).toContain('to=2026-01-01')
+      expect(url).toContain('limit=10')
+    })
   })
 })
