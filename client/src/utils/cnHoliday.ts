@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import fallbackData from '../constants/cn-holiday-fallback.json'
+import * as api from '../api'
 import {
   toYYYYMMDD as toYYYYMMDDCore,
   normalizeYYYYMMDD as normalizeYYYYMMDDCore,
@@ -34,15 +34,25 @@ function uniqSorted(list: string[]): string[] {
 
 function safeParseDataset(raw: any): CnHolidayDataset | null {
   if (!raw || typeof raw !== 'object') return null
-  const years = Array.isArray(raw.years) ? raw.years.filter((n: any) => Number.isInteger(n)) : []
-  const holidays = Array.isArray(raw.holidays) ? raw.holidays.map(String) : []
-  const workdays = Array.isArray(raw.workdays) ? raw.workdays.map(String) : []
+  const years: number[] = Array.isArray(raw.years)
+    ? (raw.years.filter((n: unknown) => Number.isInteger(n) && typeof n === 'number') as number[])
+    : []
+  const holidays: string[] = Array.isArray(raw.holidays) ? raw.holidays.map(String) : []
+  const workdays: string[] = Array.isArray(raw.workdays) ? raw.workdays.map(String) : []
   const fetchedAt = typeof raw.fetchedAt === 'string' ? raw.fetchedAt : new Date(0).toISOString()
   const source =
     raw.source === 'remote' || raw.source === 'cache' || raw.source === 'fallback' ? raw.source : 'cache'
-  const normalizedHolidays = uniqSorted(holidays.map((x) => normalizeYYYYMMDD(x)).filter(Boolean) as string[])
-  const normalizedWorkdays = uniqSorted(workdays.map((x) => normalizeYYYYMMDD(x)).filter(Boolean) as string[])
-  const normalizedYears = Array.from(new Set(years)).sort()
+  const normalizedHolidays = uniqSorted(
+    holidays
+      .map((x: string) => normalizeYYYYMMDD(x))
+      .filter((x): x is string => Boolean(x)),
+  )
+  const normalizedWorkdays = uniqSorted(
+    workdays
+      .map((x: string) => normalizeYYYYMMDD(x))
+      .filter((x): x is string => Boolean(x)),
+  )
+  const normalizedYears = Array.from(new Set(years)).sort((a, b) => a - b)
   return {
     years: normalizedYears,
     holidays: normalizedHolidays,
@@ -102,36 +112,72 @@ export async function ensureCnHolidayDataset(params?: {
   const cached = readCnHolidayDatasetSync()
   if (isCoveringYears(cached, years)) return cached!
 
-  // 2. 将内置 fallback 数据与缓存合并，覆盖所需年份则直接使用（无需网络）
-  const fb = safeParseDataset({ ...fallbackData, source: 'fallback' })
-  const merged: CnHolidayDataset = safeParseDataset({
-    years: uniqSorted([...(cached?.years ?? []), ...(fb?.years ?? [])]).map((x) => Number(x)),
-    holidays: uniqSorted([...(cached?.holidays ?? []), ...(fb?.holidays ?? [])]),
-    workdays: uniqSorted([...(cached?.workdays ?? []), ...(fb?.workdays ?? [])]),
-    fetchedAt: new Date().toISOString(),
-    source: fb?.source ?? 'fallback',
-  })!
-
-  if (isCoveringYears(merged, years)) {
-    writeCnHolidayDatasetSync(merged)
-    return merged
+  // 2. 如果已登录，尝试从云端拉取
+  if (api.getToken()) {
+    try {
+      const { years: yearData } = await api.getHolidays(years)
+      const merged: CnHolidayDataset = safeParseDataset({
+        years: uniqSorted([
+          ...(cached?.years ?? []).map(String),
+          ...yearData.map((y) => String(y.year)),
+        ]).map((x) => Number(x)),
+        holidays: uniqSorted([...(cached?.holidays ?? []), ...yearData.flatMap((y) => y.holidays)]),
+        workdays: uniqSorted([...(cached?.workdays ?? []), ...yearData.flatMap((y) => y.workdays)]),
+        fetchedAt: new Date().toISOString(),
+        source: 'remote',
+      })!
+      if (isCoveringYears(merged, years)) {
+        writeCnHolidayDatasetSync(merged)
+        return merged
+      }
+      // 云端数据不足以覆盖全部年份，回退到 timor.tech 单年拉取
+      const missingYears = years.filter((y) => !merged.years.includes(y))
+      try {
+        const fetched = await Promise.all(missingYears.map(fetchYearFromProvider))
+        const enhanced: CnHolidayDataset = safeParseDataset({
+          years: uniqSorted([
+            ...merged.years.map(String),
+            ...missingYears.map(String),
+          ]).map((x) => Number(x)),
+          holidays: uniqSorted([...merged.holidays, ...fetched.flatMap((x) => x.holidays)]),
+          workdays: uniqSorted([...merged.workdays, ...fetched.flatMap((x) => x.workdays)]),
+          fetchedAt: new Date().toISOString(),
+          source: 'remote',
+        })!
+        writeCnHolidayDatasetSync(enhanced)
+        return enhanced
+      } catch {
+        writeCnHolidayDatasetSync(merged)
+        return merged
+      }
+    } catch (err) {
+      console.warn('[cnHoliday] 云端拉取失败', err)
+    }
   }
 
-  // 3. 本地数据不足时，才尝试外部 API（失败不影响功能）
-  const missingYears = years.filter((y) => !merged.years.includes(y))
+  // 3. 未登录或云端失败：尝试外部 timor.tech（覆盖所需年份）
   try {
-    const fetched = await Promise.all(missingYears.map(fetchYearFromProvider))
-    const enhanced: CnHolidayDataset = safeParseDataset({
-      years: uniqSorted([...merged.years, ...missingYears]).map((x) => Number(x)),
-      holidays: uniqSorted([...merged.holidays, ...fetched.flatMap((x) => x.holidays)]),
-      workdays: uniqSorted([...merged.workdays, ...fetched.flatMap((x) => x.workdays)]),
+    const fetched = await Promise.all(years.map(fetchYearFromProvider))
+    const fromRemote: CnHolidayDataset = safeParseDataset({
+      years: uniqSorted([
+        ...(cached?.years ?? []).map(String),
+        ...years.map(String),
+      ]).map((x) => Number(x)),
+      holidays: uniqSorted([...(cached?.holidays ?? []), ...fetched.flatMap((x) => x.holidays)]),
+      workdays: uniqSorted([...(cached?.workdays ?? []), ...fetched.flatMap((x) => x.workdays)]),
       fetchedAt: new Date().toISOString(),
       source: 'remote',
     })!
-    writeCnHolidayDatasetSync(enhanced)
-    return enhanced
+    writeCnHolidayDatasetSync(fromRemote)
+    return fromRemote
   } catch {
-    // API 失败，返回本地数据（已包含当前所需年份）
-    return merged
+    // 4. 完全失败 → 返回本地缓存或空数据集
+    return cached ?? {
+      years: [],
+      holidays: [],
+      workdays: [],
+      fetchedAt: new Date(0).toISOString(),
+      source: 'cache',
+    }
   }
 }
