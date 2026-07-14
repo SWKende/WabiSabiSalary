@@ -1,8 +1,12 @@
+// ========== 数字键盘 — 侘寂美学 ==========
+
+@use '../../styles/variables' as *;
+
 .nk-overlay {
   position: fixed;
   inset: 0;
   z-index: 450;
-  background: rgba(44, 44, 44, 0.24);
+  background: $palette-alpha-ink-24;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -16,10 +20,10 @@
 
 .nk-panel {
   width: 100%;
-  background: #faf8f4;
-  border-radius: 18px 18px 0 0;
-  border-top: 1px solid rgba(44, 44, 44, 0.08);
-  padding: 16px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: $color-bg-page;
+  border-radius: $radius-md $radius-md 0 0;
+  border-top: 1px solid $color-divider-subtle;
+  padding: $sp-4 $sp-5 calc($sp-5 + env(safe-area-inset-bottom, 0px));
   box-sizing: border-box;
   animation: nkSlideUp 0.26s ease;
 }
@@ -30,31 +34,31 @@
 }
 
 .nk-handle {
-  width: 72px;
+  width: $sp-12;
   height: 6px;
-  border-radius: 999px;
-  background: rgba(44, 44, 44, 0.12);
-  margin: 0 auto 18px;
+  border-radius: $radius-full;
+  background: $palette-alpha-ink-12;
+  margin: 0 auto $sp-6;
 }
 
 .nk-header {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
+  gap: $sp-4;
+  margin-bottom: $sp-6;
 }
 
 .nk-title {
-  font-size: 22px;
-  color: #8a8279;
+  font-size: $font-heading-lg;
+  color: $color-text-placeholder;
   letter-spacing: 3px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .nk-preview {
-  font-size: 40px;
-  color: #2c2c2c;
+  font-size: $font-heading-lg;
+  color: $color-text-primary;
   font-weight: 500;
   line-height: 1;
   font-family: 'Shippori Mincho B1', serif;
@@ -66,49 +70,49 @@
 .nk-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: $sp-3;
 }
 
 .nk-key {
-  min-height: 96px;
+  min-height: $btn-height-lg;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f0e8;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 8px;
+  background: $color-bg-surface-soft;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-sm;
   transition: transform 0.2s ease, background 0.2s ease;
 
   &:active {
     transform: scale(0.98);
-    background: #ece5d8;
+    background: $palette-sand-200;
   }
 
   &.nk-key-delete {
-    background: rgba(44, 44, 44, 0.06);
+    background: $color-shadow-soft;
   }
 }
 
 .nk-key-text {
-  font-size: 32px;
-  color: #2c2c2c;
+  font-size: $font-body-lg;
+  color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
   line-height: 1;
 }
 
 .nk-footer {
   display: flex;
-  gap: 12px;
-  margin-top: 16px;
+  gap: $sp-3;
+  margin-top: $sp-4;
 }
 
 .nk-btn {
   flex: 1;
-  min-height: 88px;
+  min-height: $input-height-lg;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: $radius-sm;
   transition: transform 0.2s ease, background 0.2s ease;
 
   &:active {
@@ -117,22 +121,22 @@
 }
 
 .nk-btn-cancel {
-  border: 1px solid rgba(44, 44, 44, 0.08);
+  border: 1px solid $color-divider-subtle;
   background: transparent;
 }
 
 .nk-btn-confirm {
-  background: #2c2c2c;
-  border: 1px solid #2c2c2c;
+  background: $color-text-primary;
+  border: 1px solid $color-text-primary;
 
   .nk-btn-text {
-    color: #faf8f4;
+    color: $color-bg-page;
   }
 }
 
 .nk-btn-text {
-  font-size: 26px;
-  color: #5c5650;
+  font-size: $font-caption-md;
+  color: $color-text-secondary;
   letter-spacing: 4px;
   font-family: 'Noto Serif SC', serif;
 }
