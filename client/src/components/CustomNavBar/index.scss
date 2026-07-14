@@ -1,10 +1,13 @@
 // 自定义导航栏 — 适配胶囊按钮
+
+@use '../../styles/variables' as *;
+
 .custom-nav-bar {
   position: relative;
   z-index: 50;
   width: 100%;
-  margin-bottom: 20px;
-  padding: 0 20px;
+  margin-bottom: $sp-5;
+  padding: 0 $sp-5;
   box-sizing: border-box;
 
   .nav-status-spacer {
@@ -16,7 +19,7 @@
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
-    padding-left: 4px;
+    padding-left: $sp-1;
 
     &.nav-capsule {
       justify-content: flex-start;
@@ -26,9 +29,9 @@
 
 // 导航栏内复用状态元素
 .status-time {
-  font-size: 26px;
+  font-size: $font-caption-md;
   font-weight: 300;
-  color: #5c5650;
+  color: $color-text-secondary;
   font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
   letter-spacing: 4px;
 }
@@ -36,55 +39,55 @@
 .status-badge {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 18px;
-  border-radius: 2px;
-  font-size: 24px;
+  gap: $sp-3;
+  padding: $sp-2 $sp-6;
+  border-radius: $radius-2;
+  font-size: $font-caption-sm;
   font-weight: 400;
   letter-spacing: 3px;
   transition: all 0.6s ease;
 
   .status-dot {
-    width: 8px;
-    height: 8px;
+    width: $sp-2;
+    height: $sp-2;
     border-radius: 50%;
     animation: dotBreath 4s ease-in-out infinite;
   }
 
   .status-icon {
-    font-size: 26px;
+    font-size: $font-caption-md;
     line-height: 1;
     transform: translateY(-1px);
   }
 
   &.working {
-    background: rgba(122, 140, 110, 0.08);
-    border: 1px solid rgba(122, 140, 110, 0.15);
-    color: #5a6b50;
+    background: $palette-alpha-sage-08;
+    border: 1px solid $palette-alpha-sage-15;
+    color: $palette-olive-700;
 
     .status-dot {
-      background: #a3b496;
+      background: $palette-sage-300;
     }
   }
 
   &.resting {
-    background: rgba(184, 84, 80, 0.12);
-    border: 1px solid rgba(184, 84, 80, 0.12);
-    color: #b85450;
+    background: $palette-alpha-rouge-12;
+    border: 1px solid $palette-alpha-rouge-12;
+    color: $color-state-danger;
 
     .status-dot {
-      background: #b85450;
+      background: $color-state-danger;
       animation: none;
     }
   }
 
   &.holiday {
-    background: rgba(214, 74, 70, 0.16);
-    border: 1px solid rgba(214, 74, 70, 0.22);
-    color: #d64a46;
+    background: $palette-alpha-rouge-16;
+    border: 1px solid $palette-alpha-rouge-22;
+    color: $palette-rouge-light;
 
     .status-dot {
-      background: #d64a46;
+      background: $palette-rouge-light;
       animation: none;
     }
   }
