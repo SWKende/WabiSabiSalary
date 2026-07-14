@@ -1,0 +1,31 @@
+// client/src/styles/components/_input.scss
+// L3 输入框组件默认值,通过 CSS 变量暴露给父容器覆写。
+
+@use '../semantic/color' as c;
+@use '../semantic/typography' as t;
+@use '../semantic/control' as k;
+@use '../tokens/radius' as r;
+
+.input {
+  --input-height       : #{k.$input-height-md};
+  --input-padding-x    : #{k.$input-padding-x};
+  --input-padding-y    : #{k.$input-padding-y};
+  --input-bg           : #{c.$color-bg-surface};
+  --input-border       : 1px solid #{c.$color-divider-subtle};
+  --input-radius       : #{r.$radius-md};
+  --input-font         : #{t.$font-body-md};
+  --input-color        : #{c.$color-text-primary};
+  --input-placeholder  : #{c.$color-text-placeholder};
+
+  height: var(--input-height);
+  padding: var(--input-padding-y) var(--input-padding-x);
+  background: var(--input-bg);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  font-size: var(--input-font);
+  color: var(--input-color);
+}
+
+.input::placeholder {
+  color: var(--input-placeholder);
+}
