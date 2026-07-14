@@ -1,13 +1,15 @@
 // 侘寂 · 時間の流れ — 日式工资时钟
 // 色调：枯山水砂石、苔藓、和纸、墨
 
+@use '../../styles/variables' as *;
+
 
 // 页面根容器 — Swiper 布局
 .salary-app-root {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: #f5f0e8;
+  background: $color-bg-surface-soft;
   overflow: hidden;
 
   &::before {
@@ -27,7 +29,7 @@
   z-index: 500;
   display: flex;
   flex-direction: column;
-  background: #f5f0e8;
+  background: $color-bg-surface-soft;
   will-change: transform, opacity;
 }
 
@@ -55,8 +57,8 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(200, 185, 154, 0.25) 30%,
-    rgba(200, 185, 154, 0.25) 70%,
+    $palette-sand-300 30%,
+    $palette-sand-300 70%,
     transparent 100%
   );
   z-index: 10;
@@ -95,10 +97,10 @@
   align-items: center;
   gap: 10px;
   padding: 24px 36px 20px;
-  background: rgba(250, 248, 244, 0.82);
-  border: 1px solid rgba(200, 185, 154, 0.35);
+  background: $color-bg-overlay;
+  border: 1px solid $palette-alpha-sand-35;
   border-radius: 20px;
-  box-shadow: 0 4px 20px rgba(44, 44, 44, 0.06), 0 1px 4px rgba(44, 44, 44, 0.04);
+  box-shadow: 0 4px 20px $color-shadow-soft, 0 1px 4px $color-shadow-soft;
   animation: overlayFloat 5s ease-in-out infinite;
 }
 
@@ -114,18 +116,18 @@
 
 .launch-panel__badge {
   padding: 5px 14px;
-  background: rgba(200, 185, 154, 0.18);
-  border: 1px solid rgba(200, 185, 154, 0.3);
+  background: $palette-alpha-sand-18;
+  border: 1px solid $palette-sand-300;
   border-radius: 999px;
   font-size: 18px;
-  color: #8a7e6c;
+  color: $palette-ink-warm-500;
   letter-spacing: 2px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .launch-panel__title {
   font-size: 42px;
-  color: #2c2c2c;
+  color: $color-text-primary;
   font-weight: 600;
   letter-spacing: 6px;
   font-family: 'Noto Serif SC', serif;
@@ -133,7 +135,7 @@
 
 .launch-panel__desc {
   font-size: 22px;
-  color: #736c63;
+  color: $color-text-tertiary;
   text-align: center;
   line-height: 1.6;
   letter-spacing: 1px;
@@ -147,20 +149,20 @@
   gap: 6px;
   margin-top: 4px;
   padding: 8px 20px;
-  background: rgba(44, 44, 44, 0.06);
+  background: $color-shadow-soft;
   border-radius: 999px;
 }
 
 .launch-panel__enter-text {
   font-size: 18px;
-  color: #5c5650;
+  color: $color-text-secondary;
   letter-spacing: 3px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .launch-panel__enter-arrow {
   font-size: 20px;
-  color: #a89878;
+  color: $color-brand-primary-strong;
   line-height: 1;
 }
 
@@ -170,7 +172,7 @@
   height: 100%;
   padding: 40px 64px;
   box-sizing: border-box;
-  background: #f5f0e8;
+  background: $color-bg-surface-soft;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -185,7 +187,7 @@
 .mock-hero-label {
   display: block;
   font-size: 16px;
-  color: #8a8279;
+  color: $color-text-placeholder;
   letter-spacing: 8px;
   margin-bottom: 10px;
   font-family: 'Noto Serif SC', serif;
@@ -201,7 +203,7 @@
 
 .mock-currency {
   font-size: 18px;
-  color: #a89878;
+  color: $color-brand-primary-strong;
   margin-top: 6px;
   font-family: 'Noto Serif SC', serif;
 }
@@ -209,7 +211,7 @@
 .mock-number {
   font-size: 44px;
   font-weight: 600;
-  color: #2c2c2c;
+  color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
   line-height: 1;
 }
@@ -217,7 +219,7 @@
 .mock-progress {
   width: 120px;
   height: 2px;
-  background: rgba(44, 44, 44, 0.08);
+  background: $color-divider-subtle;
   margin: 0 auto 6px;
   border-radius: 1px;
   overflow: hidden;
@@ -226,12 +228,12 @@
 .mock-progress-fill {
   width: 65%;
   height: 100%;
-  background: #c8b99a;
+  background: $color-brand-primary;
 }
 
 .mock-target {
   font-size: 14px;
-  color: #8a8279;
+  color: $color-text-placeholder;
   letter-spacing: 3px;
   font-family: 'Noto Serif SC', serif;
 }
@@ -239,15 +241,15 @@
 .mock-live {
   text-align: center;
   padding: 20px;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.06);
+  background: $color-bg-page;
+  border: 1px solid $color-shadow-soft;
   border-radius: 2px;
 }
 
 .mock-live-label {
   display: block;
   font-size: 14px;
-  color: #8a8279;
+  color: $color-text-placeholder;
   letter-spacing: 6px;
   margin-bottom: 8px;
   font-family: 'Noto Serif SC', serif;
@@ -255,22 +257,22 @@
 
 .mock-live-amount {
   font-size: 28px;
-  color: #2c2c2c;
+  color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
   font-weight: 500;
 }
 
 .mock-card {
   padding: 14px 16px;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.06);
+  background: $color-bg-page;
+  border: 1px solid $color-shadow-soft;
   border-radius: 2px;
 }
 
 .mock-card-title {
   display: block;
   font-size: 16px;
-  color: #2c2c2c;
+  color: $color-text-primary;
   letter-spacing: 3px;
   margin-bottom: 8px;
   font-family: 'Noto Serif SC', serif;
@@ -279,13 +281,13 @@
 .mock-card-line {
   height: 2px;
   width: 70%;
-  background: rgba(44, 44, 44, 0.06);
+  background: $color-shadow-soft;
   border-radius: 1px;
 }
 
 .mock-card-bar {
   height: 3px;
-  background: #ece5d8;
+  background: $palette-sand-200;
   border-radius: 1px;
   overflow: hidden;
 }
@@ -293,7 +295,7 @@
 .mock-card-bar-fill {
   width: 55%;
   height: 100%;
-  background: #c8b99a;
+  background: $color-brand-primary;
 }
 
 // ========== 缩略预览：记账页 ==========
@@ -302,7 +304,7 @@
   height: 100%;
   padding: 40px 64px;
   box-sizing: border-box;
-  background: #f5f0e8;
+  background: $color-bg-surface-soft;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -314,12 +316,12 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 0 4px 10px;
-  border-bottom: 1px solid rgba(44, 44, 44, 0.06);
+  border-bottom: 1px solid $color-shadow-soft;
 }
 
 .mock-bk-title {
   font-size: 22px;
-  color: #2c2c2c;
+  color: $color-text-primary;
   font-weight: 500;
   letter-spacing: 6px;
   font-family: 'Noto Serif SC', serif;
@@ -332,7 +334,7 @@
 .mock-bk-summary-label {
   display: block;
   font-size: 12px;
-  color: #8a8279;
+  color: $color-text-placeholder;
   letter-spacing: 2px;
   margin-bottom: 2px;
   font-family: 'Noto Serif SC', serif;
@@ -340,7 +342,7 @@
 
 .mock-bk-summary-val {
   font-size: 20px;
-  color: #7a8c6e;
+  color: $color-state-success;
   font-family: 'Shippori Mincho B1', serif;
   font-weight: 500;
 }
@@ -348,14 +350,14 @@
 .mock-bk-pen {
   padding: 12px 0;
   text-align: center;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.08);
+  background: $color-bg-page;
+  border: 1px solid $color-divider-subtle;
   border-radius: 2px;
 }
 
 .mock-bk-pen-text {
   font-size: 16px;
-  color: #5c5650;
+  color: $color-text-secondary;
   letter-spacing: 6px;
   font-family: 'Noto Serif SC', serif;
 }
@@ -368,17 +370,17 @@
 .mock-bk-chip {
   padding: 5px 12px;
   font-size: 13px;
-  color: #736c63;
-  background: rgba(200, 185, 154, 0.12);
-  border: 1px solid rgba(200, 185, 154, 0.2);
+  color: $color-text-tertiary;
+  background: $palette-alpha-sand-12;
+  border: 1px solid $palette-alpha-sand-20;
   border-radius: 999px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .mock-bk-chip--active {
-  background: rgba(200, 185, 154, 0.3);
-  border-color: rgba(200, 185, 154, 0.45);
-  color: #5c5650;
+  background: $palette-sand-300;
+  border-color: $palette-alpha-sand-45;
+  color: $color-text-secondary;
 }
 
 .mock-bk-list {
@@ -401,26 +403,26 @@
   flex-shrink: 0;
 }
 
-.mock-bk-dot--food { background: #b85450; }
-.mock-bk-dot--transport { background: #c8b99a; }
-.mock-bk-dot--other { background: #7a8c6e; }
-.mock-bk-dot--income { background: #a89878; }
+.mock-bk-dot--food { background: $color-state-danger; }
+.mock-bk-dot--transport { background: $color-brand-primary; }
+.mock-bk-dot--other { background: $color-state-success; }
+.mock-bk-dot--income { background: $color-brand-primary-strong; }
 
 .mock-bk-name {
   flex: 1;
   font-size: 16px;
-  color: #5c5650;
+  color: $color-text-secondary;
   font-family: 'Noto Serif SC', serif;
 }
 
 .mock-bk-val {
   font-size: 17px;
-  color: #2c2c2c;
+  color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
 }
 
 .mock-bk-val--income {
-  color: #7a8c6e;
+  color: $color-state-success;
 }
 
 .mock-bk-charts {
@@ -432,8 +434,8 @@
 .mock-bk-chart-card {
   flex: 1;
   padding: 12px 14px;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.06);
+  background: $color-bg-page;
+  border: 1px solid $color-shadow-soft;
   border-radius: 2px;
   display: flex;
   flex-direction: column;
@@ -442,7 +444,7 @@
 
 .mock-bk-chart-title {
   font-size: 13px;
-  color: #8a8279;
+  color: $color-text-placeholder;
   letter-spacing: 2px;
   font-family: 'Noto Serif SC', serif;
 }
@@ -457,7 +459,7 @@
 .mock-bk-bar {
   flex: 1;
   border-radius: 2px 2px 0 0;
-  background: rgba(200, 185, 154, 0.5);
+  background: $palette-alpha-sand-50;
   min-height: 4px;
 }
 
@@ -470,7 +472,7 @@
   flex: 1;
   text-align: center;
   font-size: 10px;
-  color: #a39d95;
+  color: $palette-ink-warm-300;
   font-family: 'Shippori Mincho B1', serif;
 }
 
@@ -486,10 +488,10 @@
   border-radius: 50%;
   flex-shrink: 0;
   background: conic-gradient(
-    #b85450 0% 35%,
-    #c8b99a 35% 55%,
-    #7a8c6e 55% 75%,
-    #a89878 75% 100%
+    $color-state-danger 0% 35%,
+    $color-brand-primary 35% 55%,
+    $color-state-success 55% 75%,
+    $color-brand-primary-strong 75% 100%
   );
 }
 
@@ -512,13 +514,13 @@
   flex-shrink: 0;
 }
 
-.mock-bk-legend-dot--a { background: #b85450; }
-.mock-bk-legend-dot--b { background: #c8b99a; }
-.mock-bk-legend-dot--c { background: #7a8c6e; }
+.mock-bk-legend-dot--a { background: $color-state-danger; }
+.mock-bk-legend-dot--b { background: $color-brand-primary; }
+.mock-bk-legend-dot--c { background: $color-state-success; }
 
 .mock-bk-legend-text {
   font-size: 12px;
-  color: #736c63;
+  color: $color-text-tertiary;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -558,13 +560,13 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: rgba(44, 44, 44, 0.15);
+    background: $color-divider-subtle;
     transition: all 0.4s ease;
 
     &.active {
       width: 24px;
       border-radius: 3px;
-      background: #c8b99a;
+      background: $color-brand-primary;
     }
   }
 }
@@ -600,7 +602,7 @@
   .hero-label {
     display: block;
     font-size: 28px;
-    color: #8a8279;
+    color: $color-text-placeholder;
     letter-spacing: 10px;
     margin-bottom: 24px;
     font-weight: 400;
@@ -616,7 +618,7 @@
 
     .hero-currency {
       font-size: 40px;
-      color: #a89878;
+      color: $color-brand-primary-strong;
       font-weight: 300;
       margin-top: 14px;
       font-family: 'Noto Serif SC', serif;
@@ -625,7 +627,7 @@
     .hero-number {
       font-size: 88px;
       font-weight: 600;
-      color: #2c2c2c;
+      color: $color-text-primary;
       font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
       letter-spacing: 2px;
       line-height: 1;
@@ -636,14 +638,14 @@
   .hero-progress-bg {
     width: 240px;
     height: 2px;
-    background: rgba(44, 44, 44, 0.08);
+    background: $color-divider-subtle;
     margin: 0 auto 20px;
     position: relative;
     overflow: hidden;
 
     .hero-progress-fill {
       height: 100%;
-      background: #c8b99a;
+      background: $color-brand-primary;
       transition: width 1s ease;
       position: relative;
 
@@ -655,7 +657,7 @@
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #c8b99a;
+        background: $color-brand-primary;
         opacity: 0.6;
       }
     }
@@ -663,7 +665,7 @@
 
   .hero-target {
     font-size: 24px;
-    color: #8a8279;
+    color: $color-text-placeholder;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
     font-weight: 300;
@@ -677,9 +679,9 @@
   text-align: center;
   padding: 44px 24px;
   margin-bottom: 28px;
-  background: #faf8f4;
+  background: $color-bg-page;
   border-radius: 2px;
-  border: 1px solid rgba(44, 44, 44, 0.08);
+  border: 1px solid $color-divider-subtle;
 
   .live-glow {
     position: absolute;
@@ -689,7 +691,7 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(200, 185, 154, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, $palette-alpha-sand-15 0%, transparent 70%);
     pointer-events: none;
     animation: inkBreath 6s ease-in-out infinite;
   }
@@ -698,7 +700,7 @@
     position: relative;
     display: block;
     font-size: 24px;
-    color: #8a8279;
+    color: $color-text-placeholder;
     letter-spacing: 8px;
     margin-bottom: 20px;
     font-family: 'Noto Serif SC', serif;
@@ -710,7 +712,7 @@
     display: block;
     font-size: 56px;
     font-weight: 500;
-    color: #2c2c2c;
+    color: $color-text-primary;
     font-family: 'Shippori Mincho B1', serif;
     letter-spacing: 2px;
     margin-bottom: 16px;
@@ -721,7 +723,7 @@
     position: relative;
     display: block;
     font-size: 22px;
-    color: #7a8c6e;
+    color: $color-state-success;
     font-family: 'Noto Serif SC', serif;
     letter-spacing: 3px;
     font-weight: 400;
@@ -737,8 +739,8 @@
   gap: 18px;
   padding: 30px 24px;
   margin-bottom: 28px;
-  background: linear-gradient(180deg, rgba(250, 248, 244, 0.96) 0%, rgba(241, 236, 228, 0.98) 100%);
-  border: 1px solid rgba(114, 107, 96, 0.12);
+  background: linear-gradient(180deg, $color-bg-overlay 0%, $palette-alpha-paper-98 100%);
+  border: 1px solid $palette-alpha-ink-warm-12;
   border-radius: 2px;
   overflow: hidden;
 
@@ -749,7 +751,7 @@
     width: 168px;
     height: 168px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(220, 206, 177, 0.26) 0%, rgba(220, 206, 177, 0) 72%);
+    background: radial-gradient(circle, $palette-alpha-warm-26 0%, $palette-alpha-warm-0b 72%);
     pointer-events: none;
   }
 
@@ -761,7 +763,7 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(231, 221, 195, 0.45) 0%, rgba(231, 221, 195, 0) 72%);
+    background: radial-gradient(circle, $palette-alpha-warm-45 0%, $palette-alpha-warm-0 72%);
     pointer-events: none;
   }
 
@@ -787,17 +789,17 @@
   .holiday-card-kicker {
     display: inline-block;
     padding: 6px 12px;
-    background: rgba(167, 180, 160, 0.14);
-    border: 1px solid rgba(167, 180, 160, 0.2);
+    background: $palette-alpha-sage-14;
+    border: 1px solid $palette-alpha-sage-20;
     font-size: 18px;
-    color: #7f8977;
+    color: $palette-sage-500;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
   }
 
   .holiday-card-title {
     font-size: 34px;
-    color: #5b544d;
+    color: $palette-ink-warm-900;
     font-weight: 500;
     letter-spacing: 4px;
     line-height: 1.35;
@@ -806,7 +808,7 @@
 
   .holiday-card-desc {
     font-size: 22px;
-    color: #7b736a;
+    color: $palette-ink-warm-700;
     line-height: 1.7;
     letter-spacing: 1px;
     font-family: 'Noto Serif SC', serif;
@@ -840,7 +842,7 @@
 
   .live-currency {
     font-size: 40px;
-    color: #a89878;
+    color: $color-brand-primary-strong;
     font-weight: 300;
     margin-top: 4px;
     font-family: 'Noto Serif SC', serif;
@@ -851,15 +853,15 @@
 .detail-card {
   position: relative;
   z-index: 1;
-  background: #faf8f4;
+  background: $color-bg-page;
   border-radius: 2px;
-  border: 1px solid rgba(44, 44, 44, 0.08);
+  border: 1px solid $color-divider-subtle;
   margin-bottom: 24px;
   overflow: hidden;
   transition: all 0.4s ease;
 
   &:active {
-    background: #f0e8d8;
+    background: $palette-sand-300;
   }
 
   .detail-header {
@@ -870,7 +872,7 @@
 
     .detail-title {
       font-size: 28px;
-      color: #2c2c2c;
+      color: $color-text-primary;
       font-weight: 500;
       letter-spacing: 4px;
       font-family: 'Noto Serif SC', serif;
@@ -878,7 +880,7 @@
 
     .detail-arrow {
       font-size: 20px;
-      color: #a89878;
+      color: $color-brand-primary-strong;
       transition: transform 0.4s ease;
     }
   }
@@ -896,7 +898,7 @@
       justify-content: space-between;
       align-items: center;
       padding: 16px 0;
-      border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+      border-bottom: 1px solid $color-divider-subtle;
 
       &:last-child {
         border-bottom: none;
@@ -904,7 +906,7 @@
 
       .detail-name {
         font-size: 26px;
-        color: #8a8279;
+        color: $color-text-placeholder;
         font-family: 'Noto Serif SC', serif;
         font-weight: 400;
         letter-spacing: 2px;
@@ -912,16 +914,16 @@
 
       .detail-value {
         font-size: 28px;
-        color: #2c2c2c;
+        color: $color-text-primary;
         font-family: 'Shippori Mincho B1', serif;
         font-weight: 500;
 
         &.highlight {
-          color: #a89878;
+          color: $color-brand-primary-strong;
         }
 
         &.gold {
-          color: #2c2c2c;
+          color: $color-text-primary;
           font-weight: 600;
         }
       }
@@ -944,9 +946,9 @@
 .progress-card {
   position: relative;
   z-index: 1;
-  background: #faf8f4;
+  background: $color-bg-page;
   border-radius: 2px;
-  border: 1px solid rgba(44, 44, 44, 0.08);
+  border: 1px solid $color-divider-subtle;
   padding: 24px;
   margin-bottom: 24px;
 
@@ -958,7 +960,7 @@
 
     .progress-title {
       font-size: 26px;
-      color: #2c2c2c;
+      color: $color-text-primary;
       font-weight: 500;
       letter-spacing: 4px;
       font-family: 'Noto Serif SC', serif;
@@ -966,7 +968,7 @@
 
     .progress-percent {
       font-size: 30px;
-      color: #a89878;
+      color: $color-brand-primary-strong;
       font-family: 'Shippori Mincho B1', serif;
       font-weight: 500;
     }
@@ -976,14 +978,14 @@
   .progress-bar-bg {
     width: 100%;
     height: 3px;
-    background: #ece5d8;
+    background: $palette-sand-200;
     border-radius: 0;
     overflow: hidden;
     margin-bottom: 16px;
 
     .progress-bar-fill {
       height: 100%;
-      background: #c8b99a;
+      background: $color-brand-primary;
       transition: width 1s ease;
       position: relative;
 
@@ -995,7 +997,7 @@
         width: 7px;
         height: 7px;
         border-radius: 50%;
-        background: #c8b99a;
+        background: $color-brand-primary;
         opacity: 0.5;
         animation: stoneGlow 3s ease-in-out infinite;
       }
@@ -1009,7 +1011,7 @@
     .progress-start,
     .progress-end {
       font-size: 22px;
-      color: #8a8279;
+      color: $color-text-placeholder;
       font-family: 'Noto Serif SC', serif;
       letter-spacing: 2px;
       font-weight: 300;
@@ -1026,16 +1028,16 @@
 .countdown-card {
   position: relative;
   z-index: 1;
-  background: #f0e8d8;
+  background: $palette-sand-300;
   border-radius: 2px;
-  border: 1px solid rgba(44, 44, 44, 0.08);
+  border: 1px solid $color-divider-subtle;
   padding: 32px 24px;
   margin-bottom: 32px;
 
   .countdown-title {
     display: block;
     font-size: 26px;
-    color: #5c5650;
+    color: $color-text-secondary;
     font-weight: 400;
     letter-spacing: 6px;
     margin-bottom: 32px;
@@ -1055,7 +1057,7 @@
         display: block;
         font-size: 48px;
         font-weight: 600;
-        color: #2c2c2c;
+        color: $color-text-primary;
         font-family: 'Shippori Mincho B1', serif;
         line-height: 1;
         margin-bottom: 12px;
@@ -1064,7 +1066,7 @@
       .countdown-unit {
         display: block;
         font-size: 22px;
-        color: #8a8279;
+        color: $color-text-placeholder;
         letter-spacing: 4px;
         font-family: 'Noto Serif SC', serif;
         font-weight: 300;
@@ -1082,7 +1084,7 @@
 
   .footer-text {
     font-size: 22px;
-    color: #8a8279;
+    color: $color-text-placeholder;
     letter-spacing: 3px;
     font-family: 'Noto Serif SC', serif;
     font-weight: 300;
@@ -1101,19 +1103,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  box-shadow: 0 2px 12px rgba(44, 44, 44, 0.08);
+  background: $color-bg-page;
+  border: 1px solid $color-divider-subtle;
+  box-shadow: 0 2px 12px $color-divider-subtle;
   transition: all 0.3s ease;
 
   &:active {
     transform: scale(0.95);
-    background: #f0e8d8;
+    background: $palette-sand-300;
   }
 
   .fab-icon {
     font-size: 32px;
-    color: #5c5650;
+    color: $color-text-secondary;
     line-height: 1;
   }
 }
@@ -1123,7 +1125,7 @@
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(44, 44, 44, 0.3);
+  background: $color-divider-subtle;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -1148,8 +1150,8 @@
 .settings-panel {
   width: 100%;
   max-height: 92vh;
-  background: #faf8f4;
-  border-top: 1px solid rgba(44, 44, 44, 0.08);
+  background: $color-bg-page;
+  border-top: 1px solid $color-divider-subtle;
   border-radius: 8px 8px 0 0;
   animation: panelSlideUp 0.35s ease;
   display: flex;
@@ -1177,12 +1179,12 @@
   justify-content: space-between;
   align-items: center;
   padding: 32px 32px 24px;
-  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+  border-bottom: 1px solid $color-divider-subtle;
   flex-shrink: 0;
 
   .settings-title {
     font-size: 28px;
-    color: #2c2c2c;
+    color: $color-text-primary;
     font-weight: 500;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
@@ -1197,7 +1199,7 @@
 
     .settings-close-text {
       font-size: 28px;
-      color: #8a8279;
+      color: $color-text-placeholder;
     }
   }
 }
@@ -1215,7 +1217,7 @@
   .settings-section-title {
     display: block;
     font-size: 22px;
-    color: #8a8279;
+    color: $color-text-placeholder;
     letter-spacing: 4px;
     margin-bottom: 20px;
     font-family: 'Noto Serif SC', serif;
@@ -1225,7 +1227,7 @@
 
 .settings-divider {
   height: 1px;
-  background: rgba(44, 44, 44, 0.08);
+  background: $color-divider-subtle;
   margin: 4px 0;
 }
 
@@ -1241,8 +1243,8 @@
   justify-content: center;
   padding: 18px 0;
   border-radius: 2px;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  background: rgba(44, 44, 44, 0.03);
+  border: 1px solid $color-divider-subtle;
+  background: $palette-alpha-ink-03;
   transition: all 0.3s ease;
 
   &:active {
@@ -1252,17 +1254,17 @@
   .module-switch-text {
     font-size: 22px;
     letter-spacing: 4px;
-    color: #8a8279;
+    color: $color-text-placeholder;
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
   }
 
   &.active {
-    background: rgba(200, 185, 154, 0.22);
-    border-color: rgba(200, 185, 154, 0.55);
+    background: $palette-alpha-sand-22;
+    border-color: $palette-alpha-sand-55;
 
     .module-switch-text {
-      color: #2c2c2c;
+      color: $color-text-primary;
     }
   }
 }
@@ -1272,7 +1274,7 @@
   display: flex;
   gap: 16px;
   padding: 20px 32px 36px;
-  border-top: 1px solid rgba(44, 44, 44, 0.08);
+  border-top: 1px solid $color-divider-subtle;
   flex-shrink: 0;
 
   .settings-btn {
@@ -1296,40 +1298,40 @@
 
     &.settings-btn-reset {
       background: transparent;
-      border: 1px solid rgba(44, 44, 44, 0.08);
+      border: 1px solid $color-divider-subtle;
 
       .settings-btn-text {
-        color: #8a8279;
+        color: $color-text-placeholder;
       }
 
       &:active {
-        background: #ece5d8;
+        background: $palette-sand-200;
       }
     }
 
     &.settings-btn-logout {
       background: transparent;
-      border: 1px solid rgba(192, 57, 43, 0.25);
+      border: 1px solid $palette-alpha-rouge-25;
 
       .settings-btn-text {
-        color: #c0392b;
+        color: $palette-rouge-strong;
       }
 
       &:active {
-        background: rgba(192, 57, 43, 0.08);
+        background: $palette-alpha-rouge-08;
       }
     }
 
     &.settings-btn-save {
-      background: #2c2c2c;
-      border: 1px solid #2c2c2c;
+      background: $color-text-primary;
+      border: 1px solid $color-text-primary;
 
       .settings-btn-text {
-        color: #faf8f4;
+        color: $color-bg-page;
       }
 
       &:active {
-        background: #5c5650;
+        background: $color-text-secondary;
       }
     }
   }
@@ -1341,7 +1343,7 @@
   align-items: center;
   gap: 16px;
   padding: 20px 0;
-  border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+  border-bottom: 1px solid $color-divider-subtle;
 
   &:last-child {
     border-bottom: none;
@@ -1351,7 +1353,7 @@
 .bk-setting-label {
   flex: 1;
   font-size: 28px;
-  color: #2c2c2c;
+  color: $color-text-primary;
   font-family: 'Noto Serif SC', serif;
   font-weight: 400;
   letter-spacing: 2px;
@@ -1365,9 +1367,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(44, 44, 44, 0.04);
+  background: $color-shadow-soft;
   border-radius: 10px;
-  border: 1px solid rgba(44, 44, 44, 0.06);
+  border: 1px solid $color-shadow-soft;
 }
 
 // 迷你柱状图缩略图
@@ -1381,14 +1383,14 @@
   .mini-bar {
     flex: 1;
     border-radius: 1px 1px 0 0;
-    background: rgba(184, 84, 80, 0.45);
+    background: $palette-alpha-rouge-45;
   }
 
   &.mini-bar-monthly {
     gap: 1.5px;
 
     .mini-bar {
-      background: rgba(200, 185, 154, 0.6);
+      background: $palette-alpha-sand-60;
     }
   }
 }
@@ -1403,7 +1405,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: conic-gradient(#b85450 0% 35%, #c8b99a 35% 55%, #7a8c6e 55% 75%, #a89878 75% 100%);
-    box-shadow: 0 0 0 1px rgba(44, 44, 44, 0.04);
+    background: conic-gradient($color-state-danger 0% 35%, $color-brand-primary 35% 55%, $color-state-success 55% 75%, $color-brand-primary-strong 75% 100%);
+    box-shadow: 0 0 0 1px $color-shadow-soft;
   }
 }

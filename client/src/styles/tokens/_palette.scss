@@ -27,8 +27,38 @@ $palette-alpha-ink-06  : rgba(44, 44, 44, 0.06);
 $palette-alpha-ink-08  : rgba(44, 44, 44, 0.08);
 $palette-alpha-ink-15  : rgba(44, 44, 44, 0.15);
 $palette-alpha-ink-30  : rgba(44, 44, 44, 0.30);
+$palette-alpha-sand-12 : rgba(200, 185, 154, 0.12);
+$palette-alpha-sand-15 : rgba(200, 185, 154, 0.15);
+$palette-alpha-sand-18 : rgba(200, 185, 154, 0.18);
+$palette-alpha-sand-20 : rgba(200, 185, 154, 0.20);
+$palette-alpha-sand-22 : rgba(200, 185, 154, 0.22);
 $palette-alpha-sand-25 : rgba(200, 185, 154, 0.25);
 $palette-alpha-sand-30 : rgba(200, 185, 154, 0.30);
+$palette-alpha-sand-35 : rgba(200, 185, 154, 0.35);
+$palette-alpha-sand-45 : rgba(200, 185, 154, 0.45);
+$palette-alpha-sand-50 : rgba(200, 185, 154, 0.50);
+$palette-alpha-sand-55 : rgba(200, 185, 154, 0.55);
+$palette-alpha-sand-60 : rgba(200, 185, 154, 0.60);
 $palette-alpha-sand-82 : rgba(250, 248, 244, 0.82);
 $palette-alpha-sand-96 : rgba(250, 248, 244, 0.96);
+$palette-alpha-paper-98 : rgba(241, 236, 228, 0.98);
+$palette-alpha-warm-0  : rgba(231, 221, 195, 0);
 $palette-alpha-warm-45 : rgba(231, 221, 195, 0.45);
+$palette-alpha-warm-26 : rgba(220, 206, 177, 0.26);
+$palette-alpha-warm-0b : rgba(220, 206, 177, 0);
+
+// 状态色 alpha(用于 settings 危险按钮、holiday sage 文本背景等)
+$palette-alpha-rouge-08 : rgba(192, 57, 43, 0.08);
+$palette-alpha-rouge-25 : rgba(192, 57, 43, 0.25);
+$palette-alpha-rouge-45 : rgba(184, 84, 80, 0.45);
+$palette-alpha-sage-14 : rgba(167, 180, 160, 0.14);
+$palette-alpha-sage-20 : rgba(167, 180, 160, 0.20);
+$palette-alpha-ink-warm-12 : rgba(114, 107, 96, 0.12);
+
+// 一次性业务色(首页特殊语义位,无重复使用)
+$palette-ink-warm-500  : #8a7e6c;
+$palette-ink-warm-300  : #a39d95;
+$palette-sage-500      : #7f8977;
+$palette-ink-warm-900  : #5b544d;
+$palette-ink-warm-700  : #7b736a;
+$palette-rouge-strong  : #c0392b;
