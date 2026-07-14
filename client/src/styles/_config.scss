@@ -1,0 +1,6 @@
+// client/src/styles/_config.scss
+// 全局 SCSS 变量,作为 Taro 单位转换的基线参数。
+// 设计稿 750 宽,1px = 2rpx。后续样式中所有尺寸应继承此基线。
+
+$design-width: 750;
+$rpx-base: 2; // 1px in 750-宽设计稿对应 2rpx
