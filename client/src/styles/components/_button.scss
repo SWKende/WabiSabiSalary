@@ -1,0 +1,30 @@
+// client/src/styles/components/_button.scss
+// L3 按钮组件默认值。
+
+@use '../semantic/color' as c;
+@use '../semantic/typography' as t;
+@use '../semantic/control' as k;
+@use '../tokens/radius' as r;
+
+.btn {
+  --btn-height        : #{k.$btn-height-md};
+  --btn-padding-x     : #{k.$input-padding-x};
+  --btn-padding-y     : #{k.$input-padding-y};
+  --btn-radius        : #{r.$radius-md};
+  --btn-font          : #{t.$font-body-lg};
+  --btn-color-primary : #{c.$color-brand-primary};
+  --btn-bg-primary    : #{c.$color-text-primary};
+  --btn-color-text    : #ffffff;
+
+  height: var(--btn-height);
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  border-radius: var(--btn-radius);
+  font-size: var(--btn-font);
+  color: var(--btn-color-text);
+  background: var(--btn-bg-primary);
+  border: 0;
+}
+
+.btn--primary {
+  background: var(--btn-bg-primary);
+}

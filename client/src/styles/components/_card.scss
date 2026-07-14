@@ -1,0 +1,22 @@
+// client/src/styles/components/_card.scss
+// L3 卡片组件默认值。
+
+@use '../semantic/color' as c;
+@use '../semantic/typography' as t;
+@use '../tokens/radius' as r;
+@use '../tokens/spacing' as sp;
+
+.card {
+  --card-bg         : #{c.$color-bg-surface};
+  --card-padding-y  : #{sp.$sp-6};
+  --card-padding-x  : #{sp.$sp-4};
+  --card-radius     : #{r.$radius-md};
+  --card-shadow     : 0 2rpx 12rpx #{c.$color-shadow-soft};
+  --card-color      : #{c.$color-text-primary};
+
+  background: var(--card-bg);
+  padding: var(--card-padding-y) var(--card-padding-x);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  color: var(--card-color);
+}
