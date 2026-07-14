@@ -119,14 +119,14 @@
   background: $palette-alpha-sand-18;
   border: 1px solid $palette-sand-300;
   border-radius: 999px;
-  font-size: 18px;
+  font-size: $font-heading-md;
   color: $palette-ink-warm-500;
   letter-spacing: 2px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .launch-panel__title {
-  font-size: 42px;
+  font-size: $font-display-lg;
   color: $color-text-primary;
   font-weight: 600;
   letter-spacing: 6px;
@@ -134,7 +134,7 @@
 }
 
 .launch-panel__desc {
-  font-size: 22px;
+  font-size: $font-heading-lg;
   color: $color-text-tertiary;
   text-align: center;
   line-height: 1.6;
@@ -154,14 +154,14 @@
 }
 
 .launch-panel__enter-text {
-  font-size: 18px;
+  font-size: $font-heading-md;
   color: $color-text-secondary;
   letter-spacing: 3px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .launch-panel__enter-arrow {
-  font-size: 20px;
+  font-size: $font-heading-lg;
   color: $color-brand-primary-strong;
   line-height: 1;
 }
@@ -186,7 +186,7 @@
 
 .mock-hero-label {
   display: block;
-  font-size: 16px;
+  font-size: $font-body-md;
   color: $color-text-placeholder;
   letter-spacing: 8px;
   margin-bottom: 10px;
@@ -202,14 +202,14 @@
 }
 
 .mock-currency {
-  font-size: 18px;
+  font-size: $font-heading-md;
   color: $color-brand-primary-strong;
   margin-top: 6px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .mock-number {
-  font-size: 44px;
+  font-size: $font-heading-lg;
   font-weight: 600;
   color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
@@ -232,7 +232,7 @@
 }
 
 .mock-target {
-  font-size: 14px;
+  font-size: $font-body-sm;
   color: $color-text-placeholder;
   letter-spacing: 3px;
   font-family: 'Noto Serif SC', serif;
@@ -248,7 +248,7 @@
 
 .mock-live-label {
   display: block;
-  font-size: 14px;
+  font-size: $font-body-sm;
   color: $color-text-placeholder;
   letter-spacing: 6px;
   margin-bottom: 8px;
@@ -256,7 +256,7 @@
 }
 
 .mock-live-amount {
-  font-size: 28px;
+  font-size: $font-display-lg;
   color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
   font-weight: 500;
@@ -271,7 +271,7 @@
 
 .mock-card-title {
   display: block;
-  font-size: 16px;
+  font-size: $font-body-md;
   color: $color-text-primary;
   letter-spacing: 3px;
   margin-bottom: 8px;
@@ -320,7 +320,7 @@
 }
 
 .mock-bk-title {
-  font-size: 22px;
+  font-size: $font-heading-lg;
   color: $color-text-primary;
   font-weight: 500;
   letter-spacing: 6px;
@@ -333,7 +333,7 @@
 
 .mock-bk-summary-label {
   display: block;
-  font-size: 12px;
+  font-size: $font-caption-sm;
   color: $color-text-placeholder;
   letter-spacing: 2px;
   margin-bottom: 2px;
@@ -341,7 +341,7 @@
 }
 
 .mock-bk-summary-val {
-  font-size: 20px;
+  font-size: $font-heading-lg;
   color: $color-state-success;
   font-family: 'Shippori Mincho B1', serif;
   font-weight: 500;
@@ -356,7 +356,7 @@
 }
 
 .mock-bk-pen-text {
-  font-size: 16px;
+  font-size: $font-body-md;
   color: $color-text-secondary;
   letter-spacing: 6px;
   font-family: 'Noto Serif SC', serif;
@@ -369,7 +369,7 @@
 
 .mock-bk-chip {
   padding: 5px 12px;
-  font-size: 13px;
+  font-size: $font-caption-md;
   color: $color-text-tertiary;
   background: $palette-alpha-sand-12;
   border: 1px solid $palette-alpha-sand-20;
@@ -410,13 +410,13 @@
 
 .mock-bk-name {
   flex: 1;
-  font-size: 16px;
+  font-size: $font-body-md;
   color: $color-text-secondary;
   font-family: 'Noto Serif SC', serif;
 }
 
 .mock-bk-val {
-  font-size: 17px;
+  font-size: $font-body-md;
   color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
 }
@@ -443,7 +443,7 @@
 }
 
 .mock-bk-chart-title {
-  font-size: 13px;
+  font-size: $font-caption-md;
   color: $color-text-placeholder;
   letter-spacing: 2px;
   font-family: 'Noto Serif SC', serif;
@@ -471,7 +471,7 @@
 .mock-bk-chart-label {
   flex: 1;
   text-align: center;
-  font-size: 10px;
+  font-size: 20rpx;
   color: $palette-ink-warm-300;
   font-family: 'Shippori Mincho B1', serif;
 }
@@ -519,7 +519,7 @@
 .mock-bk-legend-dot--c { background: $color-state-success; }
 
 .mock-bk-legend-text {
-  font-size: 12px;
+  font-size: $font-caption-sm;
   color: $color-text-tertiary;
   font-family: 'Noto Serif SC', serif;
 }
@@ -601,7 +601,7 @@
 
   .hero-label {
     display: block;
-    font-size: 28px;
+    font-size: $font-display-lg;
     color: $color-text-placeholder;
     letter-spacing: 10px;
     margin-bottom: 24px;
@@ -617,7 +617,7 @@
     margin-bottom: 32px;
 
     .hero-currency {
-      font-size: 40px;
+      font-size: $font-display-lg;
       color: $color-brand-primary-strong;
       font-weight: 300;
       margin-top: 14px;
@@ -625,7 +625,7 @@
     }
 
     .hero-number {
-      font-size: 88px;
+      font-size: $font-display-xl;
       font-weight: 600;
       color: $color-text-primary;
       font-family: 'Shippori Mincho B1', 'Noto Serif SC', serif;
@@ -664,7 +664,7 @@
   }
 
   .hero-target {
-    font-size: 24px;
+    font-size: 48rpx;
     color: $color-text-placeholder;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
@@ -699,7 +699,7 @@
   .live-label {
     position: relative;
     display: block;
-    font-size: 24px;
+    font-size: 48rpx;
     color: $color-text-placeholder;
     letter-spacing: 8px;
     margin-bottom: 20px;
@@ -710,7 +710,7 @@
   .live-amount {
     position: relative;
     display: block;
-    font-size: 56px;
+    font-size: $font-display-lg;
     font-weight: 500;
     color: $color-text-primary;
     font-family: 'Shippori Mincho B1', serif;
@@ -722,7 +722,7 @@
   .live-rate {
     position: relative;
     display: block;
-    font-size: 22px;
+    font-size: $font-heading-lg;
     color: $color-state-success;
     font-family: 'Noto Serif SC', serif;
     letter-spacing: 3px;
@@ -791,14 +791,14 @@
     padding: 6px 12px;
     background: $palette-alpha-sage-14;
     border: 1px solid $palette-alpha-sage-20;
-    font-size: 18px;
+    font-size: $font-heading-md;
     color: $palette-sage-500;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
   }
 
   .holiday-card-title {
-    font-size: 34px;
+    font-size: $font-heading-md;
     color: $palette-ink-warm-900;
     font-weight: 500;
     letter-spacing: 4px;
@@ -807,7 +807,7 @@
   }
 
   .holiday-card-desc {
-    font-size: 22px;
+    font-size: $font-heading-lg;
     color: $palette-ink-warm-700;
     line-height: 1.7;
     letter-spacing: 1px;
@@ -841,7 +841,7 @@
   margin-bottom: 12px;
 
   .live-currency {
-    font-size: 40px;
+    font-size: $font-display-lg;
     color: $color-brand-primary-strong;
     font-weight: 300;
     margin-top: 4px;
@@ -871,7 +871,7 @@
     padding: 24px 24px;
 
     .detail-title {
-      font-size: 28px;
+      font-size: $font-display-lg;
       color: $color-text-primary;
       font-weight: 500;
       letter-spacing: 4px;
@@ -879,7 +879,7 @@
     }
 
     .detail-arrow {
-      font-size: 20px;
+      font-size: $font-heading-lg;
       color: $color-brand-primary-strong;
       transition: transform 0.4s ease;
     }
@@ -905,7 +905,7 @@
       }
 
       .detail-name {
-        font-size: 26px;
+        font-size: $font-display-lg;
         color: $color-text-placeholder;
         font-family: 'Noto Serif SC', serif;
         font-weight: 400;
@@ -913,7 +913,7 @@
       }
 
       .detail-value {
-        font-size: 28px;
+        font-size: $font-display-lg;
         color: $color-text-primary;
         font-family: 'Shippori Mincho B1', serif;
         font-weight: 500;
@@ -959,7 +959,7 @@
     margin-bottom: 20px;
 
     .progress-title {
-      font-size: 26px;
+      font-size: $font-display-lg;
       color: $color-text-primary;
       font-weight: 500;
       letter-spacing: 4px;
@@ -967,7 +967,7 @@
     }
 
     .progress-percent {
-      font-size: 30px;
+      font-size: $font-display-lg;
       color: $color-brand-primary-strong;
       font-family: 'Shippori Mincho B1', serif;
       font-weight: 500;
@@ -1010,7 +1010,7 @@
 
     .progress-start,
     .progress-end {
-      font-size: 22px;
+      font-size: $font-heading-lg;
       color: $color-text-placeholder;
       font-family: 'Noto Serif SC', serif;
       letter-spacing: 2px;
@@ -1036,7 +1036,7 @@
 
   .countdown-title {
     display: block;
-    font-size: 26px;
+    font-size: $font-display-lg;
     color: $color-text-secondary;
     font-weight: 400;
     letter-spacing: 6px;
@@ -1055,7 +1055,7 @@
 
       .countdown-num {
         display: block;
-        font-size: 48px;
+        font-size: $font-display-lg;
         font-weight: 600;
         color: $color-text-primary;
         font-family: 'Shippori Mincho B1', serif;
@@ -1065,7 +1065,7 @@
 
       .countdown-unit {
         display: block;
-        font-size: 22px;
+        font-size: $font-heading-lg;
         color: $color-text-placeholder;
         letter-spacing: 4px;
         font-family: 'Noto Serif SC', serif;
@@ -1083,7 +1083,7 @@
   padding-top: 20px;
 
   .footer-text {
-    font-size: 22px;
+    font-size: $font-heading-lg;
     color: $color-text-placeholder;
     letter-spacing: 3px;
     font-family: 'Noto Serif SC', serif;
@@ -1114,7 +1114,7 @@
   }
 
   .fab-icon {
-    font-size: 32px;
+    font-size: $font-display-lg;
     color: $color-text-secondary;
     line-height: 1;
   }
@@ -1183,7 +1183,7 @@
   flex-shrink: 0;
 
   .settings-title {
-    font-size: 28px;
+    font-size: $font-display-lg;
     color: $color-text-primary;
     font-weight: 500;
     letter-spacing: 4px;
@@ -1198,7 +1198,7 @@
     justify-content: center;
 
     .settings-close-text {
-      font-size: 28px;
+      font-size: $font-display-lg;
       color: $color-text-placeholder;
     }
   }
@@ -1216,7 +1216,7 @@
 
   .settings-section-title {
     display: block;
-    font-size: 22px;
+    font-size: $font-heading-lg;
     color: $color-text-placeholder;
     letter-spacing: 4px;
     margin-bottom: 20px;
@@ -1252,7 +1252,7 @@
   }
 
   .module-switch-text {
-    font-size: 22px;
+    font-size: $font-heading-lg;
     letter-spacing: 4px;
     color: $color-text-placeholder;
     font-family: 'Noto Serif SC', serif;
@@ -1290,7 +1290,7 @@
     }
 
     .settings-btn-text {
-      font-size: 26px;
+      font-size: $font-display-lg;
       letter-spacing: 4px;
       font-family: 'Noto Serif SC', serif;
       font-weight: 400;
@@ -1352,7 +1352,7 @@
 
 .bk-setting-label {
   flex: 1;
-  font-size: 28px;
+  font-size: $font-display-lg;
   color: $color-text-primary;
   font-family: 'Noto Serif SC', serif;
   font-weight: 400;
