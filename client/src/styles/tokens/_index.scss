@@ -1,0 +1,9 @@
+// client/src/styles/tokens/_index.scss
+// L1 原语 Token 聚合入口。
+
+@forward 'palette';
+@forward 'typography';
+@forward 'spacing';
+@forward 'radius';
+@forward 'z-index';
+@forward 'motion';
