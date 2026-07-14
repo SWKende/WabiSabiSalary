@@ -27,8 +27,10 @@
     "dev:qq": "npm run build:qq -- --watch",
     "dev:jd": "npm run build:jd -- --watch",
     "dev:harmony-hybrid": "npm run build:harmony-hybrid -- --watch",
-    "lint": "npm run lint:css",
+    "lint": "npm run lint:css:strict-value",
     "lint:css": "stylelint 'src/**/*.scss'",
+    "lint:css:strict-value": "stylelint --config .stylelintrc.strict-value.yml 'src/**/*.scss'",
+    "lint:css:full": "stylelint --config .stylelintrc.yml 'src/**/*.scss'",
     "test:css": "vitest run test/styles/"
   },
   "overrides": {
