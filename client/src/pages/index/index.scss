@@ -96,10 +96,10 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  padding: 24px 36px 20px;
+  padding: $sp-6 $sp-8 $sp-5;
   background: $color-bg-overlay;
   border: 1px solid $palette-alpha-sand-35;
-  border-radius: 20px;
+  border-radius: $radius-lg;
   box-shadow: 0 4px 20px $color-shadow-soft, 0 1px 4px $color-shadow-soft;
   animation: overlayFloat 5s ease-in-out infinite;
 }
@@ -115,10 +115,10 @@
 }
 
 .launch-panel__badge {
-  padding: 5px 14px;
+  padding: $sp-2 $sp-3;
   background: $palette-alpha-sand-18;
   border: 1px solid $palette-sand-300;
-  border-radius: 999px;
+  border-radius: $radius-full;
   font-size: $font-heading-md;
   color: $palette-ink-warm-500;
   letter-spacing: 2px;
@@ -147,10 +147,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 4px;
-  padding: 8px 20px;
+  margin-top: $sp-1;
+  padding: $sp-2 $sp-5;
   background: $color-shadow-soft;
-  border-radius: 999px;
+  border-radius: $radius-full;
 }
 
 .launch-panel__enter-text {
@@ -170,18 +170,18 @@
 .launch-mock-salary {
   width: 100%;
   height: 100%;
-  padding: 40px 64px;
+  padding: $sp-10 $sp-16;
   box-sizing: border-box;
   background: $color-bg-surface-soft;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 16px;
+  gap: $sp-4;
 }
 
 .mock-hero {
   text-align: center;
-  padding: 8px 0 16px;
+  padding: $sp-2 0 $sp-4;
 }
 
 .mock-hero-label {
@@ -189,7 +189,7 @@
   font-size: $font-body-md;
   color: $color-text-placeholder;
   letter-spacing: 8px;
-  margin-bottom: 10px;
+  margin-bottom: $sp-2;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -198,13 +198,13 @@
   align-items: flex-start;
   justify-content: center;
   gap: 2px;
-  margin-bottom: 12px;
+  margin-bottom: $sp-3;
 }
 
 .mock-currency {
   font-size: $font-heading-md;
   color: $color-brand-primary-strong;
-  margin-top: 6px;
+  margin-top: $sp-2;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -220,7 +220,7 @@
   width: 120px;
   height: 2px;
   background: $color-divider-subtle;
-  margin: 0 auto 6px;
+  margin: 0 auto $sp-2;
   border-radius: 1px;
   overflow: hidden;
 }
@@ -240,10 +240,10 @@
 
 .mock-live {
   text-align: center;
-  padding: 20px;
+  padding: $sp-5;
   background: $color-bg-page;
   border: 1px solid $color-shadow-soft;
-  border-radius: 2px;
+  border-radius: $radius-2;
 }
 
 .mock-live-label {
@@ -251,7 +251,7 @@
   font-size: $font-body-sm;
   color: $color-text-placeholder;
   letter-spacing: 6px;
-  margin-bottom: 8px;
+  margin-bottom: $sp-2;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -263,10 +263,10 @@
 }
 
 .mock-card {
-  padding: 14px 16px;
+  padding: $sp-3 $sp-4;
   background: $color-bg-page;
   border: 1px solid $color-shadow-soft;
-  border-radius: 2px;
+  border-radius: $radius-2;
 }
 
 .mock-card-title {
@@ -274,7 +274,7 @@
   font-size: $font-body-md;
   color: $color-text-primary;
   letter-spacing: 3px;
-  margin-bottom: 8px;
+  margin-bottom: $sp-2;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -302,20 +302,20 @@
 .launch-mock-bk {
   width: 100%;
   height: 100%;
-  padding: 40px 64px;
+  padding: $sp-10 $sp-16;
   box-sizing: border-box;
   background: $color-bg-surface-soft;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 14px;
+  gap: $sp-3;
 }
 
 .mock-bk-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 0 4px 10px;
+  padding: 0 $sp-1 $sp-2;
   border-bottom: 1px solid $color-shadow-soft;
 }
 
@@ -336,7 +336,7 @@
   font-size: $font-caption-sm;
   color: $color-text-placeholder;
   letter-spacing: 2px;
-  margin-bottom: 2px;
+  margin-bottom: $sp-1;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -348,11 +348,11 @@
 }
 
 .mock-bk-pen {
-  padding: 12px 0;
+  padding: $sp-3 0;
   text-align: center;
   background: $color-bg-page;
   border: 1px solid $color-divider-subtle;
-  border-radius: 2px;
+  border-radius: $radius-2;
 }
 
 .mock-bk-pen-text {
@@ -364,16 +364,16 @@
 
 .mock-bk-chips {
   display: flex;
-  gap: 8px;
+  gap: $sp-2;
 }
 
 .mock-bk-chip {
-  padding: 5px 12px;
+  padding: $sp-2 $sp-3;
   font-size: $font-caption-md;
   color: $color-text-tertiary;
   background: $palette-alpha-sand-12;
   border: 1px solid $palette-alpha-sand-20;
-  border-radius: 999px;
+  border-radius: $radius-full;
   font-family: 'Noto Serif SC', serif;
 }
 
@@ -386,14 +386,14 @@
 .mock-bk-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: $sp-2;
 }
 
 .mock-bk-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 4px;
+  gap: $sp-2;
+  padding: $sp-2 $sp-1;
 }
 
 .mock-bk-dot {
@@ -427,19 +427,19 @@
 
 .mock-bk-charts {
   display: flex;
-  gap: 12px;
-  margin-top: 6px;
+  gap: $sp-3;
+  margin-top: $sp-2;
 }
 
 .mock-bk-chart-card {
   flex: 1;
-  padding: 12px 14px;
+  padding: $sp-3 $sp-3;
   background: $color-bg-page;
   border: 1px solid $color-shadow-soft;
-  border-radius: 2px;
+  border-radius: $radius-2;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: $sp-2;
 }
 
 .mock-bk-chart-title {
@@ -458,7 +458,7 @@
 
 .mock-bk-bar {
   flex: 1;
-  border-radius: 2px 2px 0 0;
+  border-radius: $radius-2 $radius-2 0 0;
   background: $palette-alpha-sand-50;
   min-height: 4px;
 }
@@ -498,13 +498,13 @@
 .mock-bk-pie-legend {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: $sp-2;
 }
 
 .mock-bk-legend-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: $sp-2;
 }
 
 .mock-bk-legend-dot {
@@ -554,7 +554,7 @@
   gap: 12px;
   height: 36px;
   flex-shrink: 0;
-  padding-bottom: env(safe-area-inset-bottom, 8px);
+  padding-bottom: env(safe-area-inset-bottom, $sp-2);
 
   .indicator-dot {
     width: 6px;
@@ -565,7 +565,7 @@
 
     &.active {
       width: 24px;
-      border-radius: 3px;
+      border-radius: $radius-xs;
       background: $color-brand-primary;
     }
   }
@@ -575,7 +575,7 @@
   position: relative;
   min-height: 100%;
   background: transparent;
-  padding: 0 20px 40px;
+  padding: 0 $sp-5 $sp-10;
   box-sizing: border-box;
   overflow-x: hidden;
 
@@ -596,15 +596,15 @@
   position: relative;
   z-index: 1;
   text-align: center;
-  margin-bottom: 32px;
-  padding: 48px 16px 44px;
+  margin-bottom: $sp-8;
+  padding: $sp-12 $sp-4 $sp-10;
 
   .hero-label {
     display: block;
     font-size: $font-display-lg;
     color: $color-text-placeholder;
     letter-spacing: 10px;
-    margin-bottom: 24px;
+    margin-bottom: $sp-6;
     font-weight: 400;
     font-family: 'Noto Serif SC', serif;
   }
@@ -613,14 +613,14 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    gap: 4px;
-    margin-bottom: 32px;
+    gap: $sp-1;
+    margin-bottom: $sp-8;
 
     .hero-currency {
       font-size: $font-display-lg;
       color: $color-brand-primary-strong;
       font-weight: 300;
-      margin-top: 14px;
+      margin-top: $sp-3;
       font-family: 'Noto Serif SC', serif;
     }
 
@@ -639,7 +639,7 @@
     width: 240px;
     height: 2px;
     background: $color-divider-subtle;
-    margin: 0 auto 20px;
+    margin: 0 auto $sp-5;
     position: relative;
     overflow: hidden;
 
@@ -677,10 +677,10 @@
   position: relative;
   z-index: 1;
   text-align: center;
-  padding: 44px 24px;
-  margin-bottom: 28px;
+  padding: $sp-10 $sp-6;
+  margin-bottom: $sp-6;
   background: $color-bg-page;
-  border-radius: 2px;
+  border-radius: $radius-2;
   border: 1px solid $color-divider-subtle;
 
   .live-glow {
@@ -702,7 +702,7 @@
     font-size: 48rpx;
     color: $color-text-placeholder;
     letter-spacing: 8px;
-    margin-bottom: 20px;
+    margin-bottom: $sp-5;
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
   }
@@ -715,7 +715,7 @@
     color: $color-text-primary;
     font-family: 'Shippori Mincho B1', serif;
     letter-spacing: 2px;
-    margin-bottom: 16px;
+    margin-bottom: $sp-4;
     line-height: 1.2;
   }
 
@@ -736,12 +736,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
-  padding: 30px 24px;
-  margin-bottom: 28px;
+  gap: $sp-4;
+  padding: $sp-8 $sp-6;
+  margin-bottom: $sp-6;
   background: linear-gradient(180deg, $color-bg-overlay 0%, $palette-alpha-paper-98 100%);
   border: 1px solid $palette-alpha-ink-warm-12;
-  border-radius: 2px;
+  border-radius: $radius-2;
   overflow: hidden;
 
   &::before {
@@ -758,8 +758,8 @@
   &::after {
     content: '';
     position: absolute;
-    top: 18px;
-    right: 18px;
+    top: $sp-4;
+    right: $sp-4;
     width: 72px;
     height: 72px;
     border-radius: 50%;
@@ -780,7 +780,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: $sp-2;
     min-width: 0;
     align-items: center;
     text-align: center;
@@ -788,7 +788,7 @@
 
   .holiday-card-kicker {
     display: inline-block;
-    padding: 6px 12px;
+    padding: $sp-2 $sp-3;
     background: $palette-alpha-sage-14;
     border: 1px solid $palette-alpha-sage-20;
     font-size: $font-heading-md;
@@ -838,13 +838,13 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
-  margin-bottom: 12px;
+  margin-bottom: $sp-3;
 
   .live-currency {
     font-size: $font-display-lg;
     color: $color-brand-primary-strong;
     font-weight: 300;
-    margin-top: 4px;
+    margin-top: $sp-1;
     font-family: 'Noto Serif SC', serif;
   }
 }
@@ -854,9 +854,9 @@
   position: relative;
   z-index: 1;
   background: $color-bg-page;
-  border-radius: 2px;
+  border-radius: $radius-2;
   border: 1px solid $color-divider-subtle;
-  margin-bottom: 24px;
+  margin-bottom: $sp-6;
   overflow: hidden;
   transition: all 0.4s ease;
 
@@ -868,7 +868,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 24px 24px;
+    padding: $sp-6 $sp-6;
 
     .detail-title {
       font-size: $font-display-lg;
@@ -890,14 +890,14 @@
   }
 
   .detail-body {
-    padding: 0 24px 20px;
+    padding: 0 $sp-6 $sp-5;
     animation: scrollUnfurl 0.5s ease;
 
     .detail-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px 0;
+      padding: $sp-4 0;
       border-bottom: 1px solid $color-divider-subtle;
 
       &:last-child {
@@ -947,16 +947,16 @@
   position: relative;
   z-index: 1;
   background: $color-bg-page;
-  border-radius: 2px;
+  border-radius: $radius-2;
   border: 1px solid $color-divider-subtle;
-  padding: 24px;
-  margin-bottom: 24px;
+  padding: $sp-6;
+  margin-bottom: $sp-6;
 
   .progress-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: $sp-5;
 
     .progress-title {
       font-size: $font-display-lg;
@@ -981,7 +981,7 @@
     background: $palette-sand-200;
     border-radius: 0;
     overflow: hidden;
-    margin-bottom: 16px;
+    margin-bottom: $sp-4;
 
     .progress-bar-fill {
       height: 100%;
@@ -1029,10 +1029,10 @@
   position: relative;
   z-index: 1;
   background: $palette-sand-300;
-  border-radius: 2px;
+  border-radius: $radius-2;
   border: 1px solid $color-divider-subtle;
-  padding: 32px 24px;
-  margin-bottom: 32px;
+  padding: $sp-8 $sp-6;
+  margin-bottom: $sp-8;
 
   .countdown-title {
     display: block;
@@ -1040,7 +1040,7 @@
     color: $color-text-secondary;
     font-weight: 400;
     letter-spacing: 6px;
-    margin-bottom: 32px;
+    margin-bottom: $sp-8;
     text-align: center;
     font-family: 'Noto Serif SC', serif;
   }
@@ -1060,7 +1060,7 @@
         color: $color-text-primary;
         font-family: 'Shippori Mincho B1', serif;
         line-height: 1;
-        margin-bottom: 12px;
+        margin-bottom: $sp-3;
       }
 
       .countdown-unit {
@@ -1080,7 +1080,7 @@
   position: relative;
   z-index: 1;
   text-align: center;
-  padding-top: 20px;
+  padding-top: $sp-5;
 
   .footer-text {
     font-size: $font-heading-lg;
@@ -1152,11 +1152,11 @@
   max-height: 92vh;
   background: $color-bg-page;
   border-top: 1px solid $color-divider-subtle;
-  border-radius: 8px 8px 0 0;
+  border-radius: $radius-sm $radius-sm 0 0;
   animation: panelSlideUp 0.35s ease;
   display: flex;
   flex-direction: column;
-  padding-bottom: env(safe-area-inset-bottom, 20px);
+  padding-bottom: env(safe-area-inset-bottom, $sp-5);
 }
 
 @keyframes panelSlideUp {
@@ -1178,7 +1178,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 32px 32px 24px;
+  padding: $sp-8 $sp-8 $sp-6;
   border-bottom: 1px solid $color-divider-subtle;
   flex-shrink: 0;
 
@@ -1206,20 +1206,20 @@
 
 // 面板内容
 .settings-body {
-  padding: 12px 32px 24px;
+  padding: $sp-3 $sp-8 $sp-6;
   flex: 1;
   overflow-y: auto;
 }
 
 .settings-section {
-  padding: 16px 0;
+  padding: $sp-4 0;
 
   .settings-section-title {
     display: block;
     font-size: $font-heading-lg;
     color: $color-text-placeholder;
     letter-spacing: 4px;
-    margin-bottom: 20px;
+    margin-bottom: $sp-5;
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
   }
@@ -1228,7 +1228,7 @@
 .settings-divider {
   height: 1px;
   background: $color-divider-subtle;
-  margin: 4px 0;
+  margin: $sp-1 0;
 }
 
 .module-switch {
@@ -1241,8 +1241,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 18px 0;
-  border-radius: 2px;
+  padding: $sp-4 0;
+  border-radius: $radius-2;
   border: 1px solid $color-divider-subtle;
   background: $palette-alpha-ink-03;
   transition: all 0.3s ease;
@@ -1272,8 +1272,8 @@
 // 面板底部按钮
 .settings-footer {
   display: flex;
-  gap: 16px;
-  padding: 20px 32px 36px;
+  gap: $sp-4;
+  padding: $sp-5 $sp-8 $sp-8;
   border-top: 1px solid $color-divider-subtle;
   flex-shrink: 0;
 
@@ -1282,7 +1282,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 22px 0;
+    padding: $sp-6 0;
     transition: all 0.3s ease;
 
     &:active {
@@ -1341,8 +1341,8 @@
 .bk-setting-row {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px 0;
+  gap: $sp-4;
+  padding: $sp-5 0;
   border-bottom: 1px solid $color-divider-subtle;
 
   &:last-child {
@@ -1368,7 +1368,7 @@
   align-items: center;
   justify-content: center;
   background: $color-shadow-soft;
-  border-radius: 10px;
+  border-radius: $radius-sm;
   border: 1px solid $color-shadow-soft;
 }
 
