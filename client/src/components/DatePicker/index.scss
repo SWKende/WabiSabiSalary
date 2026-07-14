@@ -1,10 +1,12 @@
 // ========== 自定义日期选择器 — 侘寂美学 ==========
 
+@use '../../styles/variables' as *;
+
 .dp-overlay {
   position: fixed;
   inset: 0;
   z-index: 500;
-  background: rgba(44, 44, 44, 0.3);
+  background: $palette-alpha-ink-30;
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -19,10 +21,10 @@
 .dp-panel {
   width: 100%;
   max-height: 92vh;
-  background: #faf8f4;
-  border-radius: 12px 12px 0 0;
-  padding: 32px 24px;
-  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  background: $color-bg-page;
+  border-radius: $radius-sm $radius-sm 0 0;
+  padding: $sp-8 $sp-6;
+  padding-bottom: calc($sp-6 + env(safe-area-inset-bottom, 0px));
   animation: dpSlideUp 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -39,13 +41,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: $sp-6;
 }
 
 .dp-nav {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: $sp-5;
 }
 
 .dp-nav-btn {
@@ -54,8 +56,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 2px;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-2;
   transition: all 0.2s ease;
 
   &.disabled {
@@ -63,20 +65,20 @@
   }
 
   &:active:not(.disabled) {
-    background: #f0e8d8;
+    background: $palette-sand-300;
   }
 
   .dp-nav-text {
-    font-size: 32px;
-    color: #5c5650;
+    font-size: $font-body-lg;
+    color: $color-text-secondary;
     font-weight: 300;
     line-height: 1;
   }
 }
 
 .dp-month-label {
-  font-size: 28px;
-  color: #2c2c2c;
+  font-size: $font-body-sm;
+  color: $color-text-primary;
   font-weight: 500;
   font-family: 'Noto Serif SC', serif;
   letter-spacing: 2px;
@@ -85,18 +87,18 @@
 }
 
 .dp-today-btn {
-  padding: 10px 20px;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 2px;
+  padding: $sp-3 $sp-5;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-2;
   transition: all 0.2s ease;
 
   &:active {
-    background: #f0e8d8;
+    background: $palette-sand-300;
   }
 
   .dp-today-text {
-    font-size: 22px;
-    color: #a89878;
+    font-size: $font-heading-lg;
+    color: $color-brand-primary-strong;
     font-family: 'Noto Serif SC', serif;
     letter-spacing: 2px;
   }
@@ -106,15 +108,15 @@
 .dp-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 8px;
+  margin-bottom: $sp-2;
 }
 
 .dp-weekday {
   text-align: center;
-  font-size: 22px;
-  color: #8a8279;
+  font-size: $font-heading-lg;
+  color: $color-text-placeholder;
   font-family: 'Noto Serif SC', serif;
-  padding: 10px 0;
+  padding: $sp-3 0;
   letter-spacing: 2px;
 }
 
@@ -127,16 +129,16 @@
 .dp-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 24px;
+  gap: $sp-1;
+  margin-bottom: $sp-6;
 }
 
 .dp-day {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 72px;
-  border-radius: 2px;
+  height: $input-height-md;
+  border-radius: $radius-2;
   transition: all 0.2s ease;
 
   &.dp-day-empty {
@@ -145,36 +147,36 @@
 
   &.dp-day-disabled {
     .dp-day-text {
-      color: rgba(44, 44, 44, 0.18);
+      color: $palette-alpha-ink-18;
     }
     pointer-events: none;
   }
 
   &.dp-day-today {
     .dp-day-text {
-      color: #a89878;
+      color: $color-brand-primary-strong;
       font-weight: 600;
     }
 
     &::after {
       content: '';
       position: absolute;
-      bottom: 8px;
+      bottom: $sp-2;
       left: 50%;
       transform: translateX(-50%);
-      width: 4px;
-      height: 4px;
+      width: $sp-1;
+      height: $sp-1;
       border-radius: 50%;
-      background: #c8b99a;
+      background: $color-brand-primary;
     }
     position: relative;
   }
 
   &.dp-day-selected {
-    background: #2c2c2c;
+    background: $color-text-primary;
 
     .dp-day-text {
-      color: #faf8f4;
+      color: $color-bg-page;
       font-weight: 500;
     }
 
@@ -184,12 +186,12 @@
   }
 
   &:active:not(.dp-day-disabled):not(.dp-day-empty) {
-    background: #f0e8d8;
+    background: $palette-sand-300;
   }
 
   .dp-day-text {
-    font-size: 28px;
-    color: #2c2c2c;
+    font-size: $font-body-sm;
+    color: $color-text-primary;
     font-family: 'Shippori Mincho B1', serif;
     font-weight: 400;
   }
@@ -198,9 +200,9 @@
 // 底部按钮
 .dp-footer {
   display: flex;
-  gap: 16px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(44, 44, 44, 0.08);
+  gap: $sp-4;
+  padding-top: $sp-4;
+  border-top: 1px solid $color-divider-subtle;
 }
 
 .dp-btn {
@@ -208,8 +210,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 22px 0;
-  border-radius: 2px;
+  padding: $sp-6 0;
+  border-radius: $radius-2;
   transition: all 0.3s ease;
 
   &:active {
@@ -217,7 +219,7 @@
   }
 
   .dp-btn-text {
-    font-size: 26px;
+    font-size: $font-caption-md;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
@@ -225,27 +227,27 @@
 
   &.dp-btn-cancel {
     background: transparent;
-    border: 1px solid rgba(44, 44, 44, 0.08);
+    border: 1px solid $color-divider-subtle;
 
     .dp-btn-text {
-      color: #8a8279;
+      color: $color-text-placeholder;
     }
 
     &:active {
-      background: #ece5d8;
+      background: $palette-sand-200;
     }
   }
 
   &.dp-btn-confirm {
-    background: #2c2c2c;
-    border: 1px solid #2c2c2c;
+    background: $color-text-primary;
+    border: 1px solid $color-text-primary;
 
     .dp-btn-text {
-      color: #faf8f4;
+      color: $color-bg-page;
     }
 
     &:active {
-      background: #5c5650;
+      background: $color-text-secondary;
     }
   }
 }
