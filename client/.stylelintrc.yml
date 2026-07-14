@@ -1,0 +1,40 @@
+extends:
+  - stylelint-config-standard-scss
+
+plugins:
+  - stylelint-declaration-strict-value
+  - stylelint-scss
+
+rules:
+  scale-unlimited/declaration-strict-value:
+    -
+      - /color$/
+      - /background-color$/
+      - /font-size$/
+      - /padding$/
+      - /padding-(top|right|bottom|left)$/
+      - /margin$/
+      - /margin-(top|right|bottom|left)$/
+      - /border-radius$/
+    -
+      ignoreValues:
+        - transparent
+        - currentColor
+        - inherit
+        - initial
+        - unset
+        - none
+        - /^0/
+        - /^var\(--/
+      severity: warning
+
+  scss/dollar-variable-pattern:
+    - '^(palette|fs|sp|radius|color|font|input|btn|space|motion|shadow|z-index)'
+    - ignore: 'local'
+
+overrides:
+  - files:
+      - 'src/styles/tokens/**/*.scss'
+      - 'src/styles/semantic/**/*.scss'
+    rules:
+      scale-unlimited/declaration-strict-value: null
