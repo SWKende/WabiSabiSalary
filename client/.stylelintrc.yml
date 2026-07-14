@@ -26,7 +26,7 @@ rules:
         - none
         - /^0/
         - /^var\(--/
-      severity: warning
+      severity: error
 
   scss/dollar-variable-pattern:
     - '^(palette|fs|sp|radius|color|font|input|btn|space|motion|shadow|z-index)'
