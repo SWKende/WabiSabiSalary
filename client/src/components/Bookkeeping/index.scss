@@ -1,8 +1,11 @@
 // ========== 记账页面 ==========
+
+@use '../../styles/variables' as *;
+
 .bookkeeping-page {
   position: relative;
   z-index: 1;
-  padding: 0 20px 60px;
+  padding: 0 $sp-5 $sp-16;
   box-sizing: border-box;
 }
 
@@ -10,15 +13,15 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #f5f0e8;
-  padding: 16px 4px 24px;
+  background: $color-bg-surface-soft;
+  padding: $sp-4 $sp-1 $sp-6;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
 
   .bookkeeping-title {
-    font-size: 32px;
-    color: #2c2c2c;
+    font-size: $font-body-lg;
+    color: $color-text-primary;
     font-weight: 500;
     letter-spacing: 6px;
     font-family: 'Noto Serif SC', serif;
@@ -29,27 +32,27 @@
 
     .summary-label {
       display: block;
-      font-size: 20px;
-      color: #8a8279;
+      font-size: $font-body-md;
+      color: $color-text-placeholder;
       letter-spacing: 2px;
-      margin-bottom: 4px;
+      margin-bottom: $sp-1;
       font-family: 'Noto Serif SC', serif;
     }
 
     .summary-value {
-      font-size: 28px;
+      font-size: $font-body-sm;
       font-weight: 500;
       font-family: 'Shippori Mincho B1', serif;
 
-      &.positive { color: #7a8c6e; }
-      &.negative { color: #b85450; }
+      &.positive { color: $color-state-success; }
+      &.negative { color: $color-state-danger; }
     }
   }
 }
 
 // 记账表单卡片
 .bookkeeping-form {
-  margin-bottom: 28px;
+  margin-bottom: $sp-8;
   animation: formFadeIn 0.3s ease forwards;
 
   // 动画播完后移除 animation，防止 Taro setData 触发重播
@@ -58,19 +61,19 @@
   }
 
   .form-card {
-    background: #faf8f4;
-    border: 1px solid rgba(44, 44, 44, 0.08);
-    border-radius: 2px;
-    padding: 32px 24px;
+    background: $color-bg-page;
+    border: 1px solid $color-divider-subtle;
+    border-radius: $radius-2;
+    padding: $sp-8 $sp-6;
     position: relative;
   }
 
   .form-close-btn {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 44px;
-    height: 44px;
+    top: $sp-4;
+    right: $sp-4;
+    width: $sp-12;
+    height: $sp-12;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,8 +84,8 @@
     }
 
     .form-close-icon {
-      font-size: 24px;
-      color: #8a8279;
+      font-size: $font-heading-md;
+      color: $color-text-placeholder;
       line-height: 1;
     }
   }
@@ -90,14 +93,14 @@
   .amount-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 28px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(44, 44, 44, 0.08);
+    gap: $sp-2;
+    margin-bottom: $sp-8;
+    padding-bottom: $sp-5;
+    border-bottom: 1px solid $color-divider-subtle;
 
     .amount-symbol {
-      font-size: 36px;
-      color: #a89878;
+      font-size: $font-heading-md;
+      color: $color-brand-primary-strong;
       font-weight: 300;
       font-family: 'Noto Serif SC', serif;
     }
@@ -108,22 +111,22 @@
       align-items: center;
       height: 60px;
       min-height: 60px;
-      padding: 0 4px;
+      padding: 0 $sp-1;
       box-sizing: border-box;
 
       &.is-empty {
         .amount-display-text {
-          font-size: 28px;
+          font-size: $font-body-sm;
           font-weight: 500;
-          color: #a89878;
+          color: $color-brand-primary-strong;
         }
       }
 
       &.has-value {
         .amount-display-text {
-          font-size: 48px;
+          font-size: 48rpx;
           font-weight: 500;
-          color: #a89878;
+          color: $color-brand-primary-strong;
         }
       }
 
@@ -141,39 +144,39 @@
   }
 
   .category-section {
-    margin-bottom: 28px;
+    margin-bottom: $sp-8;
 
     .type-tabs {
       display: flex;
-      border: 1px solid rgba(44, 44, 44, 0.08);
-      border-radius: 2px;
+      border: 1px solid $color-divider-subtle;
+      border-radius: $radius-2;
       overflow: hidden;
-      margin-bottom: 16px;
+      margin-bottom: $sp-4;
 
       .tab {
         flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 14px 0;
+        padding: $sp-4 0;
         background: transparent;
         transition: all 0.3s ease;
 
         &.active {
-          background: #2c2c2c;
+          background: $color-text-primary;
 
           .tab-text {
-            color: #faf8f4;
+            color: $color-bg-page;
           }
         }
 
         &:active:not(.active) {
-          background: rgba(44, 44, 44, 0.04);
+          background: $color-shadow-soft;
         }
 
         .tab-text {
-          font-size: 26px;
-          color: #8a8279;
+          font-size: $font-caption-md;
+          color: $color-text-placeholder;
           font-family: 'Noto Serif SC', serif;
           letter-spacing: 4px;
         }
@@ -186,26 +189,26 @@
 
     .category-row {
       display: inline-flex;
-      gap: 12px;
-      padding: 4px 0;
+      gap: $sp-3;
+      padding: $sp-1 0;
 
       .cat-chip {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 12px 22px;
-        border: 1px solid rgba(44, 44, 44, 0.08);
-        border-radius: 2px;
+        padding: $sp-3 $sp-6;
+        border: 1px solid $color-divider-subtle;
+        border-radius: $radius-2;
         background: transparent;
         transition: all 0.3s ease;
         flex-shrink: 0;
 
         &.active {
-          background: #2c2c2c;
-          border-color: #2c2c2c;
+          background: $color-text-primary;
+          border-color: $color-text-primary;
 
           .cat-chip-text {
-            color: #faf8f4;
+            color: $color-bg-page;
           }
         }
 
@@ -214,8 +217,8 @@
         }
 
         .cat-chip-text {
-          font-size: 24px;
-          color: #5c5650;
+          font-size: $font-caption-sm;
+          color: $color-text-secondary;
           font-family: 'Noto Serif SC', serif;
           letter-spacing: 2px;
           white-space: nowrap;
@@ -225,14 +228,14 @@
   }
 
   .date-row {
-    margin-bottom: 24px;
+    margin-bottom: $sp-6;
 
     .date-label {
       display: block;
-      font-size: 22px;
-      color: #8a8279;
+      font-size: $font-heading-lg;
+      color: $color-text-placeholder;
       letter-spacing: 2px;
-      margin-bottom: 12px;
+      margin-bottom: $sp-3;
       font-family: 'Noto Serif SC', serif;
       font-weight: 400;
     }
@@ -241,48 +244,48 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 18px 20px;
-      background: #f5f0e8;
-      border: 1px solid rgba(44, 44, 44, 0.12);
-      border-radius: 2px;
+      padding: $sp-6 $sp-5;
+      background: $color-bg-surface-soft;
+      border: 1px solid $palette-alpha-ink-15;
+      border-radius: $radius-2;
 
       .date-value {
-        font-size: 28px;
-        color: #2c2c2c;
+        font-size: $font-body-sm;
+        color: $color-text-primary;
         font-family: 'Shippori Mincho B1', serif;
         font-weight: 400;
         letter-spacing: 1px;
       }
 
       .date-arrow {
-        font-size: 32px;
-        color: #a89878;
+        font-size: $font-body-lg;
+        color: $color-brand-primary-strong;
         font-weight: 300;
       }
     }
   }
 
   .note-row {
-    margin-bottom: 28px;
+    margin-bottom: $sp-8;
 
     .note-label {
       display: block;
-      font-size: 22px;
-      color: #8a8279;
+      font-size: $font-heading-lg;
+      color: $color-text-placeholder;
       letter-spacing: 2px;
-      margin-bottom: 12px;
+      margin-bottom: $sp-3;
       font-family: 'Noto Serif SC', serif;
       font-weight: 400;
     }
 
     .note-input {
       width: 100%;
-      padding: 20px;
-      background: #f5f0e8;
-      border: 1px solid rgba(44, 44, 44, 0.12);
-      border-radius: 2px;
-      font-size: 28px;
-      color: #2c2c2c;
+      padding: $sp-5;
+      background: $color-bg-surface-soft;
+      border: 1px solid $palette-alpha-ink-15;
+      border-radius: $radius-2;
+      font-size: $font-body-sm;
+      color: $color-text-primary;
       font-family: 'Noto Serif SC', serif;
       box-sizing: border-box;
       min-height: 80px;
@@ -293,9 +296,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 22px 0;
-    background: #2c2c2c;
-    border-radius: 2px;
+    padding: $sp-6 0;
+    background: $color-text-primary;
+    border-radius: $radius-2;
     transition: all 0.3s ease;
 
     &.disabled {
@@ -304,12 +307,12 @@
 
     &:active:not(.disabled) {
       transform: scale(0.97);
-      background: #5c5650;
+      background: $color-text-secondary;
     }
 
     .submit-text {
-      font-size: 28px;
-      color: #faf8f4;
+      font-size: $font-body-sm;
+      color: $color-bg-page;
       letter-spacing: 6px;
       font-family: 'Noto Serif SC', serif;
       font-weight: 400;
@@ -327,28 +330,28 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  padding: 28px 0;
-  margin-bottom: 28px;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 2px;
+  gap: $sp-3;
+  padding: $sp-8 0;
+  margin-bottom: $sp-8;
+  background: $color-bg-page;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-2;
   transition: all 0.3s ease;
 
   &:active {
     transform: scale(0.97);
-    background: #f0e8d8;
+    background: $palette-sand-300;
   }
 
   .memory-pen-icon {
-    font-size: 32px;
-    color: #a89878;
+    font-size: $font-body-lg;
+    color: $color-brand-primary-strong;
     line-height: 1;
   }
 
   .memory-pen-text {
-    font-size: 28px;
-    color: #5c5650;
+    font-size: $font-body-sm;
+    color: $color-text-secondary;
     font-family: 'Noto Serif SC', serif;
     letter-spacing: 6px;
     font-weight: 400;
@@ -359,22 +362,22 @@
 .chart-section {
   position: relative;
   z-index: 1;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 2px;
-  padding: 24px;
-  margin-bottom: 28px;
+  background: $color-bg-page;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-2;
+  padding: $sp-6;
+  margin-bottom: $sp-8;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: $sp-6;
 
   .chart-title {
-    font-size: 24px;
-    color: #2c2c2c;
+    font-size: $font-caption-sm;
+    color: $color-text-primary;
     font-weight: 500;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
@@ -383,31 +386,31 @@
 
 .chart-toggle {
   display: flex;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 2px;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-2;
   overflow: hidden;
 
   .toggle-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 16px;
+    padding: $sp-2 $sp-4;
     background: transparent;
     transition: all 0.3s ease;
 
     &.active {
-      background: #2c2c2c;
+      background: $color-text-primary;
 
       .toggle-text {
-        color: #faf8f4;
+        color: $color-bg-page;
       }
     }
 
     .toggle-text {
       display: block;
-      font-size: 22px;
+      font-size: $font-heading-lg;
       line-height: 1;
-      color: #8a8279;
+      color: $color-text-placeholder;
       font-family: 'Noto Serif SC', serif;
       letter-spacing: 2px;
     }
@@ -416,7 +419,7 @@
 
 .chart-body {
   display: flex;
-  gap: 8px;
+  gap: $sp-2;
   height: 240px;
 }
 
@@ -426,11 +429,11 @@
   justify-content: space-between;
   width: 60px;
   flex-shrink: 0;
-  padding-bottom: 28px;
+  padding-bottom: $sp-8;
 
   .y-label {
-    font-size: 18px;
-    color: #8a8279;
+    font-size: $font-heading-md;
+    color: $color-text-placeholder;
     font-family: 'Shippori Mincho B1', serif;
     text-align: right;
   }
@@ -441,17 +444,17 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  padding-bottom: 28px;
+  padding-bottom: $sp-8;
   position: relative;
 
   &::after {
     content: '';
     position: absolute;
-    bottom: 28px;
+    bottom: $sp-8;
     left: 0;
     right: 0;
     height: 1px;
-    background: rgba(44, 44, 44, 0.08);
+    background: $color-divider-subtle;
   }
 }
 
@@ -464,10 +467,10 @@
   justify-content: flex-end;
 
   .bar-value {
-    font-size: 18px;
-    color: #8a8279;
+    font-size: $font-heading-md;
+    color: $color-text-placeholder;
     font-family: 'Shippori Mincho B1', serif;
-    margin-bottom: 4px;
+    margin-bottom: $sp-1;
     white-space: nowrap;
   }
 
@@ -488,26 +491,26 @@
     }
 
     .bar-fill {
-      width: 12px;
-      border-radius: 2px 2px 0 0;
+      width: $sp-3;
+      border-radius: $radius-2 $radius-2 0 0;
       transition: height 0.4s ease;
       min-height: 2px;
 
       &.expense {
-        background: rgba(184, 84, 80, 0.5);
+        background: $palette-alpha-rouge-45;
       }
 
       &.income {
-        background: rgba(122, 140, 110, 0.5);
+        background: $palette-alpha-sage-20;
       }
     }
   }
 
   .bar-label {
-    font-size: 18px;
-    color: #8a8279;
+    font-size: $font-heading-md;
+    color: $color-text-placeholder;
     font-family: 'Noto Serif SC', serif;
-    margin-top: 8px;
+    margin-top: $sp-2;
     letter-spacing: 1px;
   }
 }
@@ -520,8 +523,8 @@
   justify-content: center;
 
   .chart-empty-text {
-    font-size: 24px;
-    color: #8a8279;
+    font-size: $font-caption-sm;
+    color: $color-text-placeholder;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
     opacity: 0.5;
@@ -532,11 +535,11 @@
 .records-section {
   .records-title {
     display: block;
-    font-size: 24px;
-    color: #8a8279;
+    font-size: $font-caption-sm;
+    color: $color-text-placeholder;
     letter-spacing: 4px;
-    margin-bottom: 16px;
-    padding-left: 4px;
+    margin-bottom: $sp-4;
+    padding-left: $sp-1;
     font-family: 'Noto Serif SC', serif;
     font-weight: 400;
   }
@@ -545,31 +548,31 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 16px;
-    background: #faf8f4;
-    border: 1px solid rgba(44, 44, 44, 0.08);
-    border-radius: 2px;
-    margin-bottom: 10px;
+    padding: $sp-5 $sp-4;
+    background: $color-bg-page;
+    border: 1px solid $color-divider-subtle;
+    border-radius: $radius-2;
+    margin-bottom: $sp-3;
 
     .record-left {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: $sp-4;
       flex: 1;
       min-width: 0;
 
       .record-category-badge {
-        padding: 6px 12px;
-        background: rgba(200, 185, 154, 0.12);
-        border-radius: 2px;
+        padding: $sp-2 $sp-3;
+        background: $palette-alpha-sand-12;
+        border-radius: $radius-2;
         flex-shrink: 0;
         display: flex;
         align-items: center;
         justify-content: center;
 
         .record-category {
-          font-size: 20px;
-          color: #a89878;
+          font-size: $font-body-md;
+          color: $color-brand-primary-strong;
           font-family: 'Noto Serif SC', serif;
           letter-spacing: 1px;
           line-height: 1;
@@ -581,8 +584,8 @@
 
         .record-note {
           display: block;
-          font-size: 26px;
-          color: #2c2c2c;
+          font-size: $font-caption-md;
+          color: $color-text-primary;
           font-family: 'Noto Serif SC', serif;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -591,9 +594,9 @@
 
         .record-time {
           display: block;
-          font-size: 20px;
-          color: #8a8279;
-          margin-top: 4px;
+          font-size: $font-body-md;
+          color: $color-text-placeholder;
+          margin-top: $sp-1;
           font-family: 'Noto Serif SC', serif;
         }
       }
@@ -602,28 +605,28 @@
     .record-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: $sp-3;
       flex-shrink: 0;
 
       .record-amount {
-        font-size: 28px;
+        font-size: $font-body-sm;
         font-weight: 500;
         font-family: 'Shippori Mincho B1', serif;
 
-        &.positive { color: #7a8c6e; }
-        &.negative { color: #2c2c2c; }
+        &.positive { color: $color-state-success; }
+        &.negative { color: $color-text-primary; }
       }
 
       .record-delete {
-        width: 40px;
-        height: 40px;
+        width: $sp-10;
+        height: $sp-10;
         display: flex;
         align-items: center;
         justify-content: center;
 
         .record-delete-icon {
-          font-size: 28px;
-          color: #b85450;
+          font-size: $font-body-sm;
+          color: $color-state-danger;
           opacity: 0.5;
         }
 
@@ -639,11 +642,11 @@
   position: fixed;
   inset: 0;
   z-index: 400;
-  background: rgba(44, 44, 44, 0.3);
+  background: $palette-alpha-ink-30;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px;
+  padding: $sp-8;
   animation: recordConfirmFadeIn 0.25s ease;
   box-sizing: border-box;
 }
@@ -656,16 +659,16 @@
 .record-confirm-dialog {
   width: 100%;
   max-width: 560px;
-  background: #faf8f4;
-  border: 1px solid rgba(44, 44, 44, 0.08);
-  border-radius: 8px;
-  padding: 32px;
+  background: $color-bg-page;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-sm;
+  padding: $sp-8;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: $sp-3;
   animation: recordConfirmZoomIn 0.25s ease;
-  box-shadow: 0 16px 40px rgba(44, 44, 44, 0.08);
+  box-shadow: 0 16px 40px $color-divider-subtle;
 }
 
 @keyframes recordConfirmZoomIn {
@@ -680,40 +683,39 @@
 }
 
 .record-confirm-title {
-  font-size: 30px;
-  color: #2c2c2c;
+  font-size: $font-body-lg;
+  color: $color-text-primary;
   font-family: 'Noto Serif SC', serif;
   letter-spacing: 3px;
 }
 
 .record-confirm-desc {
-  font-size: 22px;
-  color: #5c5650;
+  font-size: $font-heading-lg;
+  color: $color-text-secondary;
   font-family: 'Noto Serif SC', serif;
   line-height: 1.6;
 }
 
 .record-confirm-meta {
-  font-size: 18px;
-  color: #8a8279;
-  font-family: 'Noto Serif SC', serif;
-  line-height: 1.6;
+  font-size: $font-heading-md;
+  color: $color-text-placeholder;
+  font-family: 'Noto Serif SC', serif;  line-height: 1.6;
 }
 
 .record-confirm-actions {
   display: flex;
-  gap: 16px;
-  margin-top: 12px;
+  gap: $sp-4;
+  margin-top: $sp-3;
 }
 
 .record-confirm-btn {
   flex: 1;
-  height: 88px;
+  height: $input-height-lg;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 2px;
-  border: 1px solid rgba(44, 44, 44, 0.08);
+  border-radius: $radius-2;
+  border: 1px solid $color-divider-subtle;
   transition: all 0.2s ease;
 
   &.is-cancel {
@@ -721,10 +723,10 @@
   }
 
   &.is-danger {
-    background: #2c2c2c;
+    background: $color-text-primary;
 
     .record-confirm-btn-text {
-      color: #faf8f4;
+      color: $color-bg-page;
     }
   }
 
@@ -734,8 +736,8 @@
 }
 
 .record-confirm-btn-text {
-  font-size: 24px;
-  color: #5c5650;
+  font-size: $font-caption-sm;
+  color: $color-text-secondary;
   font-family: 'Noto Serif SC', serif;
   letter-spacing: 2px;
   line-height: 1;
