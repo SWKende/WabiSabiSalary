@@ -1,7 +1,54 @@
 // client/src/styles/global.scss
-// 全局样式入口,组件 L3 默认值在此注入 :root。
-// 当前阶段为空,Phase 3 Task 3.7 后内容会扩展。
+// 全局样式入口:把 L2 语义 token 与 L3 控件默认值作为 CSS 变量暴露到 :root,便于运行时主题切换(本期不接主题)。
+
+@use './tokens/typography' as fs;
+@use './tokens/spacing' as sp;
+@use './tokens/radius' as r;
+@use './tokens/motion' as m;
+@use './tokens/z-index' as z;
+@use './semantic/color' as c;
+@use './semantic/typography' as t;
+@use './semantic/control' as k;
 
 :root {
-  // 占位:Phase 3 后追加 CSS 变量定义。
+  // 颜色
+  --color-text-primary        : #{c.$color-text-primary};
+  --color-text-secondary      : #{c.$color-text-secondary};
+  --color-text-tertiary       : #{c.$color-text-tertiary};
+  --color-text-placeholder    : #{c.$color-text-placeholder};
+  --color-bg-page             : #{c.$color-bg-page};
+  --color-bg-surface          : #{c.$color-bg-surface};
+  --color-bg-surface-soft     : #{c.$color-bg-surface-soft};
+  --color-bg-overlay          : #{c.$color-bg-overlay};
+  --color-divider-subtle      : #{c.$color-divider-subtle};
+  --color-shadow-soft         : #{c.$color-shadow-soft};
+  --color-brand-primary       : #{c.$color-brand-primary};
+  --color-brand-primary-strong: #{c.$color-brand-primary-strong};
+  --color-state-success       : #{c.$color-state-success};
+  --color-state-danger        : #{c.$color-state-danger};
+
+  // 字号
+  --font-display-xl : #{t.$font-display-xl};
+  --font-display-lg : #{t.$font-display-lg};
+  --font-heading-lg : #{t.$font-heading-lg};
+  --font-heading-md : #{t.$font-heading-md};
+  --font-body-lg    : #{t.$font-body-lg};
+  --font-body-md    : #{t.$font-body-md};
+  --font-body-sm    : #{t.$font-body-sm};
+  --font-caption-md : #{t.$font-caption-md};
+  --font-caption-sm : #{t.$font-caption-sm};
+
+  // 控件尺寸
+  --input-height-sm : #{k.$input-height-sm};
+  --input-height-md : #{k.$input-height-md};
+  --input-height-lg : #{k.$input-height-lg};
+  --input-padding-x : #{k.$input-padding-x};
+  --input-padding-y : #{k.$input-padding-y};
+  --btn-height-sm   : #{k.$btn-height-sm};
+  --btn-height-md   : #{k.$btn-height-md};
+  --btn-height-lg   : #{k.$btn-height-lg};
+
+  // 动效
+  --duration-base : #{m.$motion-duration-base};
+  --easing-standard : #{m.$motion-easing-standard};
 }

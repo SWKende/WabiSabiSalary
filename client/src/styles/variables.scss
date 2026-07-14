@@ -1,6 +1,6 @@
 // client/src/styles/variables.scss
 // 所有 SCSS 文件统一从此处 @use,避免在业务 SCSS 中直接 @use 多个文件。
-// 当前阶段为占位,Phase 2/3 完成后改为真正的 @forward 列表。
 
 @forward './tokens' show *;
 @forward './semantic' show *;
+@forward './components' show *;

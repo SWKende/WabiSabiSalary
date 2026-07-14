@@ -1,0 +1,6 @@
+// client/src/styles/semantic/_index.scss
+// L2 语义 Token 聚合入口。
+
+@forward 'color';
+@forward 'typography';
+@forward 'control';

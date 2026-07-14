@@ -1,0 +1,7 @@
+// client/src/styles/components/_index.scss
+// L3 组件聚合入口。
+
+@forward 'input';
+@forward 'button';
+@forward 'card';
+@forward 'cell';
