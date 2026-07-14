@@ -10,7 +10,9 @@ const config = {
   sourceRoot: 'src',
   outputRoot: 'dist',
   plugins: [],
-  defineConstants: {},
+  defineConstants: {
+    __API_BASE_URL__: JSON.stringify(process.env.TARO_APP_API_BASE_URL || 'http://localhost:3000')
+  },
   alias: {
     '@': require('path').resolve(__dirname, '..', 'src')
   },
@@ -19,14 +21,14 @@ const config = {
     options: {}
   },
   framework: 'react',
-  compiler: 'webpack5',
-  cache: {
-    enable: false
-  },
-  compilerOptions: {
+  compiler: {
+    type: 'webpack5',
     prebundle: {
       enable: false
     }
+  },
+  cache: {
+    enable: false
   },
   mini: {
     postcss: {

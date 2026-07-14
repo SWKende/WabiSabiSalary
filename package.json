@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": ["client", "server"],
+  "scripts": {
+    "postinstall": "node ./scripts/install-build-patches.mjs"
+  },
   "overrides": {
     "ajv": "^8.17.1"
   }

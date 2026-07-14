@@ -10,7 +10,7 @@ const TOKEN_KEY = 'auth_token'
 let tokenCache: string | null = null
 
 function getBaseUrl(): string {
-  const url = process.env.TARO_APP_API_BASE_URL
+  const url = typeof __API_BASE_URL__ === 'string' ? __API_BASE_URL__ : ''
   if (url) return url.replace(/\/+$/, '')
   // 开发环境默认值
   return 'http://localhost:3000'

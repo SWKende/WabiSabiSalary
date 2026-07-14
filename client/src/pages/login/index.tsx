@@ -45,40 +45,48 @@ export default function LoginPage() {
 
   return (
     <View className='login-root'>
-      <Text className='login-title'>{mode === 'login' ? '欢迎回来' : '创建账号'}</Text>
-      <Text className='login-subtitle'>{mode === 'login' ? '登录以同步你的数据' : '注册后可在多设备同步'}</Text>
+      <View className='login-shell'>
+        <Text className='login-title'>{mode === 'login' ? '欢迎回来' : '创建账号'}</Text>
+        <Text className='login-subtitle'>{mode === 'login' ? '登录以同步你的数据' : '注册后可在多设备同步'}</Text>
 
-      <View className='login-form'>
-        <Input
-          className='login-input'
-          placeholder='用户名（3-20 位字母/数字/下划线）'
-          value={username}
-          onInput={(e) => setUsername(e.detail.value)}
-          maxlength={20}
-        />
-        <Input
-          className='login-input'
-          placeholder='密码（6-32 位）'
-          password
-          value={password}
-          onInput={(e) => setPassword(e.detail.value)}
-          maxlength={32}
-        />
+        <View className='login-form'>
+          <View className='login-input-wrap'>
+            <Input
+              className='login-input'
+              placeholder='用户名（3-20 位字母/数字/下划线）'
+              placeholderStyle='color: #8a7f70; font-size: 15px;'
+              value={username}
+              onInput={(e) => setUsername(e.detail.value)}
+              maxlength={20}
+            />
+          </View>
+          <View className='login-input-wrap'>
+            <Input
+              className='login-input'
+              placeholder='密码（6-32 位）'
+              placeholderStyle='color: #8a7f70; font-size: 15px;'
+              password
+              value={password}
+              onInput={(e) => setPassword(e.detail.value)}
+              maxlength={32}
+            />
+          </View>
 
-        <View
-          className={`login-btn ${loading ? 'login-btn--disabled' : ''}`}
-          onClick={loading ? undefined : submit}
-        >
-          <Text>{loading ? '处理中...' : mode === 'login' ? '登 录' : '注 册'}</Text>
-        </View>
+          <View
+            className={`login-btn ${loading ? 'login-btn--disabled' : ''}`}
+            onClick={loading ? undefined : submit}
+          >
+            <Text className='login-btn__text'>{loading ? '处理中...' : mode === 'login' ? '登 录' : '注 册'}</Text>
+          </View>
 
-        {error && <Text className='login-error'>{error}</Text>}
+          {error && <Text className='login-error'>{error}</Text>}
 
-        <View className='login-switch'>
-          <Text>{mode === 'login' ? '还没有账号？' : '已有账号？'}</Text>
-          <Text className='login-switch__link' onClick={switchMode}>
-            {mode === 'login' ? '立即注册' : '立即登录'}
-          </Text>
+          <View className='login-switch'>
+            <Text className='login-switch__text'>{mode === 'login' ? '还没有账号？' : '已有账号？'}</Text>
+            <Text className='login-switch__link' onClick={switchMode}>
+              {mode === 'login' ? '立即注册' : '立即登录'}
+            </Text>
+          </View>
         </View>
       </View>
     </View>

@@ -3,6 +3,7 @@ dist/
 node_modules/
 .swc/
 data/
+.DS_Store
 deploy/.env
 deploy/logs/
 !deploy/logs/.gitkeep
