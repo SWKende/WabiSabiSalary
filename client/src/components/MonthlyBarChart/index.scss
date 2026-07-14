@@ -1,9 +1,12 @@
 // ========== 月度趋势柱状图 ==========
+
+@use '../../styles/variables' as *;
+
 .monthly-chart {
   .monthly-bars {
     justify-content: space-between;
     align-items: flex-end;
-    padding-bottom: 28px;
+    padding-bottom: $sp-8;
   }
 
   .monthly-bar-col {
@@ -13,29 +16,29 @@
   }
 
   .monthly-bar-track {
-    width: 8px;
+    width: $sp-2;
   }
 
   .monthly-bar-value {
     width: 100%;
-    height: 32px;
+    height: $sp-8;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    margin-bottom: 6px;
-    font-size: 16px;
+    margin-bottom: $sp-2;
+    font-size: $font-body-md;
     line-height: 1;
     white-space: nowrap;
   }
 
   .monthly-bar-label {
     width: 100%;
-    height: 20px;
+    height: $sp-5;
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    margin-top: 8px;
-    font-size: 16px;
+    margin-top: $sp-2;
+    font-size: $font-body-md;
     line-height: 1;
     letter-spacing: 1px;
   }
