@@ -39,6 +39,51 @@ API 地址默认是 `http://localhost:3000`。要指向其他地址：
 TARO_APP_API_BASE_URL=https://your-api.example.com npm run dev:weapp
 ```
 
+### Design Tokens
+
+项目使用三层 Token 体系（Primitive → Semantic → Component），集中管理尺寸、颜色、字号、间距、圆角。所有 SCSS 文件应通过 `client/src/styles/variables.scss` 引用 token，避免在业务代码中直接写 hex 颜色、px 字号、px 间距、px 圆角。
+
+**目录结构：**
+
+- `client/src/styles/tokens/` — L1 原语（palette/typography/spacing/radius/z-index/motion）
+- `client/src/styles/semantic/` — L2 语义（color/typography/control/space）
+- `client/src/styles/components/` — L3 组件（input/button/card/cell）
+- `client/src/styles/global.scss` — `:root` CSS 变量注入（33 个）
+- `client/src/styles/variables.scss` — 业务 SCSS 统一入口
+
+**使用方式：**
+
+```scss
+// 在业务 SCSS 顶部引入
+@use '@/styles/variables' as *;
+
+.my-card {
+  padding: $space-card-padding-md;       // L2 语义
+  background: $color-bg-surface;         // L2 语义
+  border-radius: $radius-md;             // L1 原语
+  font-size: $font-body-md;              // L2 语义
+  box-shadow: 0 2rpx 12rpx $color-shadow-soft;
+}
+```
+
+**单位约定：** 所有尺寸使用 `rpx`（Taro 750 稿基线，1px = 2rpx）。
+
+**CI 守卫：** PR 通过 `.github/workflows/ci.yml` 中的两道关卡：
+
+- `npm run lint:css:strict-value` — 阻止任何新的 hex/font-size/padding/margin/border-radius 字面量进入业务 SCSS
+- `npm run test:css` — 验证 token 定义、迁移回归、视觉零变化不被破坏
+
+**完整规范：** `docs/superpowers/specs/2026-07-14-typography-input-tokens-design.md`
+
+**新增样式规则：**
+
+- 禁止在业务 SCSS 中直接写 hex 颜色、px 字号、px 间距、px 圆角
+- 必须通过 `@use '@/styles/variables' as *;` 引用 L2 语义 token（优先）或 L1 原语
+- 单位使用 `rpx`（Taro 750 稿基线，1px = 2rpx）
+- 视觉零变化迁移：所有 token 命名映射表见规格文档第 4 节
+
+**注意：** `index.scss` 和 `Bookkeeping/index.scss` 中存在 9 处临时保留的字面量（1px/20rpx/48rpx），已被 strict-value 配置显式豁免并标注 TODO；后续清理需走单独的迁移任务。
+
 ### 后端
 
 ```bash
