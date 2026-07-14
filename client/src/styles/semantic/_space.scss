@@ -1,0 +1,19 @@
+// client/src/styles/semantic/_space.scss
+// L2 语义间距:组合常用布局的 padding 复合值。
+
+@use '../tokens/spacing' as sp;
+
+// 卡片内边距
+$space-card-padding-sm : sp.$sp-3 sp.$sp-4;  // 12rpx 16rpx
+$space-card-padding-md : sp.$sp-6 sp.$sp-4;  // 24rpx 16rpx
+$space-card-padding-lg : sp.$sp-8 sp.$sp-6;  // 32rpx 24rpx
+
+// 区块上下间距
+$space-section-y     : sp.$sp-8;            // 32rpx
+$space-section-edge : sp.$sp-10 sp.$sp-4;   // 40rpx 16rpx
+
+// 页面边距
+$space-page-edge : sp.$sp-6 sp.$sp-4;       // 24rpx 16rpx
+
+// 控件水平内距
+$space-control-padding-x : sp.$sp-4;        // 16rpx
