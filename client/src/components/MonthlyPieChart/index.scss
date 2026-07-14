@@ -1,4 +1,7 @@
 // ========== 月度饼状图 ==========
+
+@use '../../styles/variables' as *;
+
 .pie-chart-section {
   min-height: 200px;
 }
@@ -12,7 +15,7 @@
 .pie-chart-area {
   display: flex;
   justify-content: center;
-  margin-bottom: 28px;
+  margin-bottom: $sp-8;
 }
 
 .pie-circle {
@@ -31,7 +34,7 @@
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background: #faf8f4;
+    background: $color-bg-page;
   }
 }
 
@@ -42,8 +45,8 @@
   height: 200px;
 
   .chart-empty-text {
-    font-size: 24px;
-    color: #8a8279;
+    font-size: $font-caption-sm;
+    color: $color-text-placeholder;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
     opacity: 0.5;
@@ -53,32 +56,32 @@
 .pie-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 20px;
+  gap: $sp-3 $sp-5;
   width: 100%;
 
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: $sp-2;
     min-width: 44%;
 
     .legend-color {
-      width: 16px;
-      height: 16px;
-      border-radius: 2px;
+      width: $sp-4;
+      height: $sp-4;
+      border-radius: $radius-2;
       flex-shrink: 0;
     }
 
     .legend-name {
-      font-size: 22px;
-      color: #5c5650;
+      font-size: $font-heading-lg;
+      color: $color-text-secondary;
       font-family: 'Noto Serif SC', serif;
       letter-spacing: 1px;
     }
 
     .legend-percent {
-      font-size: 22px;
-      color: #8a8279;
+      font-size: $font-heading-lg;
+      color: $color-text-placeholder;
       font-family: 'Shippori Mincho B1', serif;
       margin-left: auto;
     }
