@@ -1,0 +1,8 @@
+// L1 原语动效:时长 + 缓动函数。
+
+$motion-duration-fast  : 120ms;
+$motion-duration-base  : 200ms;
+$motion-duration-slow  : 320ms;
+
+$motion-easing-standard  : ease-in-out;
+$motion-easing-emphasized : cubic-bezier(0.4, 0, 0.2, 1);
