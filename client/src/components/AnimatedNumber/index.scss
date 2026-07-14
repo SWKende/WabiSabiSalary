@@ -1,4 +1,6 @@
 // 动画数字 — 逐字符从下往上渐入渐出
+
+@use '../../styles/variables' as *;
 .animated-number {
   display: inline-flex;
   overflow: hidden;
