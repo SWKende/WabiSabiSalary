@@ -1,0 +1,21 @@
+// client/src/styles/components/_cell.scss
+// L3 单元格组件默认值。
+
+@use '../semantic/color' as c;
+@use '../semantic/typography' as t;
+@use '../tokens/spacing' as sp;
+
+.cell {
+  --cell-bg         : #{c.$color-bg-surface};
+  --cell-padding-y  : #{sp.$sp-3};
+  --cell-padding-x  : #{sp.$sp-4};
+  --cell-divider    : 1px solid #{c.$color-divider-subtle};
+  --cell-font       : #{t.$font-body-md};
+  --cell-color      : #{c.$color-text-primary};
+
+  background: var(--cell-bg);
+  padding: var(--cell-padding-y) var(--cell-padding-x);
+  border-bottom: var(--cell-divider);
+  font-size: var(--cell-font);
+  color: var(--cell-color);
+}
