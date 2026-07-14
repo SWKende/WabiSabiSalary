@@ -1,0 +1,27 @@
+// L2 语义颜色:把 L1 色板绑到业务角色。
+
+@use '../tokens/palette' as p;
+
+// 文字
+$color-text-primary     : p.$palette-ink-900;
+$color-text-secondary   : p.$palette-ink-700;
+$color-text-tertiary    : p.$palette-ink-500;
+$color-text-placeholder : p.$palette-ink-300;
+
+// 背景
+$color-bg-page          : p.$palette-sand-50;
+$color-bg-surface       : #ffffff;
+$color-bg-surface-soft  : p.$palette-sand-100;
+$color-bg-overlay       : p.$palette-alpha-sand-96;
+
+// 分割/阴影
+$color-divider-subtle   : p.$palette-alpha-ink-08;
+$color-shadow-soft      : p.$palette-alpha-ink-06;
+
+// 品牌
+$color-brand-primary        : p.$palette-accent-500;
+$color-brand-primary-strong : p.$palette-accent-700;
+
+// 状态
+$color-state-success : p.$palette-olive-500;
+$color-state-danger  : p.$palette-rouge-500;
