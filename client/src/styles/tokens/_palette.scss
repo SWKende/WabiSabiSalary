@@ -1,0 +1,34 @@
+// L1 原语色板:仅承载原始颜色值,无业务含义。
+
+// 墨色 (主文字)
+$palette-ink-900 : #2c2c2c;
+$palette-ink-700 : #5c5650;
+$palette-ink-500 : #736c63;
+$palette-ink-300 : #8a8279;
+
+// 沙色 (背景/分割)
+$palette-sand-50  : #faf8f4;
+$palette-sand-100 : #f5f0e8;
+$palette-sand-200 : #ece5d8;
+$palette-sand-300 : #f0e8d8;
+
+// 强调金
+$palette-accent-500 : #c8b99a;
+$palette-accent-700 : #a89878;
+
+// 状态色
+$palette-olive-500  : #7a8c6e;
+$palette-rouge-500  : #b85450;
+
+// 半透明叠加
+$palette-alpha-ink-03  : rgba(44, 44, 44, 0.03);
+$palette-alpha-ink-04  : rgba(44, 44, 44, 0.04);
+$palette-alpha-ink-06  : rgba(44, 44, 44, 0.06);
+$palette-alpha-ink-08  : rgba(44, 44, 44, 0.08);
+$palette-alpha-ink-15  : rgba(44, 44, 44, 0.15);
+$palette-alpha-ink-30  : rgba(44, 44, 44, 0.30);
+$palette-alpha-sand-25 : rgba(200, 185, 154, 0.25);
+$palette-alpha-sand-30 : rgba(200, 185, 154, 0.30);
+$palette-alpha-sand-82 : rgba(250, 248, 244, 0.82);
+$palette-alpha-sand-96 : rgba(250, 248, 244, 0.96);
+$palette-alpha-warm-45 : rgba(231, 221, 195, 0.45);
