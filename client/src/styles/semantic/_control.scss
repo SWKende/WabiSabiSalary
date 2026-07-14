@@ -1,0 +1,18 @@
+// client/src/styles/semantic/_control.scss
+// L2 控件尺寸:输入框、按钮高度与内边距。
+
+@use '../tokens/spacing' as sp;
+
+// 输入框
+$input-height-sm  : 56rpx;
+$input-height-md  : 72rpx;
+$input-height-lg  : 88rpx;
+
+$input-padding-x  : sp.$sp-4;
+$input-padding-y  : sp.$sp-2;
+$input-gap-label  : sp.$sp-3;
+
+// 按钮
+$btn-height-sm : 56rpx;
+$btn-height-md : 80rpx;
+$btn-height-lg : 96rpx;
