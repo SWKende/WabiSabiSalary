@@ -6,7 +6,16 @@
   "scripts": {
     "postinstall": "node ./scripts/install-build-patches.mjs"
   },
-  "overrides": {
+  "devDependencies": {
     "ajv": "^8.17.1"
+  },
+  "overrides": {
+    "ajv": "^8.17.1",
+    "@eslint/eslintrc": { "ajv": "^6.12.4" },
+    "eslint": { "ajv": "^6.12.4" },
+    "@tarojs/plugin-doctor": {
+      "eslint": { "ajv": "^6.12.4" }
+    },
+    "schema-utils@2": { "ajv": "^6.12.4" }
   }
 }

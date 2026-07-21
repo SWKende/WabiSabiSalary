@@ -2,147 +2,34 @@
 /**
  * Postinstall patches for the Taro 4.2 + webpack 5 toolchain.
  *
- * Three npm dependency-version mismatches block `npm run build:weapp`:
+ * One npm dependency-version mismatch blocks `npm run build:weapp`:
  *
- * 1) Each eslint (root, @tarojs/plugin-doctor, @eslint/eslintrc) needs
- *    `ajv@^6.12.4` + transitive deps (`fast-deep-equal`, `fast-json-stable-stringify`,
- *    `json-schema-traverse`, `uri-js`) nested beside it. Without the nested ajv@6,
- *    webpackbar's plugin-doctor step crashes with
- *    `Cannot find module 'ajv/lib/refs/json-schema-draft-04.json'`.
+ *   `webpackbar@5.0.2` is the only progress plugin in `@tarojs/webpack5-runner`
+ *   and it inherits from `webpack.ProgressPlugin`. Its constructor sets
+ *   `this.options = { name, color, reporters, reporter, basic, fancy, ... }` —
+ *   webpack 4 fields. webpack 5 ProgressPlugin's `_applyOnCompiler` runs
+ *   `compiler.validate(schema, this.options, ...)` with strict
+ *   `additionalProperties: false`, so it throws.
+ *   Fix: strip those reporter-only fields out of `this.options` and into
+ *   `this._extra`, and update all internal references. Also rename the
+ *   destructured local `reporters` to `reportersInput` so it doesn't shadow
+ *   the module-scope `reporters` constant.
  *
- * 2) `schema-utils@2` (used by babel-loader@8) ships with `ajv-keywords@3`
- *    which is only compatible with `ajv@6/7`. With the root `overrides: ajv@^8`,
- *    `require('ajv')` from `schema-utils/dist/validate.js` resolves to `ajv@8`
- *    and `ajv-keywords/keywords/_formatLimit.js` crashes on
- *    `Cannot read properties of undefined (reading 'date')`.
- *    Fix: nest ajv@6 + deps into `babel-loader/node_modules/schema-utils/node_modules/`.
- *
- * 3) `webpackbar@5.0.2` is the only progress plugin in `@tarojs/webpack5-runner`
- *    and it inherits from `webpack.ProgressPlugin`. Its constructor sets
- *    `this.options = { name, color, reporters, reporter, basic, fancy, ... }` —
- *    webpack 4 fields. webpack 5 ProgressPlugin's `_applyOnCompiler` runs
- *    `compiler.validate(schema, this.options, ...)` with strict
- *    `additionalProperties: false`, so it throws.
- *    Fix: strip those reporter-only fields out of `this.options` and into
- *    `this._extra`, and update all internal references. Also rename the
- *    destructured local `reporters` to `reportersInput` so it doesn't shadow
- *    the module-scope `reporters` constant.
- *
- * The source of ajv@6 + transitive deps is `@eslint/eslintrc/node_modules/`
- * which `npm` already nested there during install — copy from there rather
- * than running `npm install` again.
+ * AJV 6/8 selection (eslint, @eslint/eslintrc, @tarojs/plugin-doctor,
+ * schema-utils@2 must see ajv@6; everything else sees ajv@8) is enforced at
+ * install time via the `overrides` block in `package.json` — this script no
+ * longer needs to copy ajv into nested node_modules.
  *
  * Idempotent: safe to run on every `npm install`.
  */
-import {
-  existsSync,
-  readdirSync,
-  readFileSync,
-  writeFileSync,
-  mkdirSync,
-  cpSync,
-} from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, '..');
 
-const AJV_DEPS = ['ajv', 'fast-deep-equal', 'fast-json-stable-stringify', 'json-schema-traverse', 'uri-js'];
-const AJV_SRC = `${repoRoot}/node_modules/@eslint/eslintrc/node_modules`;
-
-// --- 1) ajv@6 nesting for every eslint + schema-utils ---
-
-function readJson(p) {
-  try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return null; }
-}
-
-/**
- * Find every directory whose package.json has name === 'eslint'. Allows up to
- * 2 levels of node_modules traversal so nested copies (e.g. inside
- * @tarojs/plugin-doctor) are reached.
- */
-function findEslintDirs(root) {
-  const out = [];
-  function walk(dir, depth, inNmCount) {
-    if (depth > 12) return;
-    if (!existsSync(dir)) return;
-    let entries;
-    try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
-    for (const e of entries) {
-      if (!e.isDirectory()) continue;
-      if (e.name.startsWith('.')) continue;
-      const full = join(dir, e.name);
-      const nextNm = e.name === 'node_modules' ? inNmCount + 1 : inNmCount;
-      if (nextNm > 2) continue;
-      const pkg = readJson(join(full, 'package.json'));
-      if (pkg?.name === 'eslint') { out.push(full); continue; }
-      walk(full, depth + 1, nextNm);
-    }
-  }
-  walk(root, 0, 0);
-  return out;
-}
-
-/**
- * Walk up from `start` looking for the nearest `node_modules/ajv` and return its
- * version, or null if none found.
- */
-function nearestAjvVersion(start) {
-  let cur = start;
-  while (true) {
-    const p = join(cur, 'node_modules', 'ajv', 'package.json');
-    if (existsSync(p)) return readJson(p)?.version ?? null;
-    const parent = dirname(cur);
-    if (parent === cur) return null;
-    cur = parent;
-  }
-}
-
-function ensureAjv6Beside(targetDir) {
-  const ver = nearestAjvVersion(targetDir);
-  if (ver && /^6\./.test(ver)) return 'already-ok';
-  const targetNodeModules = join(targetDir, 'node_modules');
-  mkdirSync(targetNodeModules, { recursive: true });
-  for (const dep of AJV_DEPS) {
-    const src = join(AJV_SRC, dep);
-    const dst = join(targetNodeModules, dep);
-    if (!existsSync(src)) {
-      return `missing-source:${dep}`;
-    }
-    if (!existsSync(dst)) {
-      cpSync(src, dst, { recursive: true });
-    }
-  }
-  return 'installed';
-}
-
-let ajvInstalled = 0;
-let ajvAlreadyOk = 0;
-let ajvMissed = 0;
-
-const eslintDirs = [...new Set(findEslintDirs(repoRoot))];
-for (const dir of eslintDirs) {
-  const r = ensureAjv6Beside(dir);
-  if (r === 'installed') ajvInstalled++;
-  else if (r === 'already-ok') ajvAlreadyOk++;
-  else { ajvMissed++; console.warn(`[postinstall] ajv@6 next to ${dir}: ${r}`); }
-}
-
-// schema-utils@2 (used by babel-loader@8) needs its own nested ajv@6
-const schemaUtilsDir = join(repoRoot, 'node_modules/babel-loader/node_modules/schema-utils');
-if (existsSync(schemaUtilsDir)) {
-  const r = ensureAjv6Beside(schemaUtilsDir);
-  if (r === 'installed') ajvInstalled++;
-  else if (r === 'already-ok') ajvAlreadyOk++;
-  else { ajvMissed++; console.warn(`[postinstall] ajv@6 next to schema-utils: ${r}`); }
-}
-
-if (ajvInstalled || ajvMissed) {
-  console.log(`[postinstall] ajv@6 nested: ${ajvInstalled} installed, ${ajvAlreadyOk} already OK, ${ajvMissed} failed`);
-}
-
-// --- 2) webpackbar WebpackBarPlugin patch for webpack 5 ---
+// --- webpackbar WebpackBarPlugin patch for webpack 5 ---
 
 /**
  * Replace the WebpackBarPlugin constructor (and the state getter + _ensureState)
