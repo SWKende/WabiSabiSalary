@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 
 const FILE = '../../src/pages/login/index.scss';
@@ -60,5 +60,41 @@ describe('pages/login/index.scss migration', () => {
       throw new Error(`Raw px literal(s): ${violations.slice(0, 8).join('; ')}`);
     }
     expect(violations).toHaveLength(0);
+  });
+
+  it('SCSS forbids raw rgb()/rgba()/hsl()/hsla() literals in login and token index files', () => {
+    const files = [
+      resolve(__dirname, '../../src/pages/login/index.scss'),
+      resolve(__dirname, '../../src/styles/variables.scss'),
+      resolve(__dirname, '../../src/styles/tokens/_index.scss'),
+      resolve(__dirname, '../../src/styles/semantic/_index.scss'),
+      resolve(__dirname, '../../src/styles/components/_index.scss'),
+    ];
+    for (const f of files) {
+      if (!existsSync(f)) continue;
+      const src = readFileSync(f, 'utf8');
+      const stripped = src
+        .split('\n')
+        .filter((line) => !line.trim().startsWith('//') && !line.trim().startsWith('*'))
+        .join('\n');
+      const match = stripped.match(/\b(?:rgb|rgba|hsl|hsla)\s*\(/i);
+      if (match) {
+        throw new Error(`Raw color function literal in ${f}: ${match[0]}`);
+      }
+    }
+  });
+
+  it('login TSX contains no placeholderStyle, inline raw hex color, or inline font-size:px', () => {
+    const path = resolve(__dirname, '../../src/pages/login/index.tsx');
+    const src = readFileSync(path, 'utf8');
+    if (/placeholderStyle\s*=/.test(src)) {
+      throw new Error('placeholderStyle is forbidden in login TSX (use placeholderClass + token styles)');
+    }
+    if (/style\s*=\s*['"][^'"]*#[0-9a-fA-F]{3,8}/.test(src)) {
+      throw new Error('Inline raw hex color found in login TSX style attribute');
+    }
+    if (/style\s*=\s*['"][^'"]*font-size\s*:\s*[0-9]+px/.test(src)) {
+      throw new Error('Inline font-size:px found in login TSX style attribute');
+    }
   });
 });
