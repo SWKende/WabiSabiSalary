@@ -1,115 +1,318 @@
+// 登录页 —— 墨签账簿 (Ink Ledger)
+// 所有颜色 / 字号 / 间距 / 圆角均引用现有设计 token;装饰用的半透明朱红通过
+// $color-state-danger + opacity 表达,不使用任何 rgb()/rgba()/hsl() 裸色。
+
 @use '../../styles/variables' as *;
 
 .login-root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  padding: $sp-12 $sp-10 calc($sp-12 + env(safe-area-inset-bottom, 0px));
   background: $color-bg-surface-soft;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: $sp-12 $sp-10;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
-.login-shell {
-  width: 100%;
-  max-width: 620px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+// 左侧朱红装订线 + 两个装订节点(纯装饰);透明度由 opacity 表达,颜色引用状态色 token。
+.login-binding {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 21rpx;
+  width: 1px;
+  background: $color-state-danger;
+  opacity: 0.32;
+  pointer-events: none;
+  z-index: 1;
 
-.login-title {
-  font-size: $font-heading-lg;
-  color: $palette-ink-warm-900;
-  font-weight: 600;
-  line-height: 1.3;
-  margin-bottom: $sp-4;
-}
+  &__node {
+    position: absolute;
+    left: -3rpx;
+    width: 7rpx;
+    height: 7rpx;
+    border: 1px solid $color-state-danger;
+    border-radius: 50%;
+    background: $color-bg-surface-soft;
 
-.login-subtitle {
-  font-size: $font-body-md;
-  color: $palette-ink-warm-500;
-  line-height: 1.6;
-  margin-bottom: $sp-16;
-}
+    &--top {
+      top: 128rpx;
+    }
 
-.login-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: $sp-6;
-}
-
-.login-input-wrap {
-  height: $input-height-md;
-  display: flex;
-  align-items: center;
-  padding: 0 $sp-6;
-  background: $color-bg-surface;
-  border-radius: $radius-sm;
-  border: 1px solid $palette-alpha-ink-04;
-  box-sizing: border-box;
-}
-
-.login-input {
-  width: 100%;
-  height: 100%;
-  font-size: $font-body-md;
-  line-height: $input-height-md;
-  color: $palette-ink-warm-900;
-}
-
-.login-btn {
-  margin-top: $sp-5;
-  background: $palette-ink-warm-900;
-  color: $color-bg-surface;
-  border-radius: $radius-sm;
-  padding: $sp-5;
-  text-align: center;
-
-  &--disabled {
-    opacity: 0.5;
+    &--bottom {
+      bottom: 94rpx;
+    }
   }
 }
 
-.login-btn__text {
+// 右上纵向页码:逐字堆叠,靠 flex column 实现,不使用 writing-mode(兼容传统 WebView)。
+.login-folio {
+  position: absolute;
+  top: 50%;
+  right: 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $sp-2;
+  transform: translateY(-50%);
+  color: $palette-ink-warm-500;
+  opacity: 0.72;
+  pointer-events: none;
+  z-index: 1;
+
+  &__char {
+    font-size: $font-caption-sm;
+    line-height: 1;
+    letter-spacing: 2rpx;
+  }
+}
+
+.login-shell {
+  position: relative;
+  width: 100%;
+  max-width: 620rpx;
+  margin: 0 auto;
+  z-index: 2;
+}
+
+.login-hero {
+  padding: $sp-12 0 $sp-10;
+  border-bottom: 1rpx solid $palette-alpha-ink-15;
+
+  &__kicker {
+    color: $color-brand-primary-strong;
+    font-size: $font-caption-sm;
+    letter-spacing: 4rpx;
+    text-transform: uppercase;
+  }
+
+  &__title {
+    display: block;
+    margin: $sp-3 0;
+    color: $color-text-primary;
+    font-size: $font-display-lg;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: 12rpx;
+  }
+
+  &__copy {
+    color: $color-text-tertiary;
+    font-size: $font-body-sm;
+    line-height: 1.8;
+    letter-spacing: 1rpx;
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-8;
+  padding-top: $sp-8;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: $sp-3;
+  padding-bottom: $sp-4;
+  border-bottom: 1px solid $palette-alpha-ink-18;
+  transition: border-color $motion-duration-fast $motion-easing-standard;
+
+  &--focused {
+    border-color: $color-brand-primary-strong;
+  }
+
+  &__label {
+    color: $color-text-secondary;
+    font-size: $font-caption-md;
+    letter-spacing: 4rpx;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $sp-3;
+    min-height: 88rpx;
+  }
+}
+
+.login-input {
+  flex: 1;
+  min-height: 64rpx;
+  background: transparent;
+  color: $color-text-primary;
   font-size: $font-body-md;
-  font-weight: 500;
   line-height: 1.4;
-  color: $color-bg-surface;
+
+  &__placeholder {
+    color: $color-text-placeholder;
+    font-size: $font-body-md;
+    letter-spacing: 1rpx;
+  }
+
+  &--password {
+    letter-spacing: 6rpx;
+  }
+}
+
+// H5 端:Taro Input 内部渲染原生 <input>,通过后代 input::placeholder 映射同一组 token。
+.login-input input::placeholder {
+  color: $color-text-placeholder;
+  font-size: $font-body-md;
+  letter-spacing: 1rpx;
+}
+
+// 密码显示/隐藏按钮:重置 Taro Button 默认 margin/padding/border/::after,保证足够点击区域。
+.login-field__toggle {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: 88rpx;
+  margin: 0;
+  padding: 0 $sp-3;
+  background: transparent;
+  border: 0;
+  color: $color-text-tertiary;
+  font-size: $font-caption-sm;
+  line-height: 1;
+  letter-spacing: 2rpx;
+
+  &::after {
+    border: 0;
+  }
+
+  &:active {
+    color: $color-brand-primary-strong;
+  }
+}
+
+// 固定最小高度的错误区,避免错误出现/消失推动主按钮跳动。
+.login-error-slot {
+  display: flex;
+  align-items: center;
+  min-height: $sp-10;
 }
 
 .login-error {
+  display: flex;
+  align-items: center;
+  gap: $sp-2;
   color: $color-state-danger;
-  font-size: $font-body-sm;
-  line-height: 1.5;
-  margin-top: $sp-2;
+  font-size: $font-caption-md;
+  letter-spacing: 1rpx;
+
+  &__dot {
+    color: $color-state-danger;
+    font-size: $font-caption-md;
+    line-height: 1;
+  }
+
+  &__text {
+    color: $color-state-danger;
+    font-size: $font-caption-md;
+  }
+}
+
+// 深墨主按钮:重置 Taro Button 平台默认外观,保证 88rpx 触摸高度。
+.login-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  margin: $sp-2 0 0;
+  padding: $sp-4 0;
+  background: $palette-ink-warm-900;
+  border: 0;
+  border-radius: $radius-xs;
+  color: $color-bg-surface;
+  font-size: $font-body-md;
+  line-height: 1.4;
+  letter-spacing: 6rpx;
   text-align: center;
+
+  &::after {
+    border: 0;
+  }
+
+  &[disabled] {
+    opacity: 0.55;
+  }
+}
+
+.login-btn--hover {
+  background: $palette-ink-warm-700;
 }
 
 .login-switch {
-  margin-top: $sp-6;
-  line-height: 1.6;
-  color: $palette-ink-warm-500;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $sp-2;
+  margin-top: $sp-5;
+  color: $color-text-tertiary;
+  letter-spacing: 1rpx;
+
+  &__text {
+    color: $color-text-tertiary;
+    font-size: $font-caption-md;
+  }
+
+  &__action {
+    padding: $sp-1 0;
+    border-bottom: 1px solid $color-brand-primary-strong;
+    color: $color-brand-primary-strong;
+    font-size: $font-caption-md;
+  }
 }
 
-.login-switch__text {
-  font-size: $font-body-md;
-  color: $palette-ink-warm-500;
-}
+.login-footer-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: $sp-10;
+  color: $color-text-tertiary;
+  font-size: $font-caption-sm;
+  letter-spacing: 4rpx;
 
-.login-switch__link {
-  font-size: $font-body-md;
-  color: $palette-ink-warm-900;
-  text-decoration: underline;
-  margin-left: $sp-2;
+  &__text {
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 80rpx;
+      height: 1px;
+      background: $palette-alpha-ink-18;
+    }
+
+    &::before {
+      right: calc(100% + 16rpx);
+    }
+
+    &::after {
+      left: calc(100% + 16rpx);
+    }
+  }
 }
 
 @media (max-height: 720px) {
   .login-root {
-    justify-content: flex-start;
-    padding-top: $sp-12;
-    padding-bottom: $sp-10;
+    padding-top: $sp-8;
+  }
+
+  .login-hero {
+    padding: $sp-8 0 $sp-6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-field,
+  .login-btn {
+    transition: none;
   }
 }
