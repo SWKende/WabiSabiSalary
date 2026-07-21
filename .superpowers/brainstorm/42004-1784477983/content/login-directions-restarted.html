@@ -1,0 +1,131 @@
+<style>
+  :root { --paper:#f5f0e8; --paper-2:#faf8f4; --ink:#2c2c2c; --ink-2:#5c5650; --muted:#8a8279; --sand:#c8b99a; --moss:#7a8c6e; }
+  .direction-grid { display:grid; grid-template-columns:repeat(3,minmax(260px,1fr)); gap:22px; margin-top:24px; }
+  .direction-card { border:1px solid rgba(44,44,44,.1); border-radius:18px; overflow:hidden; background:#fff; cursor:pointer; transition:.2s ease; }
+  .direction-card:hover { transform:translateY(-3px); box-shadow:0 16px 45px rgba(44,44,44,.10); }
+  .direction-card.selected { outline:3px solid rgba(168,152,120,.55); }
+  .phone { position:relative; min-height:570px; padding:26px 20px 22px; color:var(--ink); font-family:"Noto Serif SC","Songti SC",serif; overflow:hidden; box-sizing:border-box; }
+  .phone::before { content:""; position:absolute; inset:0; opacity:.22; pointer-events:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E"); }
+  .mock-status { position:relative; display:flex; justify-content:space-between; font:600 11px -apple-system,sans-serif; letter-spacing:0; margin-bottom:20px; }
+  .brand-kicker { position:relative; color:#a89878; font-size:10px; letter-spacing:4px; text-transform:uppercase; }
+  .brand-title { position:relative; margin:8px 0 5px; font-size:27px; letter-spacing:7px; font-weight:600; }
+  .brand-sub { position:relative; color:var(--muted); font-size:11px; line-height:1.7; letter-spacing:1px; }
+  .form { position:relative; display:grid; gap:12px; }
+  .field { background:rgba(250,248,244,.84); border:1px solid rgba(44,44,44,.10); border-radius:8px; padding:13px 14px; }
+  .field-label { color:#736c63; font-size:10px; letter-spacing:2px; margin-bottom:6px; }
+  .field-value { color:#8a8279; font:12px -apple-system,sans-serif; }
+  .primary { background:var(--ink); color:#faf8f4; border-radius:8px; text-align:center; padding:14px 10px; font-size:12px; letter-spacing:5px; }
+  .switch { text-align:center; color:var(--muted); font-size:10px; letter-spacing:1px; }
+  .switch b { color:#a89878; font-weight:600; }
+  .card-copy { padding:17px 18px 18px; }
+  .card-copy h3 { margin:0 0 7px; }
+  .card-copy p { margin:0 0 12px; color:#6f6a64; min-height:44px; line-height:1.55; }
+  .tags { display:flex; flex-wrap:wrap; gap:6px; }
+  .tag { padding:4px 8px; border-radius:999px; background:#f3efe8; color:#70685f; font-size:11px; }
+  .recommended { display:inline-block; margin-left:7px; color:#846f49; background:#eee5d5; padding:2px 6px; border-radius:999px; font-size:10px; vertical-align:middle; }
+  .a { background:var(--paper); }
+  .a .sun { position:absolute; width:238px; height:238px; border-radius:50%; border:1px solid rgba(200,185,154,.55); top:42px; right:-74px; }
+  .a .sun::before,.a .sun::after { content:""; position:absolute; border-radius:50%; inset:22px; border:1px solid rgba(200,185,154,.30); }
+  .a .sun::after { inset:56px; background:rgba(200,185,154,.12); border:0; }
+  .a .hero { padding:40px 7px 48px; }
+  .a .form { padding:18px; background:rgba(250,248,244,.78); border:1px solid rgba(200,185,154,.4); border-radius:14px; box-shadow:0 10px 30px rgba(44,44,44,.06); backdrop-filter:blur(12px); }
+  .a .seal { position:absolute; right:28px; top:175px; width:30px; height:30px; border:1px solid rgba(184,84,80,.5); color:#b85450; display:grid; place-items:center; font-size:10px; }
+  .b { background:linear-gradient(180deg,#efe6d7 0 42%,#30302e 42% 100%); color:#2c2c2c; }
+  .b::after { content:""; position:absolute; left:-25%; right:-25%; top:155px; height:110px; border-radius:50% 50% 0 0; background:#f7f2e9; transform:rotate(-3deg); box-shadow:0 -10px 35px rgba(168,152,120,.25); }
+  .b .sky { position:relative; height:180px; }
+  .b .sun-dot { position:absolute; top:31px; right:20px; width:58px; height:58px; background:#d5c6a6; border-radius:50%; box-shadow:0 0 0 12px rgba(213,198,166,.18); }
+  .b .brand-title { font-size:25px; }
+  .b .form { z-index:2; margin-top:18px; padding:22px 16px 18px; color:#faf8f4; }
+  .b .field { background:rgba(250,248,244,.08); border-color:rgba(250,248,244,.18); }
+  .b .field-label,.b .switch { color:#bdb6ad; }
+  .b .field-value { color:#8f8982; }
+  .b .primary { background:#d0bea0; color:#2c2c2c; }
+  .b .switch b { color:#dfccb0; }
+  .c { background:#f7f2e9; padding-left:34px; }
+  .c .binding { position:absolute; left:18px; top:0; bottom:0; width:1px; background:rgba(184,84,80,.28); box-shadow:5px 0 0 rgba(184,84,80,.08); }
+  .c .folio { position:absolute; right:23px; top:55px; writing-mode:vertical-rl; color:#a89878; font-size:10px; letter-spacing:5px; }
+  .c .hero { padding:58px 0 36px; border-bottom:1px solid rgba(44,44,44,.13); }
+  .c .brand-title { font-size:30px; }
+  .c .form { margin-top:28px; gap:0; }
+  .c .field { border:0; border-bottom:1px solid rgba(44,44,44,.18); border-radius:0; background:transparent; padding:15px 3px; }
+  .c .primary { margin-top:22px; border-radius:2px; }
+  .c .switch { margin-top:16px; }
+  .c .date-mark { margin-top:32px; display:flex; align-items:center; gap:10px; color:#8a8279; font-size:9px; letter-spacing:2px; }
+  .c .date-mark::before { content:""; height:1px; flex:1; background:rgba(44,44,44,.12); }
+  @media (max-width: 980px) { .direction-grid { grid-template-columns:1fr; } .direction-card { max-width:430px; margin:auto; width:100%; } }
+</style>
+
+<h2>登录页可以沿三条方向切入</h2>
+<p class="subtitle">三种方案都保留现有登录/注册 API、表单字段与模式切换；差别只在构图和品牌表达。点击一张卡片选择，也可以在终端告诉我想混合哪些元素。</p>
+
+<div class="direction-grid">
+  <div class="direction-card" data-choice="washi-garden" onclick="toggleSelect(this)">
+    <div class="phone a">
+      <div class="sun"></div><div class="seal">时<br>计</div>
+      <div class="mock-status"><span>9:41</span><span>● ● ▰</span></div>
+      <div class="hero">
+        <div class="brand-kicker">Salary Clock</div>
+        <div class="brand-title">工资时钟</div>
+        <div class="brand-sub">记下每一刻的所得<br>也记下生活流过的痕迹</div>
+      </div>
+      <div class="form">
+        <div class="field"><div class="field-label">用户名</div><div class="field-value">3–20 位字母 / 数字 / 下划线</div></div>
+        <div class="field"><div class="field-label">密码</div><div class="field-value">••••••••</div></div>
+        <div class="primary">登 录</div>
+        <div class="switch">还没有账号？ <b>创建账号</b></div>
+      </div>
+    </div>
+    <div class="card-copy">
+      <h3>A. 和纸静庭 <span class="recommended">推荐</span></h3>
+      <p>以“时间圆盘 + 和纸表单”建立品牌记忆，最接近现有侘寂语言，也最适合微信小程序单屏与键盘避让。</p>
+      <div class="tags"><span class="tag">品牌一致</span><span class="tag">低风险</span><span class="tag">易适配</span></div>
+    </div>
+  </div>
+
+  <div class="direction-card" data-choice="day-night" onclick="toggleSelect(this)">
+    <div class="phone b">
+      <div class="mock-status"><span>9:41</span><span>● ● ▰</span></div>
+      <div class="sky">
+        <div class="sun-dot"></div>
+        <div class="brand-kicker">The day begins</div>
+        <div class="brand-title">工资时钟</div>
+        <div class="brand-sub">让今天的每一刻，都有回响</div>
+      </div>
+      <div class="form">
+        <div class="field"><div class="field-label">用户名</div><div class="field-value">请输入用户名</div></div>
+        <div class="field"><div class="field-label">密码</div><div class="field-value">••••••••</div></div>
+        <div class="primary">登 录</div>
+        <div class="switch">第一次使用？ <b>创建账号</b></div>
+      </div>
+    </div>
+    <div class="card-copy">
+      <h3>B. 昼夜双境</h3>
+      <p>上半是时间景观，下半是深墨操作区，视觉冲击更强；但键盘弹起、短屏与注册态适配成本更高。</p>
+      <div class="tags"><span class="tag">记忆点强</span><span class="tag">戏剧感</span><span class="tag">适配成本高</span></div>
+    </div>
+  </div>
+
+  <div class="direction-card" data-choice="ink-ledger" onclick="toggleSelect(this)">
+    <div class="phone c">
+      <div class="binding"></div><div class="folio">账户 · 第〇一页</div>
+      <div class="mock-status"><span>9:41</span><span>● ● ▰</span></div>
+      <div class="hero">
+        <div class="brand-kicker">Personal Ledger</div>
+        <div class="brand-title">入 帐</div>
+        <div class="brand-sub">登录工资时钟，继续记录<br>时间、收入与日常</div>
+      </div>
+      <div class="form">
+        <div class="field"><div class="field-label">账 户</div><div class="field-value">你的用户名</div></div>
+        <div class="field"><div class="field-label">密 码</div><div class="field-value">••••••••</div></div>
+        <div class="primary">登 录</div>
+        <div class="switch">没有账号？ <b>登记新账户</b></div>
+      </div>
+      <div class="date-mark">专注每一刻的价值</div>
+    </div>
+    <div class="card-copy">
+      <h3>C. 墨签账簿</h3>
+      <p>把页面做成一本极简账簿，字体和线条成为主角；最克制，也最贴合“记账”，但对工资时钟的动态感表达较弱。</p>
+      <div class="tags"><span class="tag">编辑感</span><span class="tag">极简</span><span class="tag">气质偏冷</span></div>
+    </div>
+  </div>
+</div>

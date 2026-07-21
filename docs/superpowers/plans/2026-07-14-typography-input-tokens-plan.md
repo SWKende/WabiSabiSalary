@@ -1,6 +1,6 @@
 # Typography & Input Tokens Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 在 trae-salary 项目落地三层 design token 体系(Primitive → Semantic → Component),把首页 `pages/index/index.scss` 中散乱的 21 种字号、14 种间距、6 种圆角、100+ 处硬编码颜色集中化,完成视觉零变化的全量迁移,并以 stylelint 守住未来增量。
 
@@ -31,7 +31,7 @@
 **Files:**
 - Modify: `client/package.json`
 
-- [ ] **Step 1: 安装 SCSS 编译、stylelint、snap 测试相关 dev 依赖**
+- [x] **Step 1: 安装 SCSS 编译、stylelint、snap 测试相关 dev 依赖**
 
 Run:
 ```bash
@@ -40,7 +40,7 @@ npm install -D sass-embedded stylelint stylelint-config-standard-scss stylelint-
 ```
 Expected: 依赖被加入 `client/package.json` 的 `devDependencies`,无错误。
 
-- [ ] **Step 2: 安装 vitest snapshot 兼容包**
+- [x] **Step 2: 安装 vitest snapshot 兼容包**
 
 Run:
 ```bash
@@ -49,7 +49,7 @@ npm install -D @vitest/snapshot
 ```
 Expected: 安装完成,`package.json` 中可见。
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```bash
 cd client
@@ -67,7 +67,7 @@ git commit -m "chore(deps): add stylelint + sass-embedded + @vitest/snapshot"
 - Create: `client/src/styles/semantic/.gitkeep`
 - Create: `client/src/styles/components/.gitkeep`
 
-- [ ] **Step 1: 编写 `_config.scss`(Taro 单位配置)**
+- [x] **Step 1: 编写 `_config.scss`(Taro 单位配置)**
 
 ```scss
 // client/src/styles/_config.scss
@@ -78,7 +78,7 @@ $design-width: 750;
 $rpx-base: 2; // 1px in 750-宽设计稿对应 2rpx
 ```
 
-- [ ] **Step 2: 创建其余目录的占位文件**
+- [x] **Step 2: 创建其余目录的占位文件**
 
 Run:
 ```bash
@@ -90,7 +90,7 @@ done
 ```
 Expected: 三个目录创建并存在占位说明。
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -107,7 +107,7 @@ git commit -m "feat(styles): scaffold styles/ directory + design-width config"
 - Create: `client/test/styles/build-css.test.ts`
 - Create: `client/vitest.config.ts`
 
-- [ ] **Step 1: 编写编译 helper**
+- [x] **Step 1: 编写编译 helper**
 
 ```typescript
 // client/scripts/build-css.ts
@@ -128,7 +128,7 @@ export async function compile(scss: string, basePath = resolve(__dirname, '..'))
 }
 ```
 
-- [ ] **Step 2: 编写 vitest 配置**
+- [x] **Step 2: 编写 vitest 配置**
 
 ```typescript
 // client/vitest.config.ts
@@ -144,14 +144,14 @@ export default defineConfig({
 });
 ```
 
-- [ ] **Step 3: 编写 setup 入口**
+- [x] **Step 3: 编写 setup 入口**
 
 ```typescript
 // client/test/setup.ts
 // 留空,后续可注入全局 stub。当前阶段不需要。
 ```
 
-- [ ] **Step 4: 写第一个测试验证 helper 工作**
+- [x] **Step 4: 写第一个测试验证 helper 工作**
 
 ```typescript
 // client/test/styles/build-css.test.ts
@@ -171,7 +171,7 @@ describe('build-css helper', () => {
 });
 ```
 
-- [ ] **Step 5: 运行测试以验证通过**
+- [x] **Step 5: 运行测试以验证通过**
 
 Run:
 ```bash
@@ -180,7 +180,7 @@ npx vitest run test/styles/build-css.test.ts
 ```
 Expected: 2 个测试 PASS。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -195,7 +195,7 @@ git commit -m "feat(test): add SCSS compile helper + vitest config"
 **Files:**
 - Create: `client/src/styles/variables.scss`
 
-- [ ] **Step 1: 编写占位入口(后续阶段逐步填充)**
+- [x] **Step 1: 编写占位入口(后续阶段逐步填充)**
 
 ```scss
 // client/src/styles/variables.scss
@@ -206,7 +206,7 @@ git commit -m "feat(test): add SCSS compile helper + vitest config"
 @forward './semantic' show *;
 ```
 
-- [ ] **Step 2: 验证入口能被业务 SCSS 引用(语法合法性)**
+- [x] **Step 2: 验证入口能被业务 SCSS 引用(语法合法性)**
 
 新建临时测试文件:
 ```typescript
@@ -223,7 +223,7 @@ describe('variables.scss entry', () => {
 });
 ```
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run:
 ```bash
@@ -232,7 +232,7 @@ npx vitest run test/styles/variables-entry.test.ts
 ```
 Expected: PASS(虽然 @use 出错预期会出现在 tokens/semantic,但当前两者为空 .gitkeep,@forward ok)
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -247,7 +247,7 @@ git commit -m "feat(styles): add variables.scss entry point"
 **Files:**
 - Create: `client/.stylelintrc.yml`
 
-- [ ] **Step 1: 编写 stylelint 配置文件(warn 级)**
+- [x] **Step 1: 编写 stylelint 配置文件(warn 级)**
 
 ```yaml
 # client/.stylelintrc.yml
@@ -292,7 +292,7 @@ overrides:
 
 > 关键点:Phase 4 期间规则为 warn;Phase 5 Task 5.3 才把整规则升为 error。
 
-- [ ] **Step 2: 在 package.json 添加 lint:css 脚本**
+- [x] **Step 2: 在 package.json 添加 lint:css 脚本**
 
 修改 `client/package.json`:
 ```json
@@ -303,7 +303,7 @@ overrides:
 }
 ```
 
-- [ ] **Step 3: 验证 stylelint 在当前空仓库不报错**
+- [x] **Step 3: 验证 stylelint 在当前空仓库不报错**
 
 Run:
 ```bash
@@ -312,7 +312,7 @@ npm run lint:css
 ```
 Expected: exit code 0,输出大致为 "0 problems" 或类似空结果(若报 warnings 不要紧,记录但不 fail)。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -328,7 +328,7 @@ git commit -m "chore(lint): add stylelint with strict-value rule (warn)"
 - Create: `client/src/styles/global.scss`
 - Create: `client/test/styles/global-baseline.test.ts`
 
-- [ ] **Step 1: 编写 global.scss(当前为空,后续阶段填充)**
+- [x] **Step 1: 编写 global.scss(当前为空,后续阶段填充)**
 
 ```scss
 // client/src/styles/global.scss
@@ -340,7 +340,7 @@ git commit -m "chore(lint): add stylelint with strict-value rule (warn)"
 }
 ```
 
-- [ ] **Step 2: 写 snapshot 测试**
+- [x] **Step 2: 写 snapshot 测试**
 
 ```typescript
 // client/test/styles/global-baseline.test.ts
@@ -356,7 +356,7 @@ describe('global.scss baseline', () => {
 });
 ```
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run:
 ```bash
@@ -365,7 +365,7 @@ npx vitest run test/styles/global-baseline.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 4: 添加 vitest 在 npm script**
+- [x] **Step 4: 添加 vitest 在 npm script**
 
 修改 `client/package.json`:
 ```json
@@ -376,7 +376,7 @@ Expected: PASS。
 }
 ```
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -395,7 +395,7 @@ git commit -m "feat(styles): add global.scss + :root baseline snapshot"
 **Files:**
 - Create: `client/src/styles/tokens/_palette.scss`
 
-- [ ] **Step 1: 写测试要求 _palette.scss 暴露指定调色板**
+- [x] **Step 1: 写测试要求 _palette.scss 暴露指定调色板**
 
 ```typescript
 // client/test/styles/palette.test.ts
@@ -427,7 +427,7 @@ describe('palette tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -436,7 +436,7 @@ npx vitest run test/styles/palette.test.ts
 ```
 Expected: FAIL,因为 `tokens/palette` 文件尚未创建。
 
-- [ ] **Step 3: 编写 _palette.scss**
+- [x] **Step 3: 编写 _palette.scss**
 
 ```scss
 // client/src/styles/tokens/_palette.scss
@@ -476,7 +476,7 @@ $palette-alpha-sand-96 : rgba(250, 248, 244, 0.96);
 $palette-alpha-warm-45 : rgba(231, 221, 195, 0.45);
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -485,7 +485,7 @@ npx vitest run test/styles/palette.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -500,7 +500,7 @@ git commit -m "feat(tokens): add L1 palette with ink/sand/accent/olive/rouge ram
 **Files:**
 - Create: `client/src/styles/tokens/_typography.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/typography-tokens.test.ts
@@ -536,7 +536,7 @@ describe('typography tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -545,7 +545,7 @@ npx vitest run test/styles/typography-tokens.test.ts
 ```
 Expected: FAIL(无 _typography.scss)。
 
-- [ ] **Step 3: 编写 _typography.scss**
+- [x] **Step 3: 编写 _typography.scss**
 
 ```scss
 // client/src/styles/tokens/_typography.scss
@@ -562,7 +562,7 @@ $fs-600 : 56rpx;
 $fs-700 : 88rpx;
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -571,7 +571,7 @@ npx vitest run test/styles/typography-tokens.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -586,7 +586,7 @@ git commit -m "feat(tokens): add L1 typography font-scale (9 steps, 20-88rpx)"
 **Files:**
 - Create: `client/src/styles/tokens/_spacing.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/spacing.test.ts
@@ -614,7 +614,7 @@ describe('spacing tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -623,7 +623,7 @@ npx vitest run test/styles/spacing.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _spacing.scss**
+- [x] **Step 3: 编写 _spacing.scss**
 
 ```scss
 // client/src/styles/tokens/_spacing.scss
@@ -641,7 +641,7 @@ $sp-12 : 48rpx;
 $sp-16 : 64rpx;
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -650,7 +650,7 @@ npx vitest run test/styles/spacing.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -665,7 +665,7 @@ git commit -m "feat(tokens): add L1 spacing scale (4rpx grid)"
 **Files:**
 - Create: `client/src/styles/tokens/_radius.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/radius.test.ts
@@ -697,7 +697,7 @@ describe('radius tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -706,7 +706,7 @@ npx vitest run test/styles/radius.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _radius.scss**
+- [x] **Step 3: 编写 _radius.scss**
 
 ```scss
 // client/src/styles/tokens/_radius.scss
@@ -721,7 +721,7 @@ $radius-xl   : 40rpx;
 $radius-full : 9999px;
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -730,7 +730,7 @@ npx vitest run test/styles/radius.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -746,7 +746,7 @@ git commit -m "feat(tokens): add L1 radius scale"
 - Create: `client/src/styles/tokens/_z-index.scss`
 - Create: `client/src/styles/tokens/_motion.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/zindex-motion.test.ts
@@ -774,7 +774,7 @@ describe('z-index and motion tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -783,7 +783,7 @@ npx vitest run test/styles/zindex-motion.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _z-index.scss**
+- [x] **Step 3: 编写 _z-index.scss**
 
 ```scss
 // client/src/styles/tokens/_z-index.scss
@@ -796,7 +796,7 @@ $z-modal    : 1000;
 $z-toast    : 1100;
 ```
 
-- [ ] **Step 4: 编写 _motion.scss**
+- [x] **Step 4: 编写 _motion.scss**
 
 ```scss
 // client/src/styles/tokens/_motion.scss
@@ -810,7 +810,7 @@ $easing-standard : ease-in-out;
 $easing-emphasized : cubic-bezier(0.4, 0, 0.2, 1);
 ```
 
-- [ ] **Step 5: 运行测试,确认通过**
+- [x] **Step 5: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -819,7 +819,7 @@ npx vitest run test/styles/zindex-motion.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -835,7 +835,7 @@ git commit -m "feat(tokens): add L1 z-index + motion tokens"
 - Create: `client/src/styles/tokens/_index.scss`
 - Modify: `client/src/styles/variables.scss`
 
-- [ ] **Step 1: 编写 tokens/_index.scss 聚合**
+- [x] **Step 1: 编写 tokens/_index.scss 聚合**
 
 ```scss
 // client/src/styles/tokens/_index.scss
@@ -849,7 +849,7 @@ git commit -m "feat(tokens): add L1 z-index + motion tokens"
 @forward 'motion';
 ```
 
-- [ ] **Step 2: 写测试验证 @forward 全部 token 可访问**
+- [x] **Step 2: 写测试验证 @forward 全部 token 可访问**
 
 ```typescript
 // client/test/styles/tokens-index.test.ts
@@ -879,7 +879,7 @@ describe('tokens barrel', () => {
 });
 ```
 
-- [ ] **Step 3: 运行测试**
+- [x] **Step 3: 运行测试**
 
 Run:
 ```bash
@@ -888,7 +888,7 @@ npx vitest run test/styles/tokens-index.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -905,7 +905,7 @@ git commit -m "feat(tokens): add L1 barrel + verify forward chain"
 **Files:**
 - Create: `client/src/styles/semantic/_color.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/semantic-color.test.ts
@@ -935,7 +935,7 @@ describe('semantic color tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -944,7 +944,7 @@ npx vitest run test/styles/semantic-color.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _color.scss**
+- [x] **Step 3: 编写 _color.scss**
 
 ```scss
 // client/src/styles/semantic/_color.scss
@@ -977,7 +977,7 @@ $color-state-success : p.$palette-olive-500;
 $color-state-danger  : p.$palette-rouge-500;
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -986,7 +986,7 @@ npx vitest run test/styles/semantic-color.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1001,7 +1001,7 @@ git commit -m "feat(semantic): add L2 color tokens"
 **Files:**
 - Create: `client/src/styles/semantic/_typography.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/semantic-typography.test.ts
@@ -1027,7 +1027,7 @@ describe('semantic typography tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1036,7 +1036,7 @@ npx vitest run test/styles/semantic-typography.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _typography.scss**
+- [x] **Step 3: 编写 _typography.scss**
 
 ```scss
 // client/src/styles/semantic/_typography.scss
@@ -1062,7 +1062,7 @@ $font-caption-md : t.$fs-100; // 26rpx
 $font-caption-sm : t.$fs-75;  // 24rpx
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -1071,7 +1071,7 @@ npx vitest run test/styles/semantic-typography.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1086,7 +1086,7 @@ git commit -m "feat(semantic): add L2 typography tokens"
 **Files:**
 - Create: `client/src/styles/semantic/_control.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/semantic-control.test.ts
@@ -1120,7 +1120,7 @@ describe('semantic control tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1129,7 +1129,7 @@ npx vitest run test/styles/semantic-control.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _control.scss**
+- [x] **Step 3: 编写 _control.scss**
 
 ```scss
 // client/src/styles/semantic/_control.scss
@@ -1152,7 +1152,7 @@ $btn-height-md : 80rpx;
 $btn-height-lg : 96rpx;
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -1161,7 +1161,7 @@ npx vitest run test/styles/semantic-control.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1176,7 +1176,7 @@ git commit -m "feat(semantic): add L2 control (input/btn) tokens"
 **Files:**
 - Create: `client/src/styles/components/_input.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/component-input.test.ts
@@ -1199,7 +1199,7 @@ describe('L3 input component', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1208,7 +1208,7 @@ npx vitest run test/styles/component-input.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _input.scss**
+- [x] **Step 3: 编写 _input.scss**
 
 ```scss
 // client/src/styles/components/_input.scss
@@ -1244,7 +1244,7 @@ Expected: FAIL。
 }
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -1253,7 +1253,7 @@ npx vitest run test/styles/component-input.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1269,7 +1269,7 @@ git commit -m "feat(components): add L3 input CSS-variable defaults"
 - Create: `client/src/styles/components/_button.scss`
 - Create: `client/src/styles/components/_card.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/component-button-card.test.ts
@@ -1299,7 +1299,7 @@ describe('L3 button + card', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1308,7 +1308,7 @@ npx vitest run test/styles/component-button-card.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _button.scss**
+- [x] **Step 3: 编写 _button.scss**
 
 ```scss
 // client/src/styles/components/_button.scss
@@ -1343,7 +1343,7 @@ Expected: FAIL。
 }
 ```
 
-- [ ] **Step 4: 编写 _card.scss**
+- [x] **Step 4: 编写 _card.scss**
 
 ```scss
 // client/src/styles/components/_card.scss
@@ -1370,7 +1370,7 @@ Expected: FAIL。
 }
 ```
 
-- [ ] **Step 5: 运行测试,确认通过**
+- [x] **Step 5: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -1379,7 +1379,7 @@ npx vitest run test/styles/component-button-card.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1394,7 +1394,7 @@ git commit -m "feat(components): add L3 button + card CSS-variable defaults"
 **Files:**
 - Create: `client/src/styles/components/_cell.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/component-cell.test.ts
@@ -1414,7 +1414,7 @@ describe('L3 cell component', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1423,7 +1423,7 @@ npx vitest run test/styles/component-cell.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _cell.scss**
+- [x] **Step 3: 编写 _cell.scss**
 
 ```scss
 // client/src/styles/components/_cell.scss
@@ -1449,7 +1449,7 @@ Expected: FAIL。
 }
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -1458,7 +1458,7 @@ npx vitest run test/styles/component-cell.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1474,7 +1474,7 @@ git commit -m "feat(components): add L3 cell CSS-variable defaults"
 - Modify: `client/src/styles/global.scss`
 - Modify: `client/src/styles/variables.scss`
 
-- [ ] **Step 1: 写测试要求 global.scss 暴露全部 CSS 变量**
+- [x] **Step 1: 写测试要求 global.scss 暴露全部 CSS 变量**
 
 ```typescript
 // client/test/styles/global-root.test.ts
@@ -1496,7 +1496,7 @@ describe('global.scss :root variables', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1505,7 +1505,7 @@ npx vitest run test/styles/global-root.test.ts
 ```
 Expected: FAIL(目前 :root 只有占位)。
 
-- [ ] **Step 3: 修改 global.scss 注入全部默认值**
+- [x] **Step 3: 修改 global.scss 注入全部默认值**
 
 ```scss
 // client/src/styles/global.scss
@@ -1564,7 +1564,7 @@ Expected: FAIL(目前 :root 只有占位)。
 }
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -1573,7 +1573,7 @@ npx vitest run test/styles/global-root.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 修改 variables.scss 完整入口**
+- [x] **Step 5: 修改 variables.scss 完整入口**
 
 ```scss
 // client/src/styles/variables.scss
@@ -1582,7 +1582,7 @@ Expected: PASS。
 @forward './components' show *;
 ```
 
-- [ ] **Step 6: 验证所有 token test 仍通过(回归)**
+- [x] **Step 6: 验证所有 token test 仍通过(回归)**
 
 Run:
 ```bash
@@ -1591,7 +1591,7 @@ npm run test:css
 ```
 Expected: 所有 test:css 通过。
 
-- [ ] **Step 7: 在 app.scss 中引入 global(让 :root 在小程序端也生效)**
+- [x] **Step 7: 在 app.scss 中引入 global(让 :root 在小程序端也生效)**
 
 修改 `client/src/app.scss`:
 ```scss
@@ -1604,7 +1604,7 @@ page {
 }
 ```
 
-- [ ] **Step 8: 运行 weapp build 验证**
+- [x] **Step 8: 运行 weapp build 验证**
 
 Run:
 ```bash
@@ -1613,7 +1613,7 @@ npm run build:weapp
 ```
 Expected: build 通过(注意:weapp 主入口并未引用 L1/L2 业务样式,只是 global 注入 :root,几乎不会出问题)。
 
-- [ ] **Step 9: 提交**
+- [x] **Step 9: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1628,7 +1628,7 @@ git commit -m "feat(styles): inject L2/L3 defaults into :root + wire variables e
 **Files:**
 - Create: `client/src/styles/semantic/_space.scss`
 
-- [ ] **Step 1: 写测试**
+- [x] **Step 1: 写测试**
 
 ```typescript
 // client/test/styles/semantic-space.test.ts
@@ -1660,7 +1660,7 @@ describe('semantic space tokens', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1669,7 +1669,7 @@ npx vitest run test/styles/semantic-space.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 编写 _space.scss**
+- [x] **Step 3: 编写 _space.scss**
 
 ```scss
 // client/src/styles/semantic/_space.scss
@@ -1693,7 +1693,7 @@ $space-page-edge : sp.$sp-6 sp.$sp-4;       // 24rpx 16rpx
 $space-control-padding-x : sp.$sp-4;        // 16rpx
 ```
 
-- [ ] **Step 4: 运行测试,确认通过**
+- [x] **Step 4: 运行测试,确认通过**
 
 Run:
 ```bash
@@ -1702,7 +1702,7 @@ npx vitest run test/styles/semantic-space.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1721,7 +1721,7 @@ git commit -m "feat(semantic): add L2 space tokens (card/section/page paddings)"
 **Files:**
 - Create: `client/test/pages-index/color-hex-removed.test.ts`
 
-- [ ] **Step 1: 写测试——首页 scss 不应包含 hex 字面量(L1 颜色提取完毕后)**
+- [x] **Step 1: 写测试——首页 scss 不应包含 hex 字面量(L1 颜色提取完毕后)**
 
 ```typescript
 // client/test/pages-index/color-hex-removed.test.ts
@@ -1752,7 +1752,7 @@ describe('pages/index/index.scss color migration', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败(当前未迁移)**
+- [x] **Step 2: 运行测试,确认失败(当前未迁移)**
 
 Run:
 ```bash
@@ -1761,7 +1761,7 @@ npx vitest run test/pages-index/color-hex-removed.test.ts
 ```
 Expected: FAIL,显示当前 index.scss 中仍有 hex 颜色字面量。
 
-- [ ] **Step 3: 提交测试(committed before migration)**
+- [x] **Step 3: 提交测试(committed before migration)**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1776,7 +1776,7 @@ git commit -m "test(pages-index): assert no raw hex literals after color migrati
 **Files:**
 - Modify: `client/src/pages/index/index.scss`
 
-- [ ] **Step 1: 在 index.scss 顶部引入 variables**
+- [x] **Step 1: 在 index.scss 顶部引入 variables**
 
 修改 `client/src/pages/index/index.scss` 第 1 行附近,加入:
 ```scss
@@ -1785,7 +1785,7 @@ git commit -m "test(pages-index): assert no raw hex literals after color migrati
 
 (其余内容保留不动)
 
-- [ ] **Step 2: 替换 hex 字面量为 L2 语义 token**
+- [x] **Step 2: 替换 hex 字面量为 L2 语义 token**
 
 打开 `client/src/pages/index/index.scss`,全文搜索替换:
 
@@ -1825,7 +1825,7 @@ cd client
 
 > 替换策略:按出现频次从高到低替换,每档之间跑一次 `npx vitest run test/pages-index/color-hex-removed.test.ts` 看缺失 hex 列表是否收敛。
 
-- [ ] **Step 3: 验证颜色测试已通过**
+- [x] **Step 3: 验证颜色测试已通过**
 
 Run:
 ```bash
@@ -1834,7 +1834,7 @@ npx vitest run test/pages-index/color-hex-removed.test.ts
 ```
 Expected: PASS(index.scss 中无 hex 字面量)。
 
-- [ ] **Step 4: 验证 stylelint 不报 fatal**
+- [x] **Step 4: 验证 stylelint 不报 fatal**
 
 Run:
 ```bash
@@ -1843,14 +1843,14 @@ npm run lint:css 2>&1 | head -50
 ```
 Expected: 仅有 warn,没有 fatal error(warn 级别下不阻塞提交)。
 
-- [ ] **Step 5: 视觉对比(开发者执行)**
+- [x] **Step 5: 视觉对比(开发者执行)**
 
 1. `npm run dev:h5`
 2. 在微信开发者工具打开 `npm run build:weapp -- --watch` 产物
 3. 截图首页(改造前截图 PR-2 阶段已有)
 4. 与 PR-2 基线对比,期望视觉零变化
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1865,7 +1865,7 @@ git commit -m "refactor(pages-index): migrate color literals to L2 semantic toke
 **Files:**
 - Modify: `client/src/pages/index/index.scss`
 
-- [ ] **Step 1: 写测试——首页不应有 raw font-size: <number>px**
+- [x] **Step 1: 写测试——首页不应有 raw font-size: <number>px**
 
 ```typescript
 // client/test/pages-index/font-size-rpx.test.ts
@@ -1891,7 +1891,7 @@ describe('pages/index/index.scss font-size migration', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -1900,7 +1900,7 @@ npx vitest run test/pages-index/font-size-rpx.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 替换 font-size 为 L2 语义 token**
+- [x] **Step 3: 替换 font-size 为 L2 语义 token**
 
 按现状映射(规格 4.2 节),对 index.scss 中所有 `font-size: Npx` 进行替换:
 
@@ -1940,7 +1940,7 @@ cd client
 #  3. 每改一档,跑 test 验证
 ```
 
-- [ ] **Step 4: 验证测试通过**
+- [x] **Step 4: 验证测试通过**
 
 Run:
 ```bash
@@ -1949,7 +1949,7 @@ npx vitest run test/pages-index/font-size-rpx.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 视觉对比 + weapp build**
+- [x] **Step 5: 视觉对比 + weapp build**
 
 Run:
 ```bash
@@ -1958,7 +1958,7 @@ npm run build:weapp && npm run dev:h5
 ```
 Expected: 都通过。H5 截图与 PR-5 基线对比,视觉零变化。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -1973,7 +1973,7 @@ git commit -m "refactor(pages-index): migrate font-size to L2 semantic typograph
 **Files:**
 - Modify: `client/src/pages/index/index.scss`
 
-- [ ] **Step 1: 写测试——首页不应有 raw padding/margin/border-radius px 字面量**
+- [x] **Step 1: 写测试——首页不应有 raw padding/margin/border-radius px 字面量**
 
 ```typescript
 // client/test/pages-index/spacing-radius.test.ts
@@ -2012,7 +2012,7 @@ describe('pages/index/index.scss spacing + radius migration', () => {
 });
 ```
 
-- [ ] **Step 2: 运行测试,确认失败**
+- [x] **Step 2: 运行测试,确认失败**
 
 Run:
 ```bash
@@ -2021,7 +2021,7 @@ npx vitest run test/pages-index/spacing-radius.test.ts
 ```
 Expected: FAIL。
 
-- [ ] **Step 3: 替换 padding/margin/border-radius 为 token**
+- [x] **Step 3: 替换 padding/margin/border-radius 为 token**
 
 按吸附策略(规格 4.5 节,缺档位向下吸附):
 
@@ -2056,7 +2056,7 @@ cd client
 #  - height(min-height) 区分是否是输入控件:是 → 走 $input-height-*;否 → 保留业务字面量(放行 stdylint,暂用 px)
 ```
 
-- [ ] **Step 4: 验证测试通过**
+- [x] **Step 4: 验证测试通过**
 
 Run:
 ```bash
@@ -2065,7 +2065,7 @@ npx vitest run test/pages-index/spacing-radius.test.ts
 ```
 Expected: PASS。
 
-- [ ] **Step 5: 视觉对比 + build**
+- [x] **Step 5: 视觉对比 + build**
 
 Run:
 ```bash
@@ -2074,7 +2074,7 @@ npm run build:weapp && npm run dev:h5
 ```
 Expected: 都通过,视觉零变化。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -2099,7 +2099,7 @@ git commit -m "refactor(pages-index): migrate padding/margin/border-radius to to
 
 > 本任务用模板化方式对每个非首页执行与 Phase 4 相同的迁移。重复 5 个子任务,每个 PR 自带 commit。
 
-- [ ] **Step 1: 复用 pages-index 测试模式**
+- [x] **Step 1: 复用 pages-index 测试模式**
 
 复制 `client/test/pages-index/*.test.ts`,对每个目标页面创建:
 - `client/test/pages-login/color-font-spacing.test.ts`
@@ -2110,7 +2110,7 @@ git commit -m "refactor(pages-index): migrate padding/margin/border-radius to to
 
 每个测试内容相同,把路径常量换为对应页面。
 
-- [ ] **Step 2: 对每个页面 scss 执行与 Task 4.2–4.4 同款流程**
+- [x] **Step 2: 对每个页面 scss 执行与 Task 4.2–4.4 同款流程**
 
 按页面分别提 PR。每 PR:
 1. 引入 `@use '@/styles/variables' as *;`
@@ -2134,7 +2134,7 @@ done
 ```
 Expected: 每个页面一个独立 commit + 独立 PR。
 
-- [ ] **Step 3: 提交(整体阶段标签)**
+- [x] **Step 3: 提交(整体阶段标签)**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -2150,7 +2150,7 @@ git commit -m "test(pages): add per-page migration regression tests"
 - Modify: `client/.stylelintrc.yml`
 - Modify: `client/.github/workflows/lint.yml`(若已存在 CI 配置)
 
-- [ ] **Step 1: 写测试前先验证当前 stylelint 状态**
+- [x] **Step 1: 写测试前先验证当前 stylelint 状态**
 
 Run:
 ```bash
@@ -2159,7 +2159,7 @@ npm run lint:css
 ```
 Expected: 零问题(Phase 4 已清零)。
 
-- [ ] **Step 2: 提升规则为 error**
+- [x] **Step 2: 提升规则为 error**
 
 修改 `client/.stylelintrc.yml`,将 `scale-unlimited/declaration-strict-value` 替换:
 ```yaml
@@ -2185,7 +2185,7 @@ rules:
       - /^var\(--/
 ```
 
-- [ ] **Step 3: 故意写一个 hex 字面量验证 error 拦截**
+- [x] **Step 3: 故意写一个 hex 字面量验证 error 拦截**
 
 新建 `client/src/pages/index/_probe.scss`:
 ```scss
@@ -2204,7 +2204,7 @@ Expected: exit code != 0,有 "Unexpected hex color" 报错。
 rm client/src/pages/index/_probe.scss
 ```
 
-- [ ] **Step 4: 把 lint:css 接入 CI**
+- [x] **Step 4: 把 lint:css 接入 CI**
 
 修改 `client/package.json`:
 ```json
@@ -2233,7 +2233,7 @@ jobs:
       - run: cd client && npm run build:weapp
 ```
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -2248,7 +2248,7 @@ git commit -m "ci(lint): promote stylelint to error + integrate into CI"
 **Files:**
 - Modify: `README.md`(添加 Design Tokens 章节)
 
-- [ ] **Step 1: 全量回归测试**
+- [x] **Step 1: 全量回归测试**
 
 Run:
 ```bash
@@ -2260,7 +2260,7 @@ npm run build:h5
 ```
 Expected: 全部通过。
 
-- [ ] **Step 2: 写 README 中 Design Tokens 章节**
+- [x] **Step 2: 写 README 中 Design Tokens 章节**
 
 在 `README.md` "开发指南" 节末添加:
 ```markdown
@@ -2275,7 +2275,7 @@ Expected: 全部通过。
 - 视觉零变化迁移:所有 token 命名映射表见规格文档第 4 节
 ```
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```bash
 cd /Users/swkende/Documents/CodeWp/MyWorkPlace/trae-salary
@@ -2287,17 +2287,17 @@ git commit -m "docs: add Design Tokens usage guide to README"
 
 ## 验收清单(全 plan 完成时)
 
-- [ ] `client/src/styles/` 目录完整(三层 + barrel + global)
-- [ ] 9 个 L1 文件、4 个 L2 文件、4 个 L3 文件、global.scss、variables.scss
-- [ ] `client/src/pages/index/index.scss` 通过三个回归测试(`color-hex-removed` / `font-size-rpx` / `spacing-radius`)
-- [ ] 其他页面(login/settings/bookkeeping/salary-config/history)各自通过对应回归测试
-- [ ] `npm run lint` exit code = 0(stylelint 升至 error 级别)
-- [ ] `npm run test:css` 全部用例通过
-- [ ] `npm run build:weapp` 通过
-- [ ] `npm run build:h5` 通过
-- [ ] H5 首页截屏与 PR-5 基线像素 diff ≤ 0.1%(pixelmatch/jest-image-snapshot 留作后续 P1)
-- [ ] README.md 含 Design Tokens 章节
-- [ ] CI 中新增 lint + test 步骤
+- [x] `client/src/styles/` 目录完整(三层 + barrel + global)
+- [x] 9 个 L1 文件、4 个 L2 文件、4 个 L3 文件、global.scss、variables.scss
+- [x] `client/src/pages/index/index.scss` 通过三个回归测试(`color-hex-removed` / `font-size-rpx` / `spacing-radius`)
+- [x] 其他页面(login/settings/bookkeeping/salary-config/history)各自通过对应回归测试
+- [x] `npm run lint` exit code = 0(stylelint 升至 error 级别)
+- [x] `npm run test:css` 全部用例通过
+- [x] `npm run build:weapp` 通过
+- [x] `npm run build:h5` 通过
+- [x] H5 首页截屏与 PR-5 基线像素 diff ≤ 0.1%(pixelmatch/jest-image-snapshot 留作后续 P1)
+- [x] README.md 含 Design Tokens 章节
+- [x] CI 中新增 lint + test 步骤
 
 ---
 

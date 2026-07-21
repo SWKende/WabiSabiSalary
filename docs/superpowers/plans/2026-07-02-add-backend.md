@@ -1,6 +1,6 @@
 # Trae Salary 添加后端 Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 为 trae-salary 项目添加 Node.js 后端，实现账号密码登录、工资配置/记账条目云端同步、节假日云端管理 + 自动同步；通过 Docker + Caddy 一键部署到云服务器。
 
@@ -113,7 +113,7 @@ trae-salary/
 - Create: `server/.gitignore`
 - Create: `server/src/index.ts`
 
-- [ ] **Step 1: 创建 server/package.json**
+- [x] **Step 1: 创建 server/package.json**
 
 ```json
 {
@@ -154,7 +154,7 @@ trae-salary/
 }
 ```
 
-- [ ] **Step 2: 创建 server/tsconfig.json**
+- [x] **Step 2: 创建 server/tsconfig.json**
 
 ```json
 {
@@ -178,7 +178,7 @@ trae-salary/
 }
 ```
 
-- [ ] **Step 3: 创建 server/vitest.config.ts**
+- [x] **Step 3: 创建 server/vitest.config.ts**
 
 ```typescript
 import { defineConfig } from 'vitest/config'
@@ -193,7 +193,7 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 4: 创建 server/.gitignore**
+- [x] **Step 4: 创建 server/.gitignore**
 
 ```
 node_modules/
@@ -204,13 +204,13 @@ data/*.db
 data/*.db-journal
 ```
 
-- [ ] **Step 5: 创建最小入口 server/src/index.ts**
+- [x] **Step 5: 创建最小入口 server/src/index.ts**
 
 ```typescript
 console.log('trae-salary-server starting...')
 ```
 
-- [ ] **Step 6: 安装依赖**
+- [x] **Step 6: 安装依赖**
 
 ```bash
 cd server && npm install
@@ -218,7 +218,7 @@ cd server && npm install
 
 Expected: 安装成功，无错误。如果 bcrypt 安装失败，可能需要 `npm rebuild bcrypt`（在 macOS 上通常无需操作）。
 
-- [ ] **Step 7: 验证 TypeScript 能编译**
+- [x] **Step 7: 验证 TypeScript 能编译**
 
 ```bash
 cd server && npx tsc --noEmit
@@ -226,7 +226,7 @@ cd server && npx tsc --noEmit
 
 Expected: 无错误输出。
 
-- [ ] **Step 8: 运行入口确认环境正常**
+- [x] **Step 8: 运行入口确认环境正常**
 
 ```bash
 cd server && npx tsx src/index.ts
@@ -234,7 +234,7 @@ cd server && npx tsx src/index.ts
 
 Expected: 输出 `trae-salary-server starting...`，按 Ctrl+C 退出。
 
-- [ ] **Step 9: 提交**
+- [x] **Step 9: 提交**
 
 ```bash
 git add server/
@@ -250,7 +250,7 @@ git commit -m "feat(server): initialize server project with TypeScript + Vitest"
 - Create: `server/.env`
 - Create: `server/.env.example`
 
-- [ ] **Step 1: 创建 server/.env.example**
+- [x] **Step 1: 创建 server/.env.example**
 
 ```bash
 # 必填：JWT 签名密钥（用 openssl rand -hex 32 生成）
@@ -262,7 +262,7 @@ DATABASE_URL=file:./data/salary.db
 TZ=Asia/Shanghai
 ```
 
-- [ ] **Step 2: 创建 server/.env（开发用）**
+- [x] **Step 2: 创建 server/.env（开发用）**
 
 ```bash
 JWT_SECRET=dev-secret-please-replace-in-production-with-openssl-rand
@@ -271,7 +271,7 @@ DATABASE_URL=file:./data/salary.db
 TZ=Asia/Shanghai
 ```
 
-- [ ] **Step 3: 创建 server/prisma/schema.prisma**
+- [x] **Step 3: 创建 server/prisma/schema.prisma**
 
 ```prisma
 generator client {
@@ -340,7 +340,7 @@ model CnHolidayYear {
 }
 ```
 
-- [ ] **Step 4: 创建 data 目录并执行首次迁移**
+- [x] **Step 4: 创建 data 目录并执行首次迁移**
 
 ```bash
 cd server && mkdir -p ../data && npx prisma migrate dev --name init
@@ -353,7 +353,7 @@ Expected:
 
 注意：SQLite 文件实际会创建在 `server/data/salary.db`（相对 prisma/schema.prisma 的路径）。生产部署时我们用绝对路径 `/data/salary.db`。
 
-- [ ] **Step 5: 验证 schema 正确**
+- [x] **Step 5: 验证 schema 正确**
 
 ```bash
 cd server && npx prisma db pull --print
@@ -361,7 +361,7 @@ cd server && npx prisma db pull --print
 
 Expected: 输出当前数据库结构，与 schema.prisma 一致。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add server/prisma/ server/.env.example server/.env
@@ -382,7 +382,7 @@ git commit -m "feat(server): add Prisma schema with initial migration"
 
 ### 子任务 3a: 密码哈希
 
-- [ ] **Step 1: 写失败测试 server/tests/password.test.ts**
+- [x] **Step 1: 写失败测试 server/tests/password.test.ts**
 
 ```typescript
 import { describe, it, expect } from 'vitest'
@@ -412,7 +412,7 @@ describe('password', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```bash
 cd server && npm test
@@ -420,7 +420,7 @@ cd server && npm test
 
 Expected: FAIL with "Cannot find module '../src/lib/password.js'" 或类似 import 错误。
 
-- [ ] **Step 3: 实现 server/src/lib/password.ts**
+- [x] **Step 3: 实现 server/src/lib/password.ts**
 
 ```typescript
 import bcrypt from 'bcrypt'
@@ -436,7 +436,7 @@ export async function verifyPassword(plain: string, hash: string): Promise<boole
 }
 ```
 
-- [ ] **Step 4: 运行测试确认通过**
+- [x] **Step 4: 运行测试确认通过**
 
 ```bash
 cd server && npm test
@@ -444,7 +444,7 @@ cd server && npm test
 
 Expected: password 测试组 3/3 PASS。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```bash
 git add server/src/lib/password.ts server/tests/password.test.ts
@@ -453,7 +453,7 @@ git commit -m "feat(server): add password hash/verify utility with bcrypt"
 
 ### 子任务 3b: JWT
 
-- [ ] **Step 6: 写失败测试 server/tests/jwt.test.ts**
+- [x] **Step 6: 写失败测试 server/tests/jwt.test.ts**
 
 ```typescript
 import { describe, it, expect, beforeAll } from 'vitest'
@@ -491,7 +491,7 @@ describe('jwt', () => {
 })
 ```
 
-- [ ] **Step 7: 运行测试确认失败**
+- [x] **Step 7: 运行测试确认失败**
 
 ```bash
 cd server && npm test
@@ -499,7 +499,7 @@ cd server && npm test
 
 Expected: jwt 测试组 FAIL with "Cannot find module"。
 
-- [ ] **Step 8: 实现 server/src/lib/jwt.ts**
+- [x] **Step 8: 实现 server/src/lib/jwt.ts**
 
 ```typescript
 import jwt from 'jsonwebtoken'
@@ -533,7 +533,7 @@ export function verifyToken(token: string): JwtPayload | null {
 
 注意：按用户要求，token 不设过期时间（永不过期）。
 
-- [ ] **Step 9: 运行测试确认通过**
+- [x] **Step 9: 运行测试确认通过**
 
 ```bash
 cd server && npm test
@@ -541,7 +541,7 @@ cd server && npm test
 
 Expected: 全部测试 PASS（password 3 个 + jwt 3 个）。
 
-- [ ] **Step 10: 提交**
+- [x] **Step 10: 提交**
 
 ```bash
 git add server/src/lib/jwt.ts server/tests/jwt.test.ts
@@ -556,7 +556,7 @@ git commit -m "feat(server): add JWT sign/verify utility (no expiration)"
 - Create: `server/src/index.ts` (替换 Task 1 的最小入口)
 - Create: `server/src/lib/db.ts`
 
-- [ ] **Step 1: 创建 Prisma client 单例 server/src/lib/db.ts**
+- [x] **Step 1: 创建 Prisma client 单例 server/src/lib/db.ts**
 
 ```typescript
 import { PrismaClient } from '@prisma/client'
@@ -566,7 +566,7 @@ export const prisma = new PrismaClient({
 })
 ```
 
-- [ ] **Step 2: 重写 server/src/index.ts 加入 Fastify 和健康检查**
+- [x] **Step 2: 重写 server/src/index.ts 加入 Fastify 和健康检查**
 
 ```typescript
 import Fastify from 'fastify'
@@ -610,7 +610,7 @@ main().catch((err) => {
 })
 ```
 
-- [ ] **Step 3: 验证启动**
+- [x] **Step 3: 验证启动**
 
 ```bash
 cd server && npx tsx src/index.ts
@@ -618,7 +618,7 @@ cd server && npx tsx src/index.ts
 
 Expected: 输出 `server listening on :3000`。
 
-- [ ] **Step 4: 在另一个终端测试健康检查**
+- [x] **Step 4: 在另一个终端测试健康检查**
 
 ```bash
 curl http://localhost:3000/health
@@ -626,9 +626,9 @@ curl http://localhost:3000/health
 
 Expected: `{"status":"ok","uptime":0.xxx}` 或类似 JSON。
 
-- [ ] **Step 5: 停止服务器（Ctrl+C）**
+- [x] **Step 5: 停止服务器（Ctrl+C）**
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add server/src/index.ts server/src/lib/db.ts
@@ -649,7 +649,7 @@ git commit -m "feat(server): add Fastify app with health check endpoint"
 
 ### 子任务 5a: 测试 helper
 
-- [ ] **Step 1: 创建 server/tests/helpers.ts**
+- [x] **Step 1: 创建 server/tests/helpers.ts**
 
 ```typescript
 import { prisma } from '../src/lib/db.js'
@@ -666,7 +666,7 @@ export async function cleanDatabase() {
 
 ### 子任务 5b: 共享类型
 
-- [ ] **Step 2: 创建 server/src/types/shared.ts**
+- [x] **Step 2: 创建 server/src/types/shared.ts**
 
 ```typescript
 export interface User {
@@ -722,7 +722,7 @@ export interface ApiErrorBody {
 
 ### 子任务 5c: 鉴权插件
 
-- [ ] **Step 3: 创建 server/src/plugins/auth.ts**
+- [x] **Step 3: 创建 server/src/plugins/auth.ts**
 
 ```typescript
 import type { FastifyPluginAsync, FastifyRequest } from 'fastify'
@@ -766,7 +766,7 @@ export const requireAuth = async (req: FastifyRequest, reply: any) => {
 
 ### 子任务 5d: 认证路由
 
-- [ ] **Step 4: 创建 server/src/routes/auth.ts**
+- [x] **Step 4: 创建 server/src/routes/auth.ts**
 
 ```typescript
 import type { FastifyPluginAsync } from 'fastify'
@@ -852,7 +852,7 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
 
 ### 子任务 5e: 接入到 index.ts
 
-- [ ] **Step 5: 修改 server/src/index.ts 注册插件和路由**
+- [x] **Step 5: 修改 server/src/index.ts 注册插件和路由**
 
 ```typescript
 import Fastify from 'fastify'
@@ -904,7 +904,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 
 ### 子任务 5f: 测试
 
-- [ ] **Step 6: 创建 server/tests/auth.test.ts**
+- [x] **Step 6: 创建 server/tests/auth.test.ts**
 
 ```typescript
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
@@ -1047,7 +1047,7 @@ describe('GET /api/auth/me', () => {
 })
 ```
 
-- [ ] **Step 7: 运行测试确认通过**
+- [x] **Step 7: 运行测试确认通过**
 
 ```bash
 cd server && npm test
@@ -1055,7 +1055,7 @@ cd server && npm test
 
 Expected: 所有测试 PASS（包括之前的 password 3 个、jwt 3 个，加上 auth 11 个）。
 
-- [ ] **Step 8: 手动验证**
+- [x] **Step 8: 手动验证**
 
 ```bash
 cd server && npx tsx src/index.ts
@@ -1070,9 +1070,9 @@ curl -X POST http://localhost:3000/api/auth/register \
 
 Expected: 201，返回 token 和 user 对象。
 
-- [ ] **Step 9: 停止服务器（Ctrl+C）**
+- [x] **Step 9: 停止服务器（Ctrl+C）**
 
-- [ ] **Step 10: 提交**
+- [x] **Step 10: 提交**
 
 ```bash
 git add server/src/plugins/auth.ts server/src/routes/auth.ts server/src/types/shared.ts server/tests/helpers.ts server/tests/auth.test.ts server/src/index.ts
@@ -1088,7 +1088,7 @@ git commit -m "feat(server): add auth routes (register/login/me) with JWT auth p
 - Create: `server/tests/config.test.ts`
 - Modify: `server/src/index.ts`
 
-- [ ] **Step 1: 写失败测试 server/tests/config.test.ts**
+- [x] **Step 1: 写失败测试 server/tests/config.test.ts**
 
 ```typescript
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
@@ -1180,7 +1180,7 @@ describe('PUT /api/config', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```bash
 cd server && npm test
@@ -1188,7 +1188,7 @@ cd server && npm test
 
 Expected: config 测试组 FAIL with "Cannot find module" 或 404。
 
-- [ ] **Step 3: 实现 server/src/routes/config.ts**
+- [x] **Step 3: 实现 server/src/routes/config.ts**
 
 ```typescript
 import type { FastifyPluginAsync } from 'fastify'
@@ -1251,7 +1251,7 @@ export const configRoutes: FastifyPluginAsync = async (app) => {
 }
 ```
 
-- [ ] **Step 4: 注册到 server/src/index.ts**
+- [x] **Step 4: 注册到 server/src/index.ts**
 
 修改 `buildApp()` 函数，在 `await app.register(authRoutes)` 后添加：
 
@@ -1259,7 +1259,7 @@ export const configRoutes: FastifyPluginAsync = async (app) => {
   await app.register(configRoutes)
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 ```bash
 cd server && npm test
@@ -1267,7 +1267,7 @@ cd server && npm test
 
 Expected: config 测试组 5/5 PASS。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add server/src/routes/config.ts server/tests/config.test.ts server/src/index.ts
@@ -1283,7 +1283,7 @@ git commit -m "feat(server): add salary config routes (GET/PUT)"
 - Create: `server/tests/entries.test.ts`
 - Modify: `server/src/index.ts`
 
-- [ ] **Step 1: 写失败测试 server/tests/entries.test.ts**
+- [x] **Step 1: 写失败测试 server/tests/entries.test.ts**
 
 ```typescript
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
@@ -1472,7 +1472,7 @@ describe('DELETE /api/entries/:id', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```bash
 cd server && npm test
@@ -1480,7 +1480,7 @@ cd server && npm test
 
 Expected: entries 测试组 FAIL。
 
-- [ ] **Step 3: 实现 server/src/routes/entries.ts**
+- [x] **Step 3: 实现 server/src/routes/entries.ts**
 
 ```typescript
 import type { FastifyPluginAsync } from 'fastify'
@@ -1614,7 +1614,7 @@ export const entriesRoutes: FastifyPluginAsync = async (app) => {
 }
 ```
 
-- [ ] **Step 4: 注册到 server/src/index.ts**
+- [x] **Step 4: 注册到 server/src/index.ts**
 
 在 `await app.register(configRoutes)` 后添加：
 
@@ -1622,7 +1622,7 @@ export const entriesRoutes: FastifyPluginAsync = async (app) => {
   await app.register(entriesRoutes)
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 ```bash
 cd server && npm test
@@ -1630,7 +1630,7 @@ cd server && npm test
 
 Expected: entries 测试组 9/9 PASS。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add server/src/routes/entries.ts server/tests/entries.test.ts server/src/index.ts
@@ -1646,7 +1646,7 @@ git commit -m "feat(server): add bookkeeping entry CRUD routes"
 - Create: `server/tests/holidays.test.ts`
 - Modify: `server/src/index.ts`
 
-- [ ] **Step 1: 写失败测试 server/tests/holidays.test.ts**
+- [x] **Step 1: 写失败测试 server/tests/holidays.test.ts**
 
 ```typescript
 import { describe, it, expect, beforeEach, afterAll } from 'vitest'
@@ -1723,7 +1723,7 @@ describe('GET /api/holidays', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```bash
 cd server && npm test
@@ -1731,7 +1731,7 @@ cd server && npm test
 
 Expected: holidays 测试组 FAIL。
 
-- [ ] **Step 3: 实现 server/src/routes/holidays.ts**
+- [x] **Step 3: 实现 server/src/routes/holidays.ts**
 
 ```typescript
 import type { FastifyPluginAsync } from 'fastify'
@@ -1774,7 +1774,7 @@ export const holidaysRoutes: FastifyPluginAsync = async (app) => {
 }
 ```
 
-- [ ] **Step 4: 注册到 server/src/index.ts**
+- [x] **Step 4: 注册到 server/src/index.ts**
 
 在 `await app.register(entriesRoutes)` 后添加：
 
@@ -1782,7 +1782,7 @@ export const holidaysRoutes: FastifyPluginAsync = async (app) => {
   await app.register(holidaysRoutes)
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 ```bash
 cd server && npm test
@@ -1790,7 +1790,7 @@ cd server && npm test
 
 Expected: holidays 测试组 4/4 PASS。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add server/src/routes/holidays.ts server/tests/holidays.test.ts server/src/index.ts
@@ -1806,7 +1806,7 @@ git commit -m "feat(server): add holidays query route"
 - Create: `server/tests/holidaySync.test.ts`
 - Modify: `server/src/index.ts`
 
-- [ ] **Step 1: 写失败测试 server/tests/holidaySync.test.ts**
+- [x] **Step 1: 写失败测试 server/tests/holidaySync.test.ts**
 
 ```typescript
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
@@ -1871,7 +1871,7 @@ describe('syncHolidaysIfMissing', () => {
 })
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```bash
 cd server && npm test
@@ -1879,7 +1879,7 @@ cd server && npm test
 
 Expected: holidaySync 测试组 FAIL。
 
-- [ ] **Step 3: 实现 server/src/lib/holidaySync.ts**
+- [x] **Step 3: 实现 server/src/lib/holidaySync.ts**
 
 ```typescript
 import cron from 'node-cron'
@@ -1965,7 +1965,7 @@ export function startHolidaySyncCron(): void {
 }
 ```
 
-- [ ] **Step 4: 在 server/src/index.ts 启动 hook 中调用**
+- [x] **Step 4: 在 server/src/index.ts 启动 hook 中调用**
 
 修改 `buildApp()`，在健康检查前添加：
 
@@ -1984,7 +1984,7 @@ export function startHolidaySyncCron(): void {
 import { syncHolidaysIfMissing, startHolidaySyncCron } from './lib/holidaySync.js'
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 ```bash
 cd server && npm test
@@ -1992,7 +1992,7 @@ cd server && npm test
 
 Expected: holidaySync 测试组 3/3 PASS。
 
-- [ ] **Step 6: 手动验证（可选，依赖外网）**
+- [x] **Step 6: 手动验证（可选，依赖外网）**
 
 ```bash
 cd server && rm -f data/salary.db && npx prisma migrate deploy && npx tsx src/index.ts
@@ -2002,7 +2002,7 @@ cd server && rm -f data/salary.db && npx prisma migrate deploy && npx tsx src/in
 
 Ctrl+C 停止。
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```bash
 git add server/src/lib/holidaySync.ts server/tests/holidaySync.test.ts server/src/index.ts
@@ -2019,7 +2019,7 @@ git commit -m "feat(server): add holiday auto-sync (startup + daily 03:00 cron)"
 - Create: `deploy/Caddyfile`
 - Create: `deploy/.env.example`
 
-- [ ] **Step 1: 创建 server/Dockerfile**
+- [x] **Step 1: 创建 server/Dockerfile**
 
 ```dockerfile
 FROM node:20-alpine AS builder
@@ -2058,7 +2058,7 @@ EXPOSE 3000
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/index.js"]
 ```
 
-- [ ] **Step 2: 创建 deploy/.env.example**
+- [x] **Step 2: 创建 deploy/.env.example**
 
 ```bash
 # 必填：用 openssl rand -hex 32 生成
@@ -2068,7 +2068,7 @@ JWT_SECRET=replace-with-real-secret
 TZ=Asia/Shanghai
 ```
 
-- [ ] **Step 3: 创建 deploy/Caddyfile（占位域名，需替换）**
+- [x] **Step 3: 创建 deploy/Caddyfile（占位域名，需替换）**
 
 ```caddyfile
 your-domain.com {
@@ -2091,7 +2091,7 @@ http://your-domain.com {
 }
 ```
 
-- [ ] **Step 4: 创建 deploy/docker-compose.yml**
+- [x] **Step 4: 创建 deploy/docker-compose.yml**
 
 ```yaml
 version: '3.8'
@@ -2140,7 +2140,7 @@ networks:
     driver: bridge
 ```
 
-- [ ] **Step 5: 验证 docker 构建（不启动）**
+- [x] **Step 5: 验证 docker 构建（不启动）**
 
 ```bash
 docker --version
@@ -2149,7 +2149,7 @@ docker compose version
 
 如果 docker 未安装，跳过此步骤直接提交。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add server/Dockerfile deploy/
@@ -2169,14 +2169,14 @@ git commit -m "feat(deploy): add Docker setup with Caddy reverse proxy + auto HT
 - Create: `client/types/` 暂不使用，可选
 - Create: `client/vitest.config.ts`
 
-- [ ] **Step 1: 用 git mv 移动整个 src/ 到 client/**
+- [x] **Step 1: 用 git mv 移动整个 src/ 到 client/**
 
 ```bash
 mkdir -p client
 git mv src client/src
 ```
 
-- [ ] **Step 2: 移动其他前端相关文件到 client/**
+- [x] **Step 2: 移动其他前端相关文件到 client/**
 
 ```bash
 git mv project.config.json client/project.config.json
@@ -2186,7 +2186,7 @@ git mv tsconfig.json client/tsconfig.json
 git mv index.html client/index.html
 ```
 
-- [ ] **Step 3: 移动根 package.json 到 client/ 并修改 name**
+- [x] **Step 3: 移动根 package.json 到 client/ 并修改 name**
 
 检查根目录是否有 package.json。如果有 scripts 字段（dev:weapp 等），移动：
 
@@ -2198,7 +2198,7 @@ git mv package.json client/package.json
 
 如果根目录 package.json 仅是 @types 之类辅助用途，可以保留在根。但因为所有前端 npm 脚本都在 client/ 下，移动更清晰。
 
-- [ ] **Step 4: 添加客户端 vitest 配置**
+- [x] **Step 4: 添加客户端 vitest 配置**
 
 创建 `client/vitest.config.ts`：
 
@@ -2220,7 +2220,7 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 5: 安装 vitest 到 client**
+- [x] **Step 5: 安装 vitest 到 client**
 
 修改 `client/package.json` 的 devDependencies，添加：
 
@@ -2235,7 +2235,7 @@ export default defineConfig({
 cd client && npm install
 ```
 
-- [ ] **Step 6: 创建根目录 package.json（workspaces 入口）**
+- [x] **Step 6: 创建根目录 package.json（workspaces 入口）**
 
 移动原根 package.json 后，根目录就没有 package.json 了。创建新的根 `package.json` 作为 npm workspaces 入口：
 
@@ -2250,7 +2250,7 @@ cd client && npm install
 
 并在根目录运行 `npm install`（创建顶层 node_modules 链接）。
 
-- [ ] **Step 7: 验证前端还能开发**
+- [x] **Step 7: 验证前端还能开发**
 
 ```bash
 cd client && npm run dev:weapp
@@ -2258,13 +2258,13 @@ cd client && npm run dev:weapp
 
 Expected: Taro 编译成功，监听文件变化。如有路径错误，根据提示修复。
 
-- [ ] **Step 8: 在微信开发者工具中打开**
+- [x] **Step 8: 在微信开发者工具中打开**
 
 打开微信开发者工具，导入项目指向 `client/dist/` 目录（构建产物）。
 
 Expected: 能正常预览小程序。
 
-- [ ] **Step 9: 提交**
+- [x] **Step 9: 提交**
 
 ```bash
 git add client/ package.json package-lock.json
@@ -2286,7 +2286,7 @@ git commit -m "refactor: move frontend code from src/ to client/ for cleaner lay
 
 ### 子任务 12a: 共享类型
 
-- [ ] **Step 1: 创建 client/src/api/types.ts**
+- [x] **Step 1: 创建 client/src/api/types.ts**
 
 ```typescript
 export interface User {
@@ -2355,7 +2355,7 @@ export class ApiError extends Error {
 
 ### 子任务 12b: 客户端核心
 
-- [ ] **Step 2: 写失败测试 client/src/api/__tests__/client.test.ts**
+- [x] **Step 2: 写失败测试 client/src/api/__tests__/client.test.ts**
 
 ```typescript
 import { describe, it, expect, beforeEach, vi } from 'vitest'
@@ -2458,7 +2458,7 @@ describe('api/client', () => {
 })
 ```
 
-- [ ] **Step 3: 运行测试确认失败**
+- [x] **Step 3: 运行测试确认失败**
 
 ```bash
 cd client && npx vitest run
@@ -2466,7 +2466,7 @@ cd client && npx vitest run
 
 Expected: FAIL with module not found。
 
-- [ ] **Step 4: 实现 client/src/api/client.ts**
+- [x] **Step 4: 实现 client/src/api/client.ts**
 
 ```typescript
 import Taro from '@tarojs/taro'
@@ -2550,7 +2550,7 @@ export async function apiRequest<T = unknown>(path: string, options: ApiRequestO
 }
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 ```bash
 cd client && npx vitest run
@@ -2560,7 +2560,7 @@ Expected: client.test.ts 7/7 PASS。
 
 ### 子任务 12c: 各域 API 模块
 
-- [ ] **Step 6: 创建 client/src/api/auth.ts**
+- [x] **Step 6: 创建 client/src/api/auth.ts**
 
 ```typescript
 import { apiRequest } from './client'
@@ -2585,7 +2585,7 @@ export function me() {
 }
 ```
 
-- [ ] **Step 7: 创建 client/src/api/config.ts**
+- [x] **Step 7: 创建 client/src/api/config.ts**
 
 ```typescript
 import { apiRequest } from './client'
@@ -2603,7 +2603,7 @@ export function updateConfig(config: Omit<SalaryConfig, 'updatedAt'>) {
 }
 ```
 
-- [ ] **Step 8: 创建 client/src/api/entries.ts**
+- [x] **Step 8: 创建 client/src/api/entries.ts**
 
 ```typescript
 import { apiRequest } from './client'
@@ -2634,7 +2634,7 @@ export function deleteEntry(id: string) {
 }
 ```
 
-- [ ] **Step 9: 创建 client/src/api/holidays.ts**
+- [x] **Step 9: 创建 client/src/api/holidays.ts**
 
 ```typescript
 import { apiRequest } from './client'
@@ -2647,7 +2647,7 @@ export function getHolidays(years: number[]) {
 }
 ```
 
-- [ ] **Step 10: 创建 client/src/api/index.ts 统一导出**
+- [x] **Step 10: 创建 client/src/api/index.ts 统一导出**
 
 ```typescript
 export * from './client'
@@ -2658,7 +2658,7 @@ export * from './holidays'
 export * from './types'
 ```
 
-- [ ] **Step 11: 提交**
+- [x] **Step 11: 提交**
 
 ```bash
 git add client/src/api/ client/package.json client/package-lock.json client/vitest.config.ts
@@ -2676,7 +2676,7 @@ git commit -m "feat(client): add API client with auth/config/entries/holidays mo
 - Modify: `client/src/app.config.ts`
 - Modify: `client/src/app.tsx`（加入登录态检查）
 
-- [ ] **Step 1: 创建 client/src/pages/login/index.config.ts**
+- [x] **Step 1: 创建 client/src/pages/login/index.config.ts**
 
 ```typescript
 export default definePageConfig({
@@ -2685,7 +2685,7 @@ export default definePageConfig({
 })
 ```
 
-- [ ] **Step 2: 创建 client/src/pages/login/index.scss**
+- [x] **Step 2: 创建 client/src/pages/login/index.scss**
 
 ```scss
 .login-root {
@@ -2770,7 +2770,7 @@ export default definePageConfig({
 }
 ```
 
-- [ ] **Step 3: 创建 client/src/pages/login/index.tsx**
+- [x] **Step 3: 创建 client/src/pages/login/index.tsx**
 
 ```tsx
 import { View, Text, Input } from '@tarojs/components'
@@ -2848,7 +2848,7 @@ export default function LoginPage() {
 }
 ```
 
-- [ ] **Step 4: 在 client/src/app.config.ts 注册登录页路由**
+- [x] **Step 4: 在 client/src/app.config.ts 注册登录页路由**
 
 修改 `pages` 数组，把登录页放在第一位（默认页）：
 
@@ -2868,7 +2868,7 @@ export default defineAppConfig({
 })
 ```
 
-- [ ] **Step 5: 修改 client/src/app.tsx 加入登录态检查**
+- [x] **Step 5: 修改 client/src/app.tsx 加入登录态检查**
 
 修改 `client/src/app.tsx`：
 
@@ -2896,7 +2896,7 @@ export default function App({ children }: PropsWithChildren) {
 }
 ```
 
-- [ ] **Step 6: 手动验证**
+- [x] **Step 6: 手动验证**
 
 ```bash
 cd client && npm run dev:weapp
@@ -2908,7 +2908,7 @@ cd client && npm run dev:weapp
 3. 登录失败应该提示错误
 4. 登录成功应该跳到首页
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```bash
 git add client/src/pages/login/ client/src/app.config.ts client/src/app.tsx
@@ -2922,7 +2922,7 @@ git commit -m "feat(client): add login/register page with auth state check"
 **Files:**
 - Modify: `client/src/pages/index/index.tsx`
 
-- [ ] **Step 1: 在 client/src/pages/index/index.tsx 顶部 import API**
+- [x] **Step 1: 在 client/src/pages/index/index.tsx 顶部 import API**
 
 在 import 块添加：
 
@@ -2930,7 +2930,7 @@ git commit -m "feat(client): add login/register page with auth state check"
 import * as api from '../../api'
 ```
 
-- [ ] **Step 2: 找到 saveConfig 函数并改造**
+- [x] **Step 2: 找到 saveConfig 函数并改造**
 
 定位到 `saveConfig` 函数（约 469-476 行），替换为：
 
@@ -2960,7 +2960,7 @@ import * as api from '../../api'
   }, [])
 ```
 
-- [ ] **Step 3: 找到 applySettings 函数并改造**
+- [x] **Step 3: 找到 applySettings 函数并改造**
 
 定位到 `applySettings` 函数（约 537-551 行），将 `saveConfig(parsed)` 改为：
 
@@ -2970,7 +2970,7 @@ import * as api from '../../api'
 
 由于 `saveConfig` 现在是 async，但 UI 不需要等待完成。fire-and-forget 模式。
 
-- [ ] **Step 4: 在组件顶部加入 useEffect 启动时拉取云端**
+- [x] **Step 4: 在组件顶部加入 useEffect 启动时拉取云端**
 
 在已有的 `useEffect(() => { ... }, [])`（约 357 行的节假日同步）之后，添加：
 
@@ -3000,14 +3000,14 @@ import * as api from '../../api'
   }, [])
 ```
 
-- [ ] **Step 5: 手动验证**
+- [x] **Step 5: 手动验证**
 
 1. 启动 server: `cd server && npx tsx src/index.ts`
 2. 启动小程序: `cd client && npm run dev:weapp`
 3. 登录后修改工资配置，查看 server 日志是否有 PUT /api/config 请求
 4. 退出登录再登录，验证配置被正确恢复
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add client/src/pages/index/index.tsx
@@ -3021,7 +3021,7 @@ git commit -m "feat(client): sync salary config to cloud on save + pull on start
 **Files:**
 - Modify: `client/src/components/Bookkeeping/index.tsx`（或类似文件，需先读确认结构）
 
-- [ ] **Step 1: 阅读 Bookkeeping 组件结构**
+- [x] **Step 1: 阅读 Bookkeeping 组件结构**
 
 ```bash
 ls client/src/components/Bookkeeping/
@@ -3037,13 +3037,13 @@ ls client/src/components/Bookkeeping/
 - 删除记账的函数名
 - 本地存储键名（如 `entries`）
 
-- [ ] **Step 2: 在 Bookkeeping 组件顶部加入 import**
+- [x] **Step 2: 在 Bookkeeping 组件顶部加入 import**
 
 ```typescript
 import * as api from '../../api'
 ```
 
-- [ ] **Step 3: 改造添加记账函数**
+- [x] **Step 3: 改造添加记账函数**
 
 找到添加记账的函数（典型代码会读 storage、push 新条目、写回 storage）。改造为：
 
@@ -3077,7 +3077,7 @@ import * as api from '../../api'
   }
 ```
 
-- [ ] **Step 4: 改造修改记账函数**
+- [x] **Step 4: 改造修改记账函数**
 
 ```typescript
   const handleUpdateEntry = async (id: string, patch: Partial<BookkeepingEntry>) => {
@@ -3095,7 +3095,7 @@ import * as api from '../../api'
   }
 ```
 
-- [ ] **Step 5: 改造删除记账函数**
+- [x] **Step 5: 改造删除记账函数**
 
 ```typescript
   const handleDeleteEntry = async (id: string) => {
@@ -3112,7 +3112,7 @@ import * as api from '../../api'
   }
 ```
 
-- [ ] **Step 6: 在 Bookkeeping 组件挂载时从云端拉取**
+- [x] **Step 6: 在 Bookkeeping 组件挂载时从云端拉取**
 
 在组件的 `useEffect` 钩子中加入：
 
@@ -3143,13 +3143,13 @@ import * as api from '../../api'
   }, [])
 ```
 
-- [ ] **Step 7: 手动验证**
+- [x] **Step 7: 手动验证**
 
 1. 登录后添加一笔记账
 2. 查看 server 日志确认 POST /api/entries
 3. 退出登录再登录，验证记账数据被正确恢复
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```bash
 git add client/src/components/Bookkeeping/
@@ -3164,13 +3164,13 @@ git commit -m "feat(client): sync bookkeeping entries to cloud on CRUD + pull on
 - Modify: `client/src/utils/cnHoliday.ts`
 - Delete: `client/src/constants/cn-holiday-fallback.json`（如果完全不再用）
 
-- [ ] **Step 1: 在 cnHoliday.ts 顶部加入 import**
+- [x] **Step 1: 在 cnHoliday.ts 顶部加入 import**
 
 ```typescript
 import * as api from '../api'
 ```
 
-- [ ] **Step 2: 修改 ensureCnHolidayDataset 优先从云端拉取**
+- [x] **Step 2: 修改 ensureCnHolidayDataset 优先从云端拉取**
 
 找到 `ensureCnHolidayDataset` 函数（约 94 行）。改造为：
 
@@ -3224,7 +3224,7 @@ export async function ensureCnHolidayDataset(params?: {
 }
 ```
 
-- [ ] **Step 3: 移除 fallback 引用**
+- [x] **Step 3: 移除 fallback 引用**
 
 修改文件顶部 import：
 
@@ -3235,19 +3235,19 @@ export async function ensureCnHolidayDataset(params?: {
 
 把函数内用到 fallbackData 的逻辑（第 106-114 行）替换为上面的云端版本。
 
-- [ ] **Step 4: 删除 fallback JSON 文件**
+- [x] **Step 4: 删除 fallback JSON 文件**
 
 ```bash
 git rm client/src/constants/cn-holiday-fallback.json
 ```
 
-- [ ] **Step 5: 手动验证**
+- [x] **Step 5: 手动验证**
 
 1. 登录后启动小程序，查看 dev tools 是否调用了 GET /api/holidays
 2. 验证今天的节假日判断正确
 3. 跨年时验证跨年数据正确
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add client/src/utils/cnHoliday.ts
@@ -3263,7 +3263,7 @@ git commit -m "refactor(client): load holidays from cloud API instead of bundled
 - Modify: `client/src/pages/login/index.tsx`
 - Modify: `client/src/pages/index/index.tsx`（启动时触发）
 
-- [ ] **Step 1: 创建 client/src/utils/sync.ts**
+- [x] **Step 1: 创建 client/src/utils/sync.ts**
 
 ```typescript
 import Taro from '@tarojs/taro'
@@ -3366,7 +3366,7 @@ export async function initialSync(): Promise<void> {
 }
 ```
 
-- [ ] **Step 2: 在登录成功时触发 initialSync**
+- [x] **Step 2: 在登录成功时触发 initialSync**
 
 修改 `client/src/pages/login/index.tsx` 的 `submit` 函数，在 `setToken(res.token)` 之后添加：
 
@@ -3377,7 +3377,7 @@ export async function initialSync(): Promise<void> {
       Taro.reLaunch({ url: '/pages/index/index' })
 ```
 
-- [ ] **Step 3: 在首页 mount 时也调用一次（防御）**
+- [x] **Step 3: 在首页 mount 时也调用一次（防御）**
 
 在 `client/src/pages/index/index.tsx` 已有 `useEffect(() => { ... }, [])` 中加入（如没有则新建）：
 
@@ -3390,7 +3390,7 @@ export async function initialSync(): Promise<void> {
   }, [])
 ```
 
-- [ ] **Step 4: 把 Task 14/15 中的 TODO 替换为 enqueueSync**
+- [x] **Step 4: 把 Task 14/15 中的 TODO 替换为 enqueueSync**
 
 回到 `client/src/pages/index/index.tsx` 的 `saveConfig`，把：
 ```typescript
@@ -3411,14 +3411,14 @@ export async function initialSync(): Promise<void> {
 
 类似地，Task 15 中的记账 CRUD 函数也要在 catch 块加入 `enqueueSync` 调用。
 
-- [ ] **Step 5: 手动验证离线场景**
+- [x] **Step 5: 手动验证离线场景**
 
 1. 关闭 server
 2. 在小程序中修改工资配置 → 应该看到 `[sync] 工资配置同步失败`
 3. 重启 server
 4. 重新进入小程序 → `initialSync` 应触发 `retryPendingSyncs`，失败的配置被同步
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```bash
 git add client/src/utils/sync.ts client/src/pages/login/index.tsx client/src/pages/index/index.tsx client/src/components/Bookkeeping/
@@ -3433,7 +3433,7 @@ git commit -m "feat(client): add initial sync + offline retry queue"
 - Modify: `README.md`
 - Delete: `README.en.md`（保留也行，但统一中文）
 
-- [ ] **Step 1: 用以下内容覆盖 README.md**
+- [x] **Step 1: 用以下内容覆盖 README.md**
 
 ```markdown
 # Trae Salary 工资计算器
@@ -3676,7 +3676,7 @@ A: 不会。失败时前端会按普通周末处理，业务正常运行。
 - Caddy 2（自动 HTTPS）
 ```
 
-- [ ] **Step 2: 删除 README.en.md（如不需要英文版）**
+- [x] **Step 2: 删除 README.en.md（如不需要英文版）**
 
 ```bash
 git rm README.en.md
@@ -3684,7 +3684,7 @@ git rm README.en.md
 
 如果想保留作为国际化模板，跳过此步。
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```bash
 git add README.md
@@ -3697,7 +3697,7 @@ git commit -m "docs: rewrite README with deployment, operations, and FAQ"
 
 **Files:** 无新增，主要验证全流程
 
-- [ ] **Step 1: 本地启动后端**
+- [x] **Step 1: 本地启动后端**
 
 ```bash
 cd server
@@ -3706,7 +3706,7 @@ npx tsx src/index.ts
 
 预期：监听 :3000，启动日志显示节假日同步尝试。
 
-- [ ] **Step 2: 启动小程序**
+- [x] **Step 2: 启动小程序**
 
 ```bash
 cd client
@@ -3715,7 +3715,7 @@ npm run dev:weapp
 
 打开微信开发者工具。
 
-- [ ] **Step 3: 完整流程测试**
+- [x] **Step 3: 完整流程测试**
 
 | 步骤 | 预期 |
 |------|------|
@@ -3733,11 +3733,11 @@ npm run dev:weapp
 
 如果任何步骤失败，根据 server/小程序日志排查。
 
-- [ ] **Step 4: 添加"退出登录"按钮（如未实现）**
+- [x] **Step 4: 添加"退出登录"按钮（如未实现）**
 
 在首页设置面板底部加一个"退出登录"按钮，调用 `clearToken()` 后 reLaunch 到登录页。
 
-- [ ] **Step 5: 在云服务器部署（生产环境）**
+- [x] **Step 5: 在云服务器部署（生产环境）**
 
 按 README 第二节的步骤完整执行：
 1. SSH 登录
@@ -3749,7 +3749,7 @@ npm run dev:weapp
 7. 在本地构建小程序：`TARO_APP_API_BASE_URL=https://your-domain.com npm run build:weapp`
 8. 用微信开发者工具上传发布
 
-- [ ] **Step 6: 配置每日备份**
+- [x] **Step 6: 配置每日备份**
 
 ```bash
 mkdir -p /backup
@@ -3758,7 +3758,7 @@ crontab -e
 
 粘贴备份 cron（同 README）。
 
-- [ ] **Step 7: 提交（如有新增代码）**
+- [x] **Step 7: 提交（如有新增代码）**
 
 ```bash
 git add .
@@ -3768,7 +3768,7 @@ git commit -m "feat: end-to-end verification and production deployment"
 
 如果没有改动，跳过此步。
 
-- [ ] **Step 8: 在 git 上加 tag 标记这次发布**
+- [x] **Step 8: 在 git 上加 tag 标记这次发布**
 
 ```bash
 git tag -a v1.1.0 -m "添加后端，支持多设备同步"
