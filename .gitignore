@@ -1,6 +1,7 @@
 dist/
 .deploy/
 node_modules/
+.npm-cache/
 .swc/
 data/
 .DS_Store
