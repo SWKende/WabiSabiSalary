@@ -1322,6 +1322,19 @@
       }
     }
 
+    &.settings-btn-login {
+      background: transparent;
+      border: 1px solid $palette-alpha-sand-45;
+
+      .settings-btn-text {
+        color: $color-brand-primary-strong;
+      }
+
+      &:active {
+        background: $palette-alpha-sand-18;
+      }
+    }
+
     &.settings-btn-save {
       background: $color-text-primary;
       border: 1px solid $color-text-primary;

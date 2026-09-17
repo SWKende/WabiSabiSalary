@@ -7,7 +7,7 @@ import { validateCredentials, type LoginMode } from './validation'
 import './index.scss'
 
 interface CopyBundle {
-  kicker: string
+  label: string
   title: string
   copy: string
   accountLabel: string
@@ -16,41 +16,35 @@ interface CopyBundle {
   loadingLabel: string
   switchPrompt: string
   switchAction: string
-  folio: string
-  footerMark: string
 }
 
 const COPY: Record<LoginMode, CopyBundle> = {
   login: {
-    kicker: 'Salary Clock · Personal Ledger',
-    title: '入 帐',
-    copy: '登录工资时钟，继续记录时间、收入与日常。',
+    label: '時 間 の 流 れ',
+    title: '登 入',
+    copy: '登录后可同步到其他设备。没有服务时，也可以先进入时钟。',
     accountLabel: '账 户',
     passwordLabel: '密 码',
-    primary: '登 录',
+    primary: '登 入',
     loadingLabel: '登录中…',
     switchPrompt: '还没有账号？',
-    switchAction: '登记新账户',
-    folio: '账户 · 第〇一页',
-    footerMark: '专注每一刻的价值',
+    switchAction: '登 記',
   },
   register: {
-    kicker: 'Salary Clock · New Account',
-    title: '登 记',
-    copy: '创建一份只属于你的账簿，从今天开始记录。',
-    accountLabel: '新账户',
-    passwordLabel: '设置密码',
-    primary: '注 册',
-    loadingLabel: '注册中…',
-    switchPrompt: '已经有账号？',
-    switchAction: '返回登录',
-    folio: '账户 · 新建页',
-    footerMark: '让记录从此处开始',
+    label: '時 間 の 流 れ',
+    title: '登 記',
+    copy: '创建一个账号，用来同步工资与记账。也可以先进入时钟。',
+    accountLabel: '新 账 户',
+    passwordLabel: '密 码',
+    primary: '登 記',
+    loadingLabel: '登记中…',
+    switchPrompt: '已有账号？',
+    switchAction: '返 回',
   },
 }
 
-const PASSWORD_TOGGLE_SHOW = '显示密码'
-const PASSWORD_TOGGLE_HIDE = '隐藏密码'
+const PASSWORD_TOGGLE_SHOW = '显 示'
+const PASSWORD_TOGGLE_HIDE = '隐 藏'
 
 function describeApiError(err: unknown): string {
   if (err instanceof ApiError) {
@@ -60,15 +54,18 @@ function describeApiError(err: unknown): string {
       case 'USERNAME_EXISTS':
         return '该用户名已被占用，请换一个'
       case 'NETWORK_ERROR':
-        return '网络连接失败，请稍后重试'
+        return '本地服务未启动，或暂时连不上。可先进入时钟离线使用。'
       case 'INVALID_INPUT':
-        // 优先展示服务端返回的具体中文校验消息
         return err.message || '操作失败'
       default:
         return err.message || '操作失败'
     }
   }
   return '操作失败'
+}
+
+const enterClock = () => {
+  Taro.reLaunch({ url: '/pages/index/index' })
 }
 
 export default function LoginPage() {
@@ -117,7 +114,7 @@ export default function LoginPage() {
       setToken(res.token)
       const { initialSync } = await import('../../utils/sync')
       await initialSync()
-      Taro.reLaunch({ url: '/pages/index/index' })
+      enterClock()
     } catch (err) {
       setError(describeApiError(err))
     } finally {
@@ -125,41 +122,41 @@ export default function LoginPage() {
     }
   }
 
-  // 顶部起点:仅当胶囊矩形有有效宽度时按微信胶囊底部定位,否则回退状态栏高度。
-  // 两条路径都不再叠加 env(safe-area-inset-top)。API 返回的 CSS 像素仅用于设备几何。
   const windowInfo = getWindowInfo()
-  const statusBarHeight = windowInfo.statusBarHeight ?? 20
-  let capsuleBottom = statusBarHeight + 36
+  const statusBarHeight = windowInfo.statusBarHeight ?? 0
+  let capsuleBottom = statusBarHeight
+  let hasCapsule = false
   try {
     const rect = Taro.getMenuButtonBoundingClientRect()
     if (rect && rect.width > 0) {
       capsuleBottom = rect.bottom
+      hasCapsule = true
     }
   } catch {
     /* ignore: 平台不支持时回退状态栏高度 */
   }
-  const topSpacing = capsuleBottom + 24
+  if (!hasCapsule) {
+    capsuleBottom = statusBarHeight
+  }
+  const isShortScreen = (windowInfo.windowHeight ?? 0) > 0 && windowInfo.windowHeight < 720
+  const topSpacing = capsuleBottom + (hasCapsule ? (isShortScreen ? 12 : 24) : 8)
 
   return (
-    <View className={`login-root login-root--${mode}`} style={{ paddingTop: `${topSpacing}px` }}>
-      <View className='login-binding'>
-        <View className='login-binding__node login-binding__node--top' />
-        <View className='login-binding__node login-binding__node--bottom' />
-      </View>
-
-      <View className='login-folio'>
-        {copy.folio.split('').map((ch, i) => (
-          <Text key={i} className='login-folio__char'>
-            {ch === ' ' ? '\u00a0' : ch}
-          </Text>
-        ))}
-      </View>
-
+    <View className='login-root' style={{ paddingTop: `${topSpacing}px` }}>
       <View className='login-shell'>
         <View className='login-hero'>
-          <Text className='login-hero__kicker'>{copy.kicker}</Text>
+          <Text className='login-hero__label'>{copy.label}</Text>
           <Text className='login-hero__title'>{copy.title}</Text>
+          <View className='login-hero__rule' />
           <Text className='login-hero__copy'>{copy.copy}</Text>
+          <View
+            className='login-hero__skip'
+            onClick={() => {
+              if (!loading) enterClock()
+            }}
+          >
+            <Text className='login-hero__skip-text'>先 进 入 时 钟</Text>
+          </View>
         </View>
 
         <View className='login-form'>
@@ -218,7 +215,7 @@ export default function LoginPage() {
             {error && (
               <Text className='login-error'>
                 <Text className='login-error__dot'>●</Text>
-                <Text className='login-error__text'>错误：{error}</Text>
+                <Text className='login-error__text'>{error}</Text>
               </Text>
             )}
           </View>
@@ -240,10 +237,6 @@ export default function LoginPage() {
             </Text>
           </View>
         </View>
-      </View>
-
-      <View className='login-footer-mark'>
-        <Text className='login-footer-mark__text'>{copy.footerMark}</Text>
       </View>
     </View>
   )

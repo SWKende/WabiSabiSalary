@@ -150,6 +150,7 @@ export default function Index() {
   const [moduleOpacity, setModuleOpacity] = useState(1)
   const [showLaunchScreen, setShowLaunchScreen] = useState(initialHomePageState.showLaunchScreen)
   const [launchExiting, setLaunchExiting] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(api.getToken()))
   const [showBkSettings, setShowBkSettings] = useState(false)
   const [bkSettingsClosing, setBkSettingsClosing] = useState(false)
   const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
@@ -404,6 +405,7 @@ export default function Index() {
 
   Taro.useDidShow(() => {
     syncHomePagePreference()
+    setIsLoggedIn(Boolean(api.getToken()))
   })
 
   // 计算 timeInfo（纯函数，依赖 tick 触发）
@@ -485,7 +487,9 @@ export default function Index() {
       /* ignore */
     }
 
-    // 2. 同步到云端
+    if (!api.getToken()) return
+
+    // 2. 已登录才同步到云端
     try {
       const updated = await api.updateConfig(newConfig)
       try {
@@ -586,9 +590,16 @@ export default function Index() {
 
   const handleLogout = useCallback(() => {
     api.clearToken()
+    setIsLoggedIn(false)
     closeSettings()
-    Taro.reLaunch({ url: '/pages/login/index' })
+    Taro.showToast({ title: '已退出登录', icon: 'none' })
   }, [closeSettings])
+
+  const handleOpenLogin = useCallback(() => {
+    closeSettings()
+    Taro.navigateTo({ url: '/pages/login/index' })
+  }, [closeSettings])
+
 
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
   const endStr = `${String(config.workEndHour).padStart(2, '0')}:00`
@@ -818,9 +829,15 @@ export default function Index() {
             </View>
 
             <View className='settings-footer'>
-              <View className='settings-btn settings-btn-logout' onClick={handleLogout}>
-                <Text className='settings-btn-text'>退 出 登 錄</Text>
-              </View>
+              {isLoggedIn ? (
+                <View className='settings-btn settings-btn-logout' onClick={handleLogout}>
+                  <Text className='settings-btn-text'>退 出 登 錄</Text>
+                </View>
+              ) : (
+                <View className='settings-btn settings-btn-login' onClick={handleOpenLogin}>
+                  <Text className='settings-btn-text'>登 入</Text>
+                </View>
+              )}
               <View className='settings-btn settings-btn-reset' onClick={resetSettings}>
                 <Text className='settings-btn-text'>恢 復 默 認</Text>
               </View>

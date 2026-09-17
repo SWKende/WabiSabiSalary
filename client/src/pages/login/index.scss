@@ -1,6 +1,5 @@
-// 登录页 —— 墨签账簿 (Ink Ledger)
-// 所有颜色 / 字号 / 间距 / 圆角均引用现有设计 token;装饰用的半透明朱红通过
-// $color-state-danger + opacity 表达,不使用任何 rgb()/rgba()/hsl() 裸色。
+// 登录页 —— 与首页同一套侘寂时钟语言
+// 和纸、明朝体、细进度线、大留白。不使用账簿装订线 / 竖排页码 / 英文眉题。
 
 @use '../../styles/variables' as *;
 
@@ -9,62 +8,20 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  padding: $sp-12 $sp-10 calc($sp-12 + env(safe-area-inset-bottom, 0px));
+  padding: $sp-8 $sp-10 calc($sp-10 + env(safe-area-inset-bottom, 0px));
   background: $color-bg-surface-soft;
   box-sizing: border-box;
-  overflow-x: hidden;
-}
+  overflow: hidden auto;
+  font-family: 'Noto Serif SC', 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
 
-// 左侧朱红装订线 + 两个装订节点(纯装饰);透明度由 opacity 表达,颜色引用状态色 token。
-.login-binding {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 21rpx;
-  width: 1px;
-  background: $color-state-danger;
-  opacity: 0.32;
-  pointer-events: none;
-  z-index: 1;
-
-  &__node {
-    position: absolute;
-    left: -3rpx;
-    width: 7rpx;
-    height: 7rpx;
-    border: 1px solid $color-state-danger;
-    border-radius: 50%;
-    background: $color-bg-surface-soft;
-
-    &--top {
-      top: 128rpx;
-    }
-
-    &--bottom {
-      bottom: 94rpx;
-    }
-  }
-}
-
-// 右上纵向页码:逐字堆叠,靠 flex column 实现,不使用 writing-mode(兼容传统 WebView)。
-.login-folio {
-  position: absolute;
-  top: 50%;
-  right: 24rpx;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: $sp-2;
-  transform: translateY(-50%);
-  color: $palette-ink-warm-500;
-  opacity: 0.72;
-  pointer-events: none;
-  z-index: 1;
-
-  &__char {
-    font-size: $font-caption-sm;
-    line-height: 1;
-    letter-spacing: 2rpx;
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
   }
 }
 
@@ -73,43 +30,82 @@
   width: 100%;
   max-width: 620rpx;
   margin: 0 auto;
-  z-index: 2;
+  z-index: 1;
 }
 
 .login-hero {
-  padding: $sp-12 0 $sp-10;
-  border-bottom: 1rpx solid $palette-alpha-ink-15;
+  padding: $sp-8 0 $sp-6;
+  text-align: center;
 
-  &__kicker {
-    color: $color-brand-primary-strong;
-    font-size: $font-caption-sm;
-    letter-spacing: 4rpx;
-    text-transform: uppercase;
+  &__label {
+    display: block;
+    color: $color-text-placeholder;
+    font-size: $font-body-md;
+    font-weight: 400;
+    letter-spacing: 10rpx;
+    font-family: 'Noto Serif SC', serif;
   }
 
   &__title {
     display: block;
-    margin: $sp-3 0;
+    margin: $sp-6 0 $sp-8;
     color: $color-text-primary;
     font-size: $font-display-lg;
     font-weight: 600;
     line-height: 1.1;
     letter-spacing: 12rpx;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  &__rule {
+    width: 240rpx;
+    height: 2rpx;
+    margin: 0 auto $sp-6;
+    background: $color-divider-subtle;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 40%;
+      height: 100%;
+      margin: 0 auto;
+      background: $color-brand-primary;
+    }
   }
 
   &__copy {
+    display: block;
+    max-width: 520rpx;
+    margin: 0 auto;
     color: $color-text-tertiary;
     font-size: $font-body-sm;
     line-height: 1.8;
-    letter-spacing: 1rpx;
+    letter-spacing: 2rpx;
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  &__skip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 88rpx;
+    margin-top: $sp-2;
+  }
+
+  &__skip-text {
+    color: $color-brand-primary-strong;
+    font-size: $font-body-sm;
+    letter-spacing: 6rpx;
+    font-family: 'Noto Serif SC', serif;
   }
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: $sp-8;
-  padding-top: $sp-8;
+  gap: $sp-6;
+  padding-top: $sp-6;
 }
 
 .login-field {
@@ -117,7 +113,7 @@
   flex-direction: column;
   gap: $sp-3;
   padding-bottom: $sp-4;
-  border-bottom: 1px solid $palette-alpha-ink-18;
+  border-bottom: 1px solid $color-divider-subtle;
   transition: border-color $motion-duration-fast $motion-easing-standard;
 
   &--focused {
@@ -125,50 +121,57 @@
   }
 
   &__label {
-    color: $color-text-secondary;
+    color: $color-text-placeholder;
     font-size: $font-caption-md;
-    letter-spacing: 4rpx;
+    letter-spacing: 6rpx;
+    font-family: 'Noto Serif SC', serif;
   }
 
   &__row {
     display: flex;
+    flex-wrap: nowrap;
     align-items: center;
     gap: $sp-3;
+    width: 100%;
     min-height: 88rpx;
   }
 }
 
+.login-field__row .login-input {
+  width: auto;
+}
+
 .login-input {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   min-height: 64rpx;
   background: transparent;
   color: $color-text-primary;
   font-size: $font-body-md;
   line-height: 1.4;
+  font-family: 'Noto Serif SC', serif;
 
   &__placeholder {
     color: $color-text-placeholder;
     font-size: $font-body-md;
     letter-spacing: 1rpx;
-  }
-
-  &--password {
-    letter-spacing: 6rpx;
+    font-family: 'Noto Serif SC', serif;
   }
 }
 
-// H5 端:Taro Input 内部渲染原生 <input>,通过后代 input::placeholder 映射同一组 token。
 .login-input input::placeholder {
   color: $color-text-placeholder;
   font-size: $font-body-md;
   letter-spacing: 1rpx;
 }
 
-// 密码显示/隐藏按钮:重置 Taro Button 默认 margin/padding/border/::after,保证足够点击区域。
 .login-field__toggle {
   display: flex;
   flex-shrink: 0;
   align-items: center;
+  width: auto;
+  min-width: 88rpx;
   min-height: 88rpx;
   margin: 0;
   padding: 0 $sp-3;
@@ -177,7 +180,8 @@
   color: $color-text-tertiary;
   font-size: $font-caption-sm;
   line-height: 1;
-  letter-spacing: 2rpx;
+  letter-spacing: 4rpx;
+  font-family: 'Noto Serif SC', serif;
 
   &::after {
     border: 0;
@@ -188,7 +192,6 @@
   }
 }
 
-// 固定最小高度的错误区,避免错误出现/消失推动主按钮跳动。
 .login-error-slot {
   display: flex;
   align-items: center;
@@ -197,25 +200,27 @@
 
 .login-error {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: $sp-2;
   color: $color-state-danger;
   font-size: $font-caption-md;
   letter-spacing: 1rpx;
+  font-family: 'Noto Serif SC', serif;
 
   &__dot {
     color: $color-state-danger;
     font-size: $font-caption-md;
-    line-height: 1;
+    line-height: 1.6;
   }
 
   &__text {
+    flex: 1;
     color: $color-state-danger;
     font-size: $font-caption-md;
+    line-height: 1.6;
   }
 }
 
-// 深墨主按钮:重置 Taro Button 平台默认外观,保证 88rpx 触摸高度。
 .login-btn {
   display: flex;
   align-items: center;
@@ -223,14 +228,15 @@
   min-height: 88rpx;
   margin: $sp-2 0 0;
   padding: $sp-4 0;
-  background: $palette-ink-warm-900;
-  border: 0;
-  border-radius: $radius-xs;
-  color: $color-bg-surface;
+  background: $color-text-primary;
+  border: 1px solid $color-text-primary;
+  border-radius: $radius-2;
+  color: $color-bg-page;
   font-size: $font-body-md;
   line-height: 1.4;
-  letter-spacing: 6rpx;
+  letter-spacing: 8rpx;
   text-align: center;
+  font-family: 'Noto Serif SC', serif;
 
   &::after {
     border: 0;
@@ -242,7 +248,7 @@
 }
 
 .login-btn--hover {
-  background: $palette-ink-warm-700;
+  background: $color-text-secondary;
 }
 
 .login-switch {
@@ -250,63 +256,22 @@
   align-items: center;
   justify-content: center;
   gap: $sp-2;
-  margin-top: $sp-5;
+  min-height: 88rpx;
   color: $color-text-tertiary;
   letter-spacing: 1rpx;
 
   &__text {
     color: $color-text-tertiary;
     font-size: $font-caption-md;
+    font-family: 'Noto Serif SC', serif;
   }
 
   &__action {
     padding: $sp-1 0;
-    border-bottom: 1px solid $color-brand-primary-strong;
     color: $color-brand-primary-strong;
     font-size: $font-caption-md;
-  }
-}
-
-.login-footer-mark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: auto;
-  padding-top: $sp-10;
-  color: $color-text-tertiary;
-  font-size: $font-caption-sm;
-  letter-spacing: 4rpx;
-
-  &__text {
-    position: relative;
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 80rpx;
-      height: 1px;
-      background: $palette-alpha-ink-18;
-    }
-
-    &::before {
-      right: calc(100% + 16rpx);
-    }
-
-    &::after {
-      left: calc(100% + 16rpx);
-    }
-  }
-}
-
-@media (max-height: 720px) {
-  .login-root {
-    padding-top: $sp-8;
-  }
-
-  .login-hero {
-    padding: $sp-8 0 $sp-6;
+    letter-spacing: 4rpx;
+    font-family: 'Noto Serif SC', serif;
   }
 }
 

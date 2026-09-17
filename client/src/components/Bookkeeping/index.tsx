@@ -170,6 +170,8 @@ function BookkeepingPageInner({
       note: note || category,
       occurredAt: new Date(`${selectedDate}T12:00:00`).toISOString(),
     }
+    if (!api.getToken()) return
+
     try {
       const res = await api.createEntry(createInput)
       const synced = updated.map((r) => (r.id === tempId ? { ...r, id: res.entry.id } : r))
@@ -194,6 +196,8 @@ function BookkeepingPageInner({
     } catch {
       /* ignore */
     }
+    if (!api.getToken()) return
+
     try {
       await api.deleteEntry(id)
     } catch (err) {
