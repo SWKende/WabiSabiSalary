@@ -228,6 +228,39 @@ const metaCache = new Map<string, unknown>()
 let entryCache: BookkeepingRecord[] = []
 /** 记录 created_at，upsert 时不覆盖首次创建时间 */
 const createdAtCache = new Map<string, string>()
+const readyListeners = new Set<() => void>()
+
+/** 原生桥接最坏情况下的等待上限；超过即降级到 storage，避免页面一直等在占位上 */
+const DEFAULT_OPEN_TIMEOUT_MS = 4000
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`本地库打开超时（${ms}ms）`)), ms)
+    promise.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (err) => {
+        clearTimeout(timer)
+        reject(err)
+      },
+    )
+  })
+}
+
+function markReady(): void {
+  ready = true
+  readyListeners.forEach((listener) => listener())
+}
+
+/** 订阅 store 就绪事件；页面用它决定挂载真实内容还是留白 */
+export function subscribeStoreReady(listener: () => void): () => void {
+  readyListeners.add(listener)
+  return () => {
+    readyListeners.delete(listener)
+  }
+}
 
 function enqueueWrite(label: string, task: () => Promise<void>): void {
   writeTail = writeTail.then(task).catch((err) => {
@@ -250,30 +283,29 @@ export function storeBackendName(): string {
 
 /**
  * 打开本地库并载入内存。可重复调用（幂等），并发调用共享同一个 promise。
- * SQLite 打不开时自动降级到 storage 驱动，保证界面永远可用。
+ *
+ * 无论走哪条路都必须 settle：原生桥接不返回、建表失败、插件缺失，一律在超时后降级到
+ * storage 驱动。页面内容依赖 store 就绪才挂载，所以这里不能一直悬着，也不能抛出去。
  *
  * options.backend 可直接注入一个 PersistBackend（测试用），否则按运行环境自动选择。
  */
-export function bootstrapStore(options: { backend?: 'sqlite' | 'storage' | PersistBackend } = {}): Promise<void> {
+export function bootstrapStore(options: {
+  backend?: 'sqlite' | 'storage' | PersistBackend
+  openTimeoutMs?: number
+} = {}): Promise<void> {
   if (ready) return Promise.resolve()
   if (bootstrapping) return bootstrapping
 
-  bootstrapping = (async () => {
+  const timeoutMs = options.openTimeoutMs ?? DEFAULT_OPEN_TIMEOUT_MS
+
+  const openAndLoad = async (): Promise<PersistBackend> => {
     let active: PersistBackend
     if (typeof options.backend === 'object' && options.backend !== null) {
       active = options.backend
+    } else if (options.backend === 'storage' || (options.backend !== 'sqlite' && !isNativeRuntime())) {
+      active = createTaroStorageBackend()
     } else {
-      const wantSqlite = options.backend ? options.backend === 'sqlite' : isNativeRuntime()
-      if (wantSqlite) {
-        try {
-          active = createSqlBackend(await createCapacitorSqlExecutor())
-        } catch (err) {
-          console.warn('[store] SQLite 打开失败，降级到本地 storage', err)
-          active = createTaroStorageBackend()
-        }
-      } else {
-        active = createTaroStorageBackend()
-      }
+      active = createSqlBackend(await createCapacitorSqlExecutor())
     }
 
     await active.init()
@@ -299,8 +331,28 @@ export function bootstrapStore(options: { backend?: 'sqlite' | 'storage' | Persi
     entryCache = entryRows.map(rowToRecord).filter((r): r is BookkeepingRecord => Boolean(r))
     for (const row of entryRows) createdAtCache.set(row.id, row.created_at)
 
+    return active
+  }
+
+  bootstrapping = (async () => {
+    let active: PersistBackend
+    try {
+      active = await withTimeout(openAndLoad(), timeoutMs)
+    } catch (err) {
+      console.warn('[store] 本地库打开失败或超时，降级到 storage 驱动', err)
+      active = createTaroStorageBackend()
+      await active.init()
+      const metaRows = await active.loadAllMeta()
+      metaCache.clear()
+      for (const row of metaRows) {
+        const parsed = parseJSON(row.value)
+        if (parsed !== null) metaCache.set(row.key, parsed)
+      }
+      entryCache = (await active.loadAllEntries()).map(rowToRecord)
+    }
+
     backend = active
-    ready = true
+    markReady()
   })().finally(() => {
     bootstrapping = null
   })
@@ -391,4 +443,5 @@ export function __resetStore(): void {
   metaCache.clear()
   entryCache = []
   createdAtCache.clear()
+  readyListeners.clear()
 }

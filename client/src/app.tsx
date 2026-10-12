@@ -1,34 +1,28 @@
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren } from 'react'
 import { View } from '@tarojs/components'
 import './app.scss'
-import { bootstrapStore, isStoreReady } from './utils/store'
+import { bootstrapStore } from './utils/store'
+import { useStoreReady } from './utils/useStoreReady'
 
 /**
- * 应用入口：先把本地库（真机 SQLite / 开发环境 storage）载入内存，再渲染页面。
+ * 入口即开始打开本地库，不等 React 挂载，尽量让就绪时刻早于用户可见的第一帧。
+ */
+void bootstrapStore()
+
+/**
+ * 应用外壳。
  *
- * 页面里读工资配置、记账记录都是同步读内存缓存，因此必须等 bootstrap 完成，
- * 否则首帧会拿到默认值并可能立刻覆盖掉真实数据。3 秒超时兜底避免白屏卡死。
+ * 注意：**任何情况下都必须渲染 children**。Taro H5 的页面宿主元素是随 children 挂进 DOM 的，
+ * 一旦在这里用占位内容顶替 children，运行时取不到页面实例就会抛「没有找到页面实例。」并整树崩溃。
+ * 需要等本地库的界面请自行用 useStoreReady 门控页面内容（见 pages/index/index.tsx）。
  */
 export default function App({ children }: PropsWithChildren) {
-  const [ready, setReady] = useState(isStoreReady())
+  const ready = useStoreReady()
 
-  useEffect(() => {
-    if (ready) return
-    let settled = false
-    const finish = () => {
-      if (settled) return
-      settled = true
-      setReady(true)
-    }
-    const timer = setTimeout(finish, 3000)
-    bootstrapStore()
-      .then(finish)
-      .catch(finish)
-      .finally(() => clearTimeout(timer))
-    return () => clearTimeout(timer)
-  }, [ready])
-
-  if (!ready) return <View className='app-boot' />
-
-  return children
+  return (
+    <>
+      {children}
+      {!ready && <View className='app-boot' />}
+    </>
+  )
 }

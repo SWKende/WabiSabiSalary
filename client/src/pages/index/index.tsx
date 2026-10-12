@@ -20,6 +20,7 @@ import {
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
 import { readJSON, writeJSON } from '../../utils/store'
+import { useStoreReady } from '../../utils/useStoreReady'
 import holidayGameSvg from './assets/holiday-game.svg'
 import holidayRunSvg from './assets/holiday-run.svg'
 import holidaySunSvg from './assets/holiday-sun.svg'
@@ -111,7 +112,7 @@ const countWorkdaysInMonth = (year: number, month: number, dataset: CnHolidayDat
   return Math.max(1, count)
 }
 
-export default function Index() {
+function HomeScreen() {
   const initialHomePageState = getInitialHomePageState()
 
   // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
@@ -1012,4 +1013,17 @@ export default function Index() {
       )}
     </View>
   )
+}
+
+/**
+ * 页面壳：等本地库进内存之后再挂载真实界面。
+ *
+ * 门控只能放在这一层。App 的 children 就是 Taro 的页面宿主元素，把它顶替掉运行时会抛
+ * 「没有找到页面实例。」并整树崩掉（真机白屏就是这么来的）；而这里返回占位 View 只影响
+ * 页面内容，宿主元素始终在 DOM 里。
+ */
+export default function Index() {
+  const storeReady = useStoreReady()
+  if (!storeReady) return <View />
+  return <HomeScreen />
 }
