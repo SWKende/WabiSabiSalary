@@ -19,7 +19,7 @@ import {
   type CnHolidayDataset,
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
-import * as api from '../../api'
+import { readJSON, writeJSON } from '../../utils/store'
 import holidayGameSvg from './assets/holiday-game.svg'
 import holidayRunSvg from './assets/holiday-run.svg'
 import holidaySunSvg from './assets/holiday-sun.svg'
@@ -42,17 +42,13 @@ const resolveHomePagePreference = (value: unknown): HomePage | null => {
 }
 
 const getInitialHomePageState = () => {
-  try {
-    const saved = Taro.getStorageSync(HOME_PAGE_STORAGE_KEY)
-    const preferredPage = resolveHomePagePreference(saved)
-    if (preferredPage !== null) {
-      return {
-        currentPage: preferredPage,
-        showLaunchScreen: false,
-      }
+  const saved = readJSON<string | number>(HOME_PAGE_STORAGE_KEY, '')
+  const preferredPage = resolveHomePagePreference(saved)
+  if (preferredPage !== null) {
+    return {
+      currentPage: preferredPage,
+      showLaunchScreen: false,
     }
-  } catch {
-    /* ignore */
   }
 
   return {
@@ -135,14 +131,10 @@ export default function Index() {
     return { capsuleRight: 0, hasCapsule: false }
   }, [])
 
-  const [config, setConfig] = useState<SalaryConfig>(() => {
-    try {
-      const saved = Taro.getStorageSync('salary_config')
-      return saved ? { ...DEFAULT_CONFIG, ...saved } : DEFAULT_CONFIG
-    } catch {
-      return DEFAULT_CONFIG
-    }
-  })
+  const [config, setConfig] = useState<SalaryConfig>(() => ({
+    ...DEFAULT_CONFIG,
+    ...readJSON<Partial<SalaryConfig>>('salary_config', {}),
+  }))
   const [showDetail, setShowDetail] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [settingsClosing, setSettingsClosing] = useState(false)
@@ -150,17 +142,12 @@ export default function Index() {
   const [moduleOpacity, setModuleOpacity] = useState(1)
   const [showLaunchScreen, setShowLaunchScreen] = useState(initialHomePageState.showLaunchScreen)
   const [launchExiting, setLaunchExiting] = useState(false)
-  const [isLoggedIn, setIsLoggedIn] = useState(() => Boolean(api.getToken()))
   const [showBkSettings, setShowBkSettings] = useState(false)
   const [bkSettingsClosing, setBkSettingsClosing] = useState(false)
-  const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => {
-    try {
-      const saved = Taro.getStorageSync('bookkeeping_settings')
-      return saved ? { ...DEFAULT_BK_SETTINGS, ...saved } : DEFAULT_BK_SETTINGS
-    } catch {
-      return DEFAULT_BK_SETTINGS
-    }
-  })
+  const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => ({
+    ...DEFAULT_BK_SETTINGS,
+    ...readJSON<Partial<BookkeepingSettings>>('bookkeeping_settings', {}),
+  }))
 
   const datePickerConfirmRef = useRef<((date: string) => void) | null>(null)
   const amountKeyboardChangeRef = useRef<((value: string) => void) | null>(null)
@@ -171,27 +158,18 @@ export default function Index() {
   const [holidayCardIndex, setHolidayCardIndex] = useState(() => pickRandomHolidayCardIndex())
 
   const syncHomePagePreference = useCallback(() => {
-    try {
-      const saved = Taro.getStorageSync(HOME_PAGE_STORAGE_KEY)
-      const preferredPage = resolveHomePagePreference(saved)
-      if (preferredPage === null) {
-        setShowLaunchScreen(true)
-      } else {
-        setCurrentPage(preferredPage)
-        setShowLaunchScreen(false)
-      }
-    } catch {
+    const preferredPage = resolveHomePagePreference(readJSON<string | number>(HOME_PAGE_STORAGE_KEY, ''))
+    if (preferredPage === null) {
       setShowLaunchScreen(true)
+    } else {
+      setCurrentPage(preferredPage)
+      setShowLaunchScreen(false)
     }
   }, [])
 
   const persistHomePagePreference = useCallback((page: HomePage) => {
     setCurrentPage(page)
-    try {
-      Taro.setStorageSync(HOME_PAGE_STORAGE_KEY, page === 0 ? 'salary' : 'bookkeeping')
-    } catch {
-      /* ignore */
-    }
+    writeJSON(HOME_PAGE_STORAGE_KEY, page === 0 ? 'salary' : 'bookkeeping')
   }, [])
 
   const handleSelectHomePage = useCallback((page: HomePage) => {
@@ -394,18 +372,10 @@ export default function Index() {
     syncHomePagePreference()
   }, [syncHomePagePreference])
 
-  // 启动时如果已登录，触发一次完整同步（配置 / 记账 / 节假日 / 重试队列）
-  useEffect(() => {
-    if (!api.getToken()) return
-    ;(async () => {
-      const { initialSync } = await import('../../utils/sync')
-      await initialSync()
-    })()
-  }, [])
+  // 节假日数据由上方 effect 负责：本地库缓存 → timor.tech 直连 → 内置静态兜底
 
   Taro.useDidShow(() => {
     syncHomePagePreference()
-    setIsLoggedIn(Boolean(api.getToken()))
   })
 
   // 计算 timeInfo（纯函数，依赖 tick 触发）
@@ -477,31 +447,10 @@ export default function Index() {
     }
   }, [tick, config, dailySalary, secondSalary, isHolidayMode, workHoursPerDay])
 
-  // 保存配置（本地 + 云端）
-  const saveConfig = useCallback(async (newConfig: SalaryConfig) => {
-    // 1. 立即更新本地（保证 UI 响应）
+  // 保存配置：立即更新内存态保证 UI 响应，异步落本地库
+  const saveConfig = useCallback((newConfig: SalaryConfig) => {
     setConfig(newConfig)
-    try {
-      Taro.setStorageSync('salary_config', newConfig)
-    } catch {
-      /* ignore */
-    }
-
-    if (!api.getToken()) return
-
-    // 2. 已登录才同步到云端
-    try {
-      const updated = await api.updateConfig(newConfig)
-      try {
-        Taro.setStorageSync('salary_config', updated)
-      } catch {
-        /* ignore */
-      }
-    } catch (err) {
-      console.warn('[sync] 工资配置同步失败，加入重试队列', err)
-      const { enqueueSync } = await import('../../utils/sync')
-      enqueueSync({ type: 'updateConfig', payload: newConfig })
-    }
+    writeJSON('salary_config', newConfig)
   }, [])
 
   // 设置面板输入处理 — 编辑态用字符串类型，与 SettingRow 的 onChange 对齐
@@ -554,11 +503,7 @@ export default function Index() {
   const toggleBkSetting = useCallback((key: keyof BookkeepingSettings) => {
     setBkSettings((prev) => {
       const next = { ...prev, [key]: !prev[key] }
-      try {
-        Taro.setStorageSync('bookkeeping_settings', next)
-      } catch {
-        /* ignore */
-      }
+      writeJSON('bookkeeping_settings', next)
       return next
     })
   }, [])
@@ -587,19 +532,6 @@ export default function Index() {
       payday: String(DEFAULT_CONFIG.payday),
     })
   }, [])
-
-  const handleLogout = useCallback(() => {
-    api.clearToken()
-    setIsLoggedIn(false)
-    closeSettings()
-    Taro.showToast({ title: '已退出登录', icon: 'none' })
-  }, [closeSettings])
-
-  const handleOpenLogin = useCallback(() => {
-    closeSettings()
-    Taro.navigateTo({ url: '/pages/login/index' })
-  }, [closeSettings])
-
 
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
   const endStr = `${String(config.workEndHour).padStart(2, '0')}:00`
@@ -829,15 +761,6 @@ export default function Index() {
             </View>
 
             <View className='settings-footer'>
-              {isLoggedIn ? (
-                <View className='settings-btn settings-btn-logout' onClick={handleLogout}>
-                  <Text className='settings-btn-text'>退 出 登 錄</Text>
-                </View>
-              ) : (
-                <View className='settings-btn settings-btn-login' onClick={handleOpenLogin}>
-                  <Text className='settings-btn-text'>登 入</Text>
-                </View>
-              )}
               <View className='settings-btn settings-btn-reset' onClick={resetSettings}>
                 <Text className='settings-btn-text'>恢 復 默 認</Text>
               </View>

@@ -1,5 +1,7 @@
 # Taro 4.2 + AJV/Taro Build Toolchain 前置修复 实施计划
 
+> **✅ 已完成（勾选框未回填）：** Task 1–3 由 `7e7850d`、`0548f88`、`b91f2b2`、`c8be37f` 落地。2026-10-11 实测 `npm run build:weapp` 与 `npm run build:h5` 均编译通过，`client/test/build/ajv-resolution.test.mjs` 7 项全绿。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 让 `npm run build:weapp` 与 `npm run build:h5` 在当前主工作区上再次能够完成 Taro build 插件加载流程，作为后续登录页重设计（方案 C“墨签账簿”）的前置验收条件。

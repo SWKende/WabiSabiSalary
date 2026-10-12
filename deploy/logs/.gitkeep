@@ -1,2 +1,0 @@
-# Empty file to ensure deploy/logs/ exists for bind mounts in docker-compose.
-# Caddy writes access logs here (mounted to /var/log/caddy).

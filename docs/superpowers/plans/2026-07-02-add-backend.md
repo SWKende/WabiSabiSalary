@@ -1,5 +1,7 @@
 # Trae Salary 添加后端 Implementation Plan
 
+> **⚠️ 已被取代（2026-10-11）：** 后端与云同步能力整体下线，项目转为纯本地安卓 App。见 `2026-10-11-android-local-app.md`。本文件保留作历史决策记录，`server/` 与 `deploy/` 目录已删除，可从 git 历史找回。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** 为 trae-salary 项目添加 Node.js 后端，实现账号密码登录、工资配置/记账条目云端同步、节假日云端管理 + 自动同步；通过 Docker + Caddy 一键部署到云服务器。

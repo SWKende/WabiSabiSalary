@@ -2,7 +2,7 @@
   "name": "trae-salary",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["client", "server"],
+  "workspaces": ["client"],
   "scripts": {
     "postinstall": "node ./scripts/install-build-patches.mjs"
   },

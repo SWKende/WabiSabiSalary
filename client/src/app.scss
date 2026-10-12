@@ -1,7 +1,15 @@
 @use './styles/global';
+@use './styles/variables' as *;
 
 page {
   font-family: 'Noto Serif SC', 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* 本地库载入瞬间的占位屏，沿用和纸底色避免出现纯白闪屏 */
+.app-boot {
+  position: fixed;
+  inset: 0;
+  background: $color-bg-page;
 }

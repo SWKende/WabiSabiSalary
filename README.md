@@ -1,283 +1,143 @@
-# Trae Salary 工资计算器
+# 工资时钟（Salary Clock）
 
-Taro 多端（微信小程序为主）的工资计算器和记账工具，支持**多设备云同步**。
+一个装在安卓手机上的**纯本地**工资计算器与记账工具：打开就能看见今天赚了多少、离发薪还有多久，偶尔记一笔开销。
+
+**没有后端，没有账号，没有云同步。** 数据存在手机本地的 SQLite 里，断网可用。
 
 ## 功能特性
 
 - 实时计算每秒工资、日薪、月薪
 - 工资明细、发薪日倒计时、今日进度可视化
-- 完整记账功能（分类、图表、统计）
-- 多设备云同步（注册账号后数据自动同步）
-- 中国节假日智能识别（数据云端自动更新）
+- 记账：分类、备注、近 7 日柱状图、月度趋势、分类占比
+- 中国节假日与调休识别（直连 timor.tech 更新，内置静态数据兜底）
+- 全部数据本地存储，卸载即清空
 
-## 项目结构
+## 技术栈
+
+| 层 | 选型 |
+|---|---|
+| 界面 | Taro 4.2 + React 18 + TypeScript + SCSS（H5 target） |
+| 容器 | Capacitor 8（WebView 壳，Android） |
+| 存储 | `@capacitor-community/sqlite`（设备本地 SQLite） |
+| 出包 | GitHub Actions（JDK 21 + Android SDK + Gradle） |
+
+转型的取舍与依据记录在 `docs/superpowers/plans/2026-10-11-android-local-app.md`。
+
+## 目录结构
 
 ```
 trae-salary/
-├── client/    前端（Taro 微信小程序）
-├── server/    后端（Node.js + Fastify + Prisma + SQLite）
-├── deploy/    部署（Docker Compose + Caddy）
-├── data/      运行时数据（gitignore）
-└── docs/      设计文档
+├── client/
+│   ├── src/
+│   │   ├── pages/index/       首页（工资时钟 + 记账，单页双模块）
+│   │   ├── components/        记账面板、图表、数字键盘、日期选择、导航栏
+│   │   ├── utils/store.ts     本地数据仓库：内存读 + 异步写队列
+│   │   ├── utils/db.ts        SQLite 后端与 storage 兜底后端
+│   │   ├── utils/cnHoliday.ts 节假日：缓存 → timor.tech → 内置兜底
+│   │   └── styles/            三层 design token（L1 原语 / L2 语义 / L3 组件）
+│   ├── assets/icon-source.png 图标与启动图源文件
+│   ├── android/               Capacitor 生成的安卓工程（已入库）
+│   └── capacitor.config.ts
+├── docs/superpowers/          设计与实施文档
+└── .github/workflows/         云端构建
 ```
 
 ## 一、本地开发
 
-### 前端
+```bash
+npm install
+cd client
+npm run dev:h5          # 监听构建，产物在 client/dist
+```
+
+用浏览器打开构建产物即可开发（推荐再配一个静态服务器）：
+
+```bash
+cd client/dist && python3 -m http.server 8080
+```
+
+**开发环境不需要任何服务端。** 浏览器里跑的是 `store.ts` 的 storage 兜底驱动（落 localStorage），真机上跑的是 SQLite，两者共用同一套上层 API，所以日常开发看不到差异。
+
+### 校验命令
 
 ```bash
 cd client
-npm install
-npm run dev:weapp
-```
-
-然后用微信开发者工具导入 `client/dist/` 目录。
-
-API 地址默认是 `http://localhost:3000`。要指向其他地址：
-
-```bash
-TARO_APP_API_BASE_URL=https://your-api.example.com npm run dev:weapp
+npm run typecheck                    # tsc --noEmit
+npm run lint                         # stylelint 严格值守卫
+npm test                             # vitest（含 store 单测）+ node:test
+npm run test:store                   # 只跑存储层测试
 ```
 
 ### Design Tokens
 
-项目使用三层 Token 体系（Primitive → Semantic → Component），集中管理尺寸、颜色、字号、间距、圆角。所有 SCSS 文件应通过 `client/src/styles/variables.scss` 引用 token，避免在业务代码中直接写 hex 颜色、px 字号、px 间距、px 圆角。
-
-**目录结构：**
-
-- `client/src/styles/tokens/` — L1 原语（palette/typography/spacing/radius/z-index/motion）
-- `client/src/styles/semantic/` — L2 语义（color/typography/control/space）
-- `client/src/styles/components/` — L3 组件（input/button/card/cell）
-- `client/src/styles/global.scss` — `:root` CSS 变量注入（33 个）
-- `client/src/styles/variables.scss` — 业务 SCSS 统一入口
-
-**使用方式：**
+三层 Token 体系（Primitive → Semantic → Component）集中在 `client/src/styles/`。业务 SCSS 一律通过 `@use '@/styles/variables' as *;` 取 token，不写裸 hex / px 字号 / px 间距 / px 圆角；尺寸单位用 `rpx`（Taro 750 稿基线）。
 
 ```scss
-// 在业务 SCSS 顶部引入
 @use '@/styles/variables' as *;
 
 .my-card {
-  padding: $space-card-padding-md;       // L2 语义
-  background: $color-bg-surface;         // L2 语义
-  border-radius: $radius-md;             // L1 原语
-  font-size: $font-body-md;              // L2 语义
-  box-shadow: 0 2rpx 12rpx $color-shadow-soft;
+  padding: $space-card-padding-md;
+  background: $color-bg-surface;
+  border-radius: $radius-md;
+  font-size: $font-body-md;
 }
 ```
 
-**单位约定：** 所有尺寸使用 `rpx`（Taro 750 稿基线，1px = 2rpx）。
+守卫由 `.github/workflows/android.yml` 的 verify job 执行：`npm run lint`（strict-value）与 `npm test` 任一失败即不出包。`src/pages/index/index.scss` 与 `src/components/Bookkeeping/index.scss` 因存量字面量在 `.stylelintrc.strict-value.yml` 中整文件豁免，属在途债务。
 
-**CI 守卫：** PR 通过 `.github/workflows/ci.yml` 中的两道关卡：
+## 二、出 APK
 
-- `npm run lint:css:strict-value` — 阻止任何新的 hex/font-size/padding/margin/border-radius 字面量进入业务 SCSS
-- `npm run test:css` — 验证 token 定义、迁移回归、视觉零变化不被破坏
+### 方式 A：云端构建（推荐，本机不需要 Android 环境）
 
-**完整规范：** `docs/superpowers/specs/2026-07-14-typography-input-tokens-design.md`
+推送到 GitHub 后，Actions 会自动跑 `verify → apk`；也可在 Actions 页面点 **Run workflow** 手动触发。几分钟后在运行记录的 Artifacts 里下载 `salary-clock-debug-apk`，解压得到 `app-debug.apk`，传到手机安装即可。
 
-**新增样式规则：**
+### 方式 B：本机构建
 
-- 禁止在业务 SCSS 中直接写 hex 颜色、px 字号、px 间距、px 圆角
-- 必须通过 `@use '@/styles/variables' as *;` 引用 L2 语义 token（优先）或 L1 原语
-- 单位使用 `rpx`（Taro 750 稿基线，1px = 2rpx）
-- 视觉零变化迁移：所有 token 命名映射表见规格文档第 4 节
-
-**注意：** `index.scss` 和 `Bookkeeping/index.scss` 中存在 9 处临时保留的字面量（1px/20rpx/48rpx），已被 strict-value 配置显式豁免并标注 TODO；后续清理需走单独的迁移任务。
-
-### 后端
+需要先装好 JDK 21 与 Android SDK（最省事的方式是安装 Android Studio），然后：
 
 ```bash
-cd server
-npm install
-cp .env.example .env
-# 编辑 .env，填入 JWT_SECRET（用 openssl rand -hex 32 生成）
-npx prisma migrate dev
-npm run dev
+cd client
+npm run android:apk        # build:h5 → cap sync android → gradlew assembleDebug
+# 产物：client/android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
-默认端口 3000。运行 `npm test` 跑全部测试。
-
-## 二、部署到云服务器（生产环境）
-
-### 前提条件
-
-- 一台云服务器（最低 1 核 1GB 内存，推荐 2 核 2GB）
-- 一个域名（如 `salary.example.com`），A 记录解析到服务器 IP
-- 服务器 80 和 443 端口在防火墙开放
-
-### 部署步骤
-
-#### 1. 安装 Docker
+连了真机时可以直接装：
 
 ```bash
-ssh user@your-server-ip
-curl -fsSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
-exit
-# 重新登录 SSH
+cd client && npm run build:android && npm run android:install
 ```
 
-#### 2. 上传代码
+改了前端代码后必须重新 `cap sync`，否则安卓工程里还是旧的 web 产物（`npm run build:android` 已包含这一步）。
 
-```bash
-# 在本地
-scp -r trae-salary user@your-server-ip:/tmp/
+### 关于安装提示
 
-# 在服务器
-sudo mkdir -p /opt/trae-salary
-sudo mv /tmp/trae-salary/* /opt/trae-salary/
-sudo chown -R $USER:$USER /opt/trae-salary
-cd /opt/trae-salary
-```
+debug 包未签名上架，安装时系统会提示「来自未知来源」，允许即可。要做成可长期使用的 release 包，需要自己的 keystore：生成后把 `KEYSTORE_BASE64`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD` 配到仓库 Secrets，并在 `client/android/app/build.gradle` 里接上 `signingConfigs`。
 
-#### 3. 配置环境变量和域名
+## 三、数据与备份
 
-```bash
-cd deploy
-cp .env.example .env
-echo "JWT_SECRET=$(openssl rand -hex 32)" >> .env
-nano Caddyfile  # 把所有 "your-domain.com" 替换为你的实际域名
-```
+真机上数据在应用私有目录的 SQLite 文件 `salary-clock.db`（表：`entries` 记账条目、`meta` 配置与节假日缓存）。
 
-#### 4. 启动
-
-```bash
-docker compose up -d
-docker compose logs -f app
-# 看到 "server listening on :3000" 即可 Ctrl+C 退出日志跟踪
-```
-
-首次启动时 Caddy 会自动向 Let's Encrypt 申请 HTTPS 证书。如果失败，查看 FAQ。
-
-#### 5. 构建小程序（带正确 API 地址）
-
-```bash
-cd ../client
-TARO_APP_API_BASE_URL=https://salary.example.com npm run build:weapp
-```
-
-然后用微信开发者工具打开 `client/dist/`，上传发布。
-
-### 验证
-
-```bash
-curl https://salary.example.com/health
-# 应返回 {"status":"ok","uptime":...}
-```
-
-打开小程序，注册账号，添加一笔记账。然后退出登录，在另一台设备登录同一账号，应能看到数据。
-
-## 三、运维
-
-### 查看运行状态
-
-```bash
-cd /opt/trae-salary/deploy
-docker compose ps              # 容器状态
-docker compose logs -f app     # 应用日志（Ctrl+C 退出）
-tail -f ../logs/caddy/access.log  # 访问日志
-```
-
-### 重启服务
-
-```bash
-docker compose restart
-```
-
-### 升级代码
-
-```bash
-cd /opt/trae-salary
-git pull  # 或重新上传新代码
-cd deploy
-docker compose up -d --build
-```
-
-### 数据备份
-
-设置每日自动备份：
-
-```bash
-mkdir -p /backup
-crontab -e
-```
-
-添加：
-
-```
-0 2 * * * cp /opt/trae-salary/data/salary.db /backup/salary-$(date +\%Y\%m\%d).db && find /backup -name "salary-*.db" -mtime +30 -delete
-```
-
-### 数据恢复
-
-```bash
-cd /opt/trae-salary/deploy
-docker compose down
-cp /backup/salary-YYYYMMDD.db /opt/trae-salary/data/salary.db
-docker compose up -d
-```
-
-### 节假日同步日志
-
-```bash
-docker compose logs app | grep holiday-sync
-```
-
-正常情况下，启动时会有 `[holiday-sync] XXXX 缺失，开始从远程拉取...` 或 `[holiday-sync] 定时任务已注册`。
+- 卸载应用或清除应用数据 = 数据丢失，Android 的系统备份不会替你导出。
+- 备份方式：用文件管理器把上述 db 文件拷出，或后续在设置面板加一个导出入口（尚未实现，见「已知缺口」）。
+- 从旧版（有过后端的那版）升级时，`store.ts` 会在库为空时把 localStorage/Taro storage 里的旧记录与配置自动迁移进 SQLite。
 
 ## 四、常见问题
 
-**Q: 忘记密码怎么办？**
+**Q：不联网能判断节假日吗？**
+能。首次联网会拉取并缓存当年与未来两年；拉不到时用 `client/src/utils/holidaySeed.ts` 里的内置数据（当前含 2026 年 33 天节假日 / 6 天补班），再兜不住就按普通周末处理。每年国务院公告发布后往 `HOLIDAY_SEED` 补一份下一年即可。
 
-A: 当前版本不支持密码找回。如需重置：
-```bash
-cd /opt/trae-salary/deploy
-docker compose exec app npx prisma studio
-```
-打开浏览器访问 `http://your-server-ip:5555`，手动修改 user 表的 passwordHash（用 bcrypt 在线工具生成新密码的哈希）。
+**Q：为什么字体在某些手机上不是明朝体？**
+SCSS 只声明了 `font-family: 'Noto Serif SC', 'Shippori Mincho B1', ...`，没有内嵌字体，实际取决于系统是否装了这些字体。要稳定需要 `@font-face` 内嵌子集，尚未做。
 
-**Q: 数据会丢吗？**
+**Q：微信里打开的 H5 和小程序还能用吗？**
+构建脚本已收敛到安卓与 H5，小程序端插件已移除；`client/dist` 现在是 H5 产物目录，供 Capacitor 打包。
 
-A: SQLite 数据在服务器本地，建议按上文开启每日备份。建议同时将 `/backup` 目录同步到云存储（OSS/S3）。
+**Q：记账记错了想改？**
+目前只能删除重记。存储层的 `updateRecord` 已经实现并有测试，缺的是表单里的编辑入口。
 
-**Q: 怎么换域名？**
+## 五、已知缺口
 
-A: 修改 `deploy/Caddyfile` 中的域名，重新 `docker compose up -d` 即可。Caddy 会自动重新申请证书。
-
-**Q: Caddy 证书申请失败？**
-
-排查清单：
-1. `curl ifconfig.me` 确认服务器 IP 正确
-2. `nslookup your-domain.com` 确认 DNS 已生效
-3. 服务器 80/443 端口是否开放：`sudo ufw status`
-4. `docker compose logs caddy` 看具体错误
-
-**Q: 怎么修改 API 地址（如换服务器）？**
-
-A: 重新构建小程序时设置新的 `TARO_APP_API_BASE_URL`：
-```bash
-cd client
-TARO_APP_API_BASE_URL=https://new-api.example.com npm run build:weapp
-```
-
-**Q: 服务端节假日同步失败会影响使用吗？**
-
-A: 不会。失败时前端会按普通周末处理，业务正常运行。
-
-## 五、技术栈
-
-### 前端
-- Taro 4.2 + React 18 + TypeScript
-- Sass
-
-### 后端
-- Node.js 20 + Fastify 4
-- Prisma 5 + SQLite
-- bcrypt（密码哈希）
-- jsonwebtoken（Token）
-- node-cron（定时任务）
-- Vitest（测试）
-
-### 部署
-- Docker + Docker Compose
-- Caddy 2（自动 HTTPS）
+- 记账条目的编辑入口（存储层已支持）
+- 数据导出 / 备份 UI
+- 明朝体字体内嵌
+- WebView 每秒刷新的性能与原生仍有差距，装机后视手感决定是否改节流

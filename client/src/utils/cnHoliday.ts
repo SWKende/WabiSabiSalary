@@ -1,5 +1,6 @@
 import Taro from '@tarojs/taro'
-import * as api from '../api'
+import { readJSON, writeJSON } from './store'
+import { HOLIDAY_SEED, HOLIDAY_SEED_YEARS } from './holidaySeed'
 import {
   toYYYYMMDD as toYYYYMMDDCore,
   normalizeYYYYMMDD as normalizeYYYYMMDDCore,
@@ -62,23 +63,24 @@ function safeParseDataset(raw: any): CnHolidayDataset | null {
   }
 }
 
+/** 从本地库同步读取已缓存的节假日数据 */
 export function readCnHolidayDatasetSync(): CnHolidayDataset | null {
+  const raw = readJSON<any>(STORAGE_KEY, null)
+  if (!raw) return null
+  const parsed = typeof raw === 'string' ? safeParseDataset(tryParse(raw)) : safeParseDataset(raw)
+  return parsed ? { ...parsed, source: 'cache' } : null
+}
+
+function tryParse(value: string): unknown {
   try {
-    const raw = Taro.getStorageSync(STORAGE_KEY)
-    if (!raw) return null
-    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
-    return safeParseDataset(parsed)
+    return JSON.parse(value)
   } catch {
     return null
   }
 }
 
-function writeCnHolidayDatasetSync(dataset: CnHolidayDataset) {
-  try {
-    Taro.setStorageSync(STORAGE_KEY, JSON.stringify(dataset))
-  } catch {
-    /* ignore */
-  }
+function writeCnHolidayDataset(dataset: CnHolidayDataset): void {
+  writeJSON(STORAGE_KEY, dataset)
 }
 
 export function classifyCnDate(dateYYYYMMDD: string, dataset: CnHolidayDataset | null): CnDayType {
@@ -101,6 +103,25 @@ async function fetchYearFromProvider(year: number): Promise<{ holidays: string[]
   return extractTimorYearHolidayData(year, res.data) as { holidays: string[]; workdays: string[] }
 }
 
+/** 把内置静态数据里能覆盖的年份拼进数据集，用于断网兜底 */
+function applySeed(years: number[], base: CnHolidayDataset | null): CnHolidayDataset {
+  const covered = years.filter((y) => HOLIDAY_SEED_YEARS.includes(y))
+  const extra = covered.map((y) => HOLIDAY_SEED[y])
+  return {
+    years: uniqSorted([...(base?.years ?? []).map(String), ...covered.map(String)]).map(Number).sort((a, b) => a - b),
+    holidays: uniqSorted([...(base?.holidays ?? []), ...extra.flatMap((x) => x.holidays)]),
+    workdays: uniqSorted([...(base?.workdays ?? []), ...extra.flatMap((x) => x.workdays)]),
+    fetchedAt: base?.fetchedAt ?? new Date(0).toISOString(),
+    source: 'fallback',
+  }
+}
+
+/**
+ * 保证拿到覆盖所需年份的节假日数据。
+ *
+ * 顺序：本地库缓存 → 直连 timor.tech（Capacitor 容器内由原生 HTTP 代发，不受 CORS 限制）
+ * → 内置静态数据兜底。兜底结果不写缓存，下次启动仍会重试拉取。
+ */
 export async function ensureCnHolidayDataset(params?: {
   baseDate?: Date
   years?: number[]
@@ -108,76 +129,26 @@ export async function ensureCnHolidayDataset(params?: {
   const base = params?.baseDate ?? new Date()
   const years = params?.years ?? [base.getFullYear(), base.getFullYear() + 1, base.getFullYear() + 2]
 
-  // 1. 优先读本地缓存
   const cached = readCnHolidayDatasetSync()
   if (isCoveringYears(cached, years)) return cached!
 
-  // 2. 如果已登录，尝试从云端拉取
-  if (api.getToken()) {
-    try {
-      const { years: yearData } = await api.getHolidays(years)
-      const merged: CnHolidayDataset = safeParseDataset({
-        years: uniqSorted([
-          ...(cached?.years ?? []).map(String),
-          ...yearData.map((y) => String(y.year)),
-        ]).map((x) => Number(x)),
-        holidays: uniqSorted([...(cached?.holidays ?? []), ...yearData.flatMap((y) => y.holidays)]),
-        workdays: uniqSorted([...(cached?.workdays ?? []), ...yearData.flatMap((y) => y.workdays)]),
-        fetchedAt: new Date().toISOString(),
-        source: 'remote',
-      })!
-      if (isCoveringYears(merged, years)) {
-        writeCnHolidayDatasetSync(merged)
-        return merged
-      }
-      // 云端数据不足以覆盖全部年份，回退到 timor.tech 单年拉取
-      const missingYears = years.filter((y) => !merged.years.includes(y))
-      try {
-        const fetched = await Promise.all(missingYears.map(fetchYearFromProvider))
-        const enhanced: CnHolidayDataset = safeParseDataset({
-          years: uniqSorted([
-            ...merged.years.map(String),
-            ...missingYears.map(String),
-          ]).map((x) => Number(x)),
-          holidays: uniqSorted([...merged.holidays, ...fetched.flatMap((x) => x.holidays)]),
-          workdays: uniqSorted([...merged.workdays, ...fetched.flatMap((x) => x.workdays)]),
-          fetchedAt: new Date().toISOString(),
-          source: 'remote',
-        })!
-        writeCnHolidayDatasetSync(enhanced)
-        return enhanced
-      } catch {
-        writeCnHolidayDatasetSync(merged)
-        return merged
-      }
-    } catch (err) {
-      console.warn('[cnHoliday] 云端拉取失败', err)
-    }
-  }
+  const missingYears = years.filter((y) => !(cached?.years ?? []).includes(y))
 
-  // 3. 未登录或云端失败：尝试外部 timor.tech（覆盖所需年份）
   try {
-    const fetched = await Promise.all(years.map(fetchYearFromProvider))
-    const fromRemote: CnHolidayDataset = safeParseDataset({
-      years: uniqSorted([
-        ...(cached?.years ?? []).map(String),
-        ...years.map(String),
-      ]).map((x) => Number(x)),
+    const fetched = await Promise.all(missingYears.map(fetchYearFromProvider))
+    const merged: CnHolidayDataset = safeParseDataset({
+      years: uniqSorted([...(cached?.years ?? []).map(String), ...missingYears.map(String)])
+        .map(Number)
+        .sort((a, b) => a - b),
       holidays: uniqSorted([...(cached?.holidays ?? []), ...fetched.flatMap((x) => x.holidays)]),
       workdays: uniqSorted([...(cached?.workdays ?? []), ...fetched.flatMap((x) => x.workdays)]),
       fetchedAt: new Date().toISOString(),
       source: 'remote',
     })!
-    writeCnHolidayDatasetSync(fromRemote)
-    return fromRemote
-  } catch {
-    // 4. 完全失败 → 返回本地缓存或空数据集
-    return cached ?? {
-      years: [],
-      holidays: [],
-      workdays: [],
-      fetchedAt: new Date(0).toISOString(),
-      source: 'cache',
-    }
+    writeCnHolidayDataset(merged)
+    return merged
+  } catch (err) {
+    console.warn('[cnHoliday] 拉取节假日失败，使用本地缓存或内置数据', err)
+    return applySeed(years, cached)
   }
 }

@@ -4,45 +4,16 @@ import Taro from '@tarojs/taro'
 import MonthlyBarChart from '../MonthlyBarChart'
 import MonthlyPieChart from '../MonthlyPieChart'
 import { createRecordTime, formatLocalDate, formatRecordTime, isRecordInMonth, isRecordOnDate } from '../../utils/format'
-import * as api from '../../api'
+import { addRecord, listRecords, removeRecord, type BookkeepingRecord } from '../../utils/store'
 import './index.scss'
+
+export type { BookkeepingRecord }
 
 // 记账设置类型
 export interface BookkeepingSettings {
   showWeeklyBar: boolean
   showMonthlyBar: boolean
   showMonthlyPie: boolean
-}
-
-// 记账记录类型（id 为 string：本地临时 'temp-<ts>'，同步后用服务端 cuid）
-export interface BookkeepingRecord {
-  id: string
-  type: 'expense' | 'income'
-  amount: string
-  note: string
-  category: string
-  time: string
-}
-
-// 旧数据迁移：无 type 字段时根据 category 推断
-function migrateRecord(r: any): BookkeepingRecord {
-  if (r.type) return r as BookkeepingRecord
-  return {
-    ...r,
-    type: r.category === '收入' || r.category === '収入' ? 'income' : 'expense',
-  }
-}
-
-// 将服务端记账条目转换为本地记录格式
-function apiEntryToRecord(e: import('../../api').BookkeepingEntry): BookkeepingRecord {
-  return {
-    id: e.id,
-    type: e.type,
-    amount: String(e.amount),
-    note: e.note ?? '',
-    category: e.category,
-    time: e.occurredAt.slice(0, 10) + ' 12:00',
-  }
 }
 
 // 记账页面组件
@@ -87,124 +58,39 @@ function BookkeepingPageInner({
     }
   }, [])
 
-  // 启动时如果已登录，从云端拉取最近 90 天的记账
-  useEffect(() => {
-    if (!api.getToken()) return
-    let cancelled = false
-    ;(async () => {
-      try {
-        const from = new Date(Date.now() - 90 * 86400 * 1000).toISOString().slice(0, 10)
-        const to = new Date().toISOString().slice(0, 10)
-        const { entries: remoteEntries } = await api.listEntries({ from, to, limit: 500 })
-        if (cancelled) return
-        const remoteIds = new Set(remoteEntries.map((e) => e.id))
-        const localOnly = records.filter(
-          (r) => !remoteIds.has(r.id) && !r.id.startsWith('temp-'),
-        )
-        const merged = [...remoteEntries.map(apiEntryToRecord), ...localOnly]
-        setRecords(merged)
-        try {
-          Taro.setStorageSync('bookkeeping_records', merged)
-        } catch {
-          /* ignore */
-        }
-      } catch (err) {
-        console.warn('[sync] 拉取记账失败', err)
-      }
-    })()
-    return () => {
-      cancelled = true
-    }
-    // 仅在 mount 时拉取一次；records 依赖读取初始值即可
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
   const [recordPendingDelete, setRecordPendingDelete] = useState<BookkeepingRecord | null>(null)
   const expenseCategories = ['餐飲', '交通', '購物', '数码', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
 
   const [activeType, setActiveType] = useState<'expense' | 'income'>('expense')
   const [category, setCategory] = useState(expenseCategories[0])
-  const [records, setRecords] = useState<BookkeepingRecord[]>(() => {
-    try {
-      const saved = Taro.getStorageSync('bookkeeping_records')
-      return saved ? (saved as any[]).filter(Boolean).map(migrateRecord) : []
-    } catch {
-      return []
-    }
-  })
+  const [records, setRecords] = useState<BookkeepingRecord[]>(() => listRecords())
 
   const handleTypeSwitch = (type: 'expense' | 'income') => {
     setActiveType(type)
     setCategory(type === 'expense' ? expenseCategories[0] : incomeCategories[0])
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!amount) return
-    const tempId = `temp-${Date.now()}`
-    const newRecord: BookkeepingRecord = {
-      id: tempId,
+    addRecord({
       type: activeType,
       amount,
       note: note || category,
       category,
       time: createRecordTime(selectedDate),
-    }
-    const updated = [newRecord, ...records]
-    setRecords(updated)
-    try {
-      Taro.setStorageSync('bookkeeping_records', updated)
-    } catch {
-      /* ignore */
-    }
+    })
+    setRecords(listRecords())
     setAmount('')
     setNote('')
     setSelectedDate(formatLocalDate(new Date()))
     setShowForm(false)
     Taro.showToast({ title: '已記錄', icon: 'success' })
-
-    // 云端同步（fire-and-forget）：成功则用服务端 id 替换临时 id
-    const createInput: import('../../api').CreateEntryInput = {
-      type: activeType,
-      amount: parseFloat(amount),
-      category,
-      note: note || category,
-      occurredAt: new Date(`${selectedDate}T12:00:00`).toISOString(),
-    }
-    if (!api.getToken()) return
-
-    try {
-      const res = await api.createEntry(createInput)
-      const synced = updated.map((r) => (r.id === tempId ? { ...r, id: res.entry.id } : r))
-      setRecords(synced)
-      try {
-        Taro.setStorageSync('bookkeeping_records', synced)
-      } catch {
-        /* ignore */
-      }
-    } catch (err) {
-      console.warn('[sync] 创建记账失败，加入重试队列', err)
-      const { enqueueSync } = await import('../../utils/sync')
-      enqueueSync({ type: 'createEntry', payload: createInput, tempId })
-    }
   }
 
-  const handleDelete = async (id: string) => {
-    const updated = records.filter((r) => r.id !== id)
-    setRecords(updated)
-    try {
-      Taro.setStorageSync('bookkeeping_records', updated)
-    } catch {
-      /* ignore */
-    }
-    if (!api.getToken()) return
-
-    try {
-      await api.deleteEntry(id)
-    } catch (err) {
-      console.warn('[sync] 删除记账失败，加入重试队列', err)
-      const { enqueueSync } = await import('../../utils/sync')
-      enqueueSync({ type: 'deleteEntry', id })
-    }
+  const handleDelete = (id: string) => {
+    removeRecord(id)
+    setRecords(listRecords())
   }
 
   const openDeleteConfirm = (record: BookkeepingRecord) => {

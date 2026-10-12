@@ -1,6 +1,6 @@
 import { View, Text } from '@tarojs/components'
 import { useState, useMemo } from 'react'
-import type { BookkeepingRecord } from '../Bookkeeping'
+import type { BookkeepingRecord } from '../../utils/store'
 import { isRecordInMonth } from '../../utils/format'
 import './index.scss'
 

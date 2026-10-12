@@ -1,5 +1,7 @@
 # 登录页“墨签账簿”重设计 + 边缘 SCSS 修复 实施计划
 
+> **⚠️ 已完成但方向被推翻（2026-09-17 评审），并已整体作废（2026-10-11）：** Task 1–5 的代码当时已提交（勾选框未回填），但 9-17 的设计评审指出「墨签账簿」与首页侘寂时钟是两套产品、且账号墙成了唯一入口；登录页随后改造过一次，最终随项目转纯本地安卓 App 而**整个删除**。见 `2026-10-11-android-local-app.md` 与 `.impeccable/critique/2026-09-17T06-24-49Z__client-src-pages-login-index-tsx.md`。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 在已有规格 `docs/superpowers/specs/2026-07-20-login-ink-ledger-redesign-design.md` 之下，落地方案 C “墨签账簿” 的登录/注册页重设计；同时以前置 Task 修复 sandbox 中首次出现的 Taro H5/weapp 构建 SCSS 编译阻塞，让最终验收可以跑到 login.scss 本身。

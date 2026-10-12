@@ -3,8 +3,5 @@ dist/
 node_modules/
 .npm-cache/
 .swc/
-data/
 .DS_Store
-deploy/.env
-deploy/logs/
-!deploy/logs/.gitkeep
+vibe_images/
