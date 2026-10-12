@@ -229,6 +229,8 @@ let entryCache: BookkeepingRecord[] = []
 /** 记录 created_at，upsert 时不覆盖首次创建时间 */
 const createdAtCache = new Map<string, string>()
 const readyListeners = new Set<() => void>()
+/** 启动时的运行环境快照，供诊断使用（见 storageDiagnostics） */
+let nativeAtBootstrap = false
 
 /** 原生桥接最坏情况下的等待上限；超过即降级到 storage，避免页面一直等在占位上 */
 const DEFAULT_OPEN_TIMEOUT_MS = 4000
@@ -282,6 +284,18 @@ export function storeBackendName(): string {
 }
 
 /**
+ * 存储后端诊断。degraded 才是关键信号：真机上本该用 SQLite，
+ * 若为 true 说明原生库没打开成功、当前数据其实落在 storage 里。
+ *
+ * native 取的是**启动时**的探测结果，不能在这里重新问一次：@capacitor/core 被 import 之后
+ * 会用真实对象覆盖 globalThis.Capacitor，届时再探测会把"本来在原生里"误判成浏览器。
+ */
+export function storageDiagnostics(): { backend: string; native: boolean; degraded: boolean } {
+  const name = storeBackendName()
+  return { backend: name, native: nativeAtBootstrap, degraded: nativeAtBootstrap && name !== 'sqlite' }
+}
+
+/**
  * 打开本地库并载入内存。可重复调用（幂等），并发调用共享同一个 promise。
  *
  * 无论走哪条路都必须 settle：原生桥接不返回、建表失败、插件缺失，一律在超时后降级到
@@ -297,12 +311,13 @@ export function bootstrapStore(options: {
   if (bootstrapping) return bootstrapping
 
   const timeoutMs = options.openTimeoutMs ?? DEFAULT_OPEN_TIMEOUT_MS
+  nativeAtBootstrap = isNativeRuntime()
 
   const openAndLoad = async (): Promise<PersistBackend> => {
     let active: PersistBackend
     if (typeof options.backend === 'object' && options.backend !== null) {
       active = options.backend
-    } else if (options.backend === 'storage' || (options.backend !== 'sqlite' && !isNativeRuntime())) {
+    } else if (options.backend === 'storage' || (options.backend !== 'sqlite' && !nativeAtBootstrap)) {
       active = createTaroStorageBackend()
     } else {
       active = createSqlBackend(await createCapacitorSqlExecutor())
@@ -444,4 +459,5 @@ export function __resetStore(): void {
   entryCache = []
   createdAtCache.clear()
   readyListeners.clear()
+  nativeAtBootstrap = false
 }

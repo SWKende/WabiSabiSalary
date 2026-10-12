@@ -19,7 +19,7 @@ import {
   type CnHolidayDataset,
 } from '../../utils/cnHoliday'
 import { getWindowInfo } from '../../utils/window'
-import { readJSON, writeJSON } from '../../utils/store'
+import { readJSON, writeJSON, storageDiagnostics } from '../../utils/store'
 import { useStoreReady } from '../../utils/useStoreReady'
 import holidayGameSvg from './assets/holiday-game.svg'
 import holidayRunSvg from './assets/holiday-run.svg'
@@ -536,6 +536,7 @@ function HomeScreen() {
 
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
   const endStr = `${String(config.workEndHour).padStart(2, '0')}:00`
+  const diagnostics = storageDiagnostics()
 
   return (
     <View className='salary-app-root'>
@@ -759,6 +760,12 @@ function HomeScreen() {
                   suffix='日'
                 />
               </View>
+
+              {/* 临时诊断：真机上确认 SQLite 是否真的在用；排查完可整段摘除 */}
+              <Text className='settings-diagnostics'>
+                本地库 {diagnostics.backend} · {diagnostics.native ? '原生' : '非原生'}
+                {diagnostics.degraded ? ' · 已降级到 storage' : ''}
+              </Text>
             </View>
 
             <View className='settings-footer'>

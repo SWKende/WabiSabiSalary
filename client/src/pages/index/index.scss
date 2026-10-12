@@ -1231,6 +1231,16 @@
   margin: $sp-1 0;
 }
 
+/* 临时诊断行：真机排查存储后端用，排查完连同 index.tsx 里的用法一起摘除 */
+.settings-diagnostics {
+  display: block;
+  margin-top: $sp-2;
+  font-size: $font-caption-sm;
+  letter-spacing: 2rpx;
+  color: $color-text-placeholder;
+  text-align: center;
+}
+
 .module-switch {
   display: flex;
   gap: 16px;
