@@ -18,9 +18,11 @@
 |---|---|---|
 | Taro `build:rn`（React Native） | **否决** | RN 无 CSS 层。项目有 3573 行 SCSS，其中 `::before/::after` 14 处、`:active` 25、`@keyframes` 19、`animation` 23、`transition` 25、`transform` 42、`position: fixed` 9、渐变 8、`box-shadow` 5、`letter-spacing` 76 —— 视觉层等于全部重写，而侘寂时钟的视觉正是产品本体。且 `@tarojs/rn-runner` 未安装，Taro 4.x 的 RN 链路活跃度明显低于 Expo。 |
 | Expo / RN 原生重写 | 备选，成本最高 | 逻辑层（`api/`、`sync.ts`、`validation.ts`、`cnHolidayCore`）可平移，但 UI 与样式要重画，2–4 周。 |
-| **Taro H5 产物 + Capacitor 套壳** | **采用** | 已实测：`npm run build:h5` 编译通过，产物在本地静态服务器 + 后端环境下完整跑通（每秒工资跳动、今日进度、发薪倒计时、记账增删、柱状/饼图），控制台 0 error，仅 37 条 Taro「暂时不支持 API」降级警告。视觉 100% 复用。 |
+| **Taro H5 产物 + Capacitor 套壳** | **采用** | 已实测：`npm run build:h5` 编译通过，产物在本地静态服务器 + 后端环境下完整跑通（每秒工资跳动、今日进度、发薪倒计时、记账增删、柱状/饼图），视觉 100% 复用。当时把 37 条 Taro「暂时不支持 API」当成了无害警告，见下方更正。 |
 
-**跨端依赖面实测：** 全项目只用 15 个 Taro API，唯一小程序专属是 `Taro.getMenuButtonBoundingClientRect`（3 处，均已有 `statusBarHeight` 兜底）；组件只用 View / Text / Input / Button / ScrollView / Image，**没有 Canvas**（两个图表是纯 View + CSS 画的）。
+**跨端依赖面实测：** 全项目只用 15 个 Taro API，唯一小程序专属是 `Taro.getMenuButtonBoundingClientRect`；组件只用 View / Text / Input / Button / ScrollView / Image，**没有 Canvas**（两个图表是纯 View + CSS 画的）。
+
+> 更正（2026-10-15，H5 预览实测）：原先记的「3 处调用均已有 `statusBarHeight` 兜底」是错的。该 API 在 H5 里返回的是**被 reject 的 Promise**，`try/catch` 抓不到，于是每次渲染抛一条未处理拒绝（导航栏每秒重渲染一次 → 1 条/秒），且 `statusBarHeight` 在 H5 取到 `NaN`，`height: NaNpx` 被浏览器整条丢弃。既然安卓壳和浏览器都不存在微信胶囊，这条适配已连同 `utils/window.ts` 一起删除，由 `test/components-custom-nav-bar/no-miniprogram-api.test.ts` 守住不回退。
 
 ## 2. 关键判断
 

@@ -119,14 +119,14 @@
   background: $palette-alpha-sand-18;
   border: 1px solid $palette-sand-300;
   border-radius: $radius-full;
-  font-size: $font-heading-md;
+  font-size: $font-caption-md;
   color: $palette-ink-warm-500;
   letter-spacing: 2px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .launch-panel__title {
-  font-size: $font-display-lg;
+  font-size: $font-heading-md;
   color: $color-text-primary;
   font-weight: 600;
   letter-spacing: 6px;
@@ -134,7 +134,7 @@
 }
 
 .launch-panel__desc {
-  font-size: $font-heading-lg;
+  font-size: $font-body-sm;
   color: $color-text-tertiary;
   text-align: center;
   line-height: 1.6;
@@ -154,14 +154,14 @@
 }
 
 .launch-panel__enter-text {
-  font-size: $font-heading-md;
+  font-size: $font-body-md;
   color: $color-text-secondary;
   letter-spacing: 3px;
   font-family: 'Noto Serif SC', serif;
 }
 
 .launch-panel__enter-arrow {
-  font-size: $font-heading-lg;
+  font-size: $font-body-md;
   color: $color-brand-primary-strong;
   line-height: 1;
 }
@@ -202,14 +202,14 @@
 }
 
 .mock-currency {
-  font-size: $font-heading-md;
+  font-size: $font-body-sm;
   color: $color-brand-primary-strong;
   margin-top: $sp-2;
   font-family: 'Noto Serif SC', serif;
 }
 
 .mock-number {
-  font-size: $font-heading-lg;
+  font-size: $font-heading-md;
   font-weight: 600;
   color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
@@ -320,7 +320,7 @@
 }
 
 .mock-bk-title {
-  font-size: $font-heading-lg;
+  font-size: $font-body-md;
   color: $color-text-primary;
   font-weight: 500;
   letter-spacing: 6px;
@@ -341,7 +341,7 @@
 }
 
 .mock-bk-summary-val {
-  font-size: $font-heading-lg;
+  font-size: $font-body-md;
   color: $color-state-success;
   font-family: 'Shippori Mincho B1', serif;
   font-weight: 500;
@@ -471,7 +471,7 @@
 .mock-bk-chart-label {
   flex: 1;
   text-align: center;
-  font-size: 20rpx;
+  font-size: $font-micro;
   color: $palette-ink-warm-300;
   font-family: 'Shippori Mincho B1', serif;
 }
@@ -531,10 +531,16 @@
   overflow: hidden;
 }
 
-// SwiperItem 内滚动区域
+// SwiperItem 内滚动区域。
+// overflow 必须自己声明：@tarojs/components 给 scroll-view 写 overflow 的那条
+// `.taro-scroll-view__scroll-y` 规则在本项目产物里根本没被注入，
+// 只靠 `scrollY` 属性会得到 overflow:visible，超出的内容被 .salary-app-root 裁掉且无法滚到。
 .page-scroll {
   height: 100%;
   flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--scroll-bottom-gap);
 }
 
 .module-container {
@@ -554,7 +560,7 @@
   gap: 12px;
   height: 36px;
   flex-shrink: 0;
-  padding-bottom: env(safe-area-inset-bottom, $sp-2);
+  padding-bottom: calc(#{$sp-2} + var(--safe-area-bottom));
 
   .indicator-dot {
     width: 6px;
@@ -601,7 +607,7 @@
 
   .hero-label {
     display: block;
-    font-size: $font-display-lg;
+    font-size: $font-body-md;
     color: $color-text-placeholder;
     letter-spacing: 10px;
     margin-bottom: $sp-6;
@@ -664,7 +670,7 @@
   }
 
   .hero-target {
-    font-size: 48rpx;
+    font-size: $font-caption-md;
     color: $color-text-placeholder;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
@@ -699,7 +705,7 @@
   .live-label {
     position: relative;
     display: block;
-    font-size: 48rpx;
+    font-size: $font-body-md;
     color: $color-text-placeholder;
     letter-spacing: 8px;
     margin-bottom: $sp-5;
@@ -722,7 +728,7 @@
   .live-rate {
     position: relative;
     display: block;
-    font-size: $font-heading-lg;
+    font-size: $font-body-sm;
     color: $color-state-success;
     font-family: 'Noto Serif SC', serif;
     letter-spacing: 3px;
@@ -791,14 +797,14 @@
     padding: $sp-2 $sp-3;
     background: $palette-alpha-sage-14;
     border: 1px solid $palette-alpha-sage-20;
-    font-size: $font-heading-md;
+    font-size: $font-caption-sm;
     color: $palette-sage-500;
     letter-spacing: 4px;
     font-family: 'Noto Serif SC', serif;
   }
 
   .holiday-card-title {
-    font-size: $font-heading-md;
+    font-size: $font-body-md;
     color: $palette-ink-warm-900;
     font-weight: 500;
     letter-spacing: 4px;
@@ -807,7 +813,7 @@
   }
 
   .holiday-card-desc {
-    font-size: $font-heading-lg;
+    font-size: $font-body-sm;
     color: $palette-ink-warm-700;
     line-height: 1.7;
     letter-spacing: 1px;
@@ -871,7 +877,7 @@
     padding: $sp-6 $sp-6;
 
     .detail-title {
-      font-size: $font-display-lg;
+      font-size: $font-heading-md;
       color: $color-text-primary;
       font-weight: 500;
       letter-spacing: 4px;
@@ -879,7 +885,7 @@
     }
 
     .detail-arrow {
-      font-size: $font-heading-lg;
+      font-size: $font-body-md;
       color: $color-brand-primary-strong;
       transition: transform 0.4s ease;
     }
@@ -905,7 +911,7 @@
       }
 
       .detail-name {
-        font-size: $font-display-lg;
+        font-size: $font-body-md;
         color: $color-text-placeholder;
         font-family: 'Noto Serif SC', serif;
         font-weight: 400;
@@ -959,7 +965,7 @@
     margin-bottom: $sp-5;
 
     .progress-title {
-      font-size: $font-display-lg;
+      font-size: $font-heading-md;
       color: $color-text-primary;
       font-weight: 500;
       letter-spacing: 4px;
@@ -967,7 +973,7 @@
     }
 
     .progress-percent {
-      font-size: $font-display-lg;
+      font-size: $font-heading-md;
       color: $color-brand-primary-strong;
       font-family: 'Shippori Mincho B1', serif;
       font-weight: 500;
@@ -1010,7 +1016,7 @@
 
     .progress-start,
     .progress-end {
-      font-size: $font-heading-lg;
+      font-size: $font-caption-md;
       color: $color-text-placeholder;
       font-family: 'Noto Serif SC', serif;
       letter-spacing: 2px;
@@ -1036,7 +1042,7 @@
 
   .countdown-title {
     display: block;
-    font-size: $font-display-lg;
+    font-size: $font-heading-md;
     color: $color-text-secondary;
     font-weight: 400;
     letter-spacing: 6px;
@@ -1055,7 +1061,7 @@
 
       .countdown-num {
         display: block;
-        font-size: $font-display-lg;
+        font-size: $font-heading-lg;
         font-weight: 600;
         color: $color-text-primary;
         font-family: 'Shippori Mincho B1', serif;
@@ -1065,7 +1071,7 @@
 
       .countdown-unit {
         display: block;
-        font-size: $font-heading-lg;
+        font-size: $font-caption-md;
         color: $color-text-placeholder;
         letter-spacing: 4px;
         font-family: 'Noto Serif SC', serif;
@@ -1083,7 +1089,7 @@
   padding-top: $sp-5;
 
   .footer-text {
-    font-size: $font-heading-lg;
+    font-size: $font-body-sm;
     color: $color-text-placeholder;
     letter-spacing: 3px;
     font-family: 'Noto Serif SC', serif;
@@ -1096,7 +1102,7 @@
 .fab-btn {
   position: fixed;
   right: 28px;
-  bottom: 48px;
+  bottom: calc(48px + var(--safe-area-bottom));
   z-index: 100;
   width: 72px;
   height: 72px;
@@ -1114,7 +1120,7 @@
   }
 
   .fab-icon {
-    font-size: $font-display-lg;
+    font-size: $font-heading-lg;
     color: $color-text-secondary;
     line-height: 1;
   }
@@ -1156,7 +1162,7 @@
   animation: panelSlideUp 0.35s ease;
   display: flex;
   flex-direction: column;
-  padding-bottom: env(safe-area-inset-bottom, $sp-5);
+  padding-bottom: calc(#{$sp-5} + var(--safe-area-bottom));
 }
 
 @keyframes panelSlideUp {
@@ -1183,7 +1189,7 @@
   flex-shrink: 0;
 
   .settings-title {
-    font-size: $font-display-lg;
+    font-size: $font-heading-md;
     color: $color-text-primary;
     font-weight: 500;
     letter-spacing: 4px;
@@ -1198,7 +1204,7 @@
     justify-content: center;
 
     .settings-close-text {
-      font-size: $font-display-lg;
+      font-size: $font-heading-md;
       color: $color-text-placeholder;
     }
   }
@@ -1216,7 +1222,7 @@
 
   .settings-section-title {
     display: block;
-    font-size: $font-heading-lg;
+    font-size: $font-body-md;
     color: $color-text-placeholder;
     letter-spacing: 4px;
     margin-bottom: $sp-5;
@@ -1262,7 +1268,7 @@
   }
 
   .module-switch-text {
-    font-size: $font-heading-lg;
+    font-size: $font-body-md;
     letter-spacing: 4px;
     color: $color-text-placeholder;
     font-family: 'Noto Serif SC', serif;
@@ -1300,7 +1306,7 @@
     }
 
     .settings-btn-text {
-      font-size: $font-display-lg;
+      font-size: $font-heading-md;
       letter-spacing: 4px;
       font-family: 'Noto Serif SC', serif;
       font-weight: 400;
@@ -1375,7 +1381,7 @@
 
 .bk-setting-label {
   flex: 1;
-  font-size: $font-display-lg;
+  font-size: $font-body-md;
   color: $color-text-primary;
   font-family: 'Noto Serif SC', serif;
   font-weight: 400;

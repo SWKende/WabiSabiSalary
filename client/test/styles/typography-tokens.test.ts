@@ -18,13 +18,13 @@ describe('typography tokens', () => {
       }
     `);
     expect(css).toContain('fs-50: 20rpx');
-    expect(css).toContain('fs-75: 24rpx');
-    expect(css).toContain('fs-100: 26rpx');
-    expect(css).toContain('fs-200: 28rpx');
-    expect(css).toContain('fs-300: 32rpx');
-    expect(css).toContain('fs-400: 36rpx');
-    expect(css).toContain('fs-500: 44rpx');
-    expect(css).toContain('fs-600: 56rpx');
-    expect(css).toContain('fs-700: 88rpx');
+    expect(css).toContain('fs-75: 22rpx');
+    expect(css).toContain('fs-100: 24rpx');
+    expect(css).toContain('fs-200: 26rpx');
+    expect(css).toContain('fs-300: 28rpx');
+    expect(css).toContain('fs-400: 32rpx');
+    expect(css).toContain('fs-500: 36rpx');
+    expect(css).toContain('fs-600: 44rpx');
+    expect(css).toContain('fs-700: 64rpx');
   });
 });

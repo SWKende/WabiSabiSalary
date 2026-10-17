@@ -124,7 +124,7 @@
 
       &.has-value {
         .amount-display-text {
-          font-size: 48rpx;
+          font-size: $font-display-lg;
           font-weight: 500;
           color: $color-brand-primary-strong;
         }
@@ -408,7 +408,7 @@
 
     .toggle-text {
       display: block;
-      font-size: $font-heading-lg;
+      font-size: $font-caption-md;
       line-height: 1;
       color: $color-text-placeholder;
       font-family: 'Noto Serif SC', serif;
@@ -432,7 +432,7 @@
   padding-bottom: $sp-8;
 
   .y-label {
-    font-size: $font-heading-md;
+    font-size: $font-caption-sm;
     color: $color-text-placeholder;
     font-family: 'Shippori Mincho B1', serif;
     text-align: right;
@@ -507,7 +507,7 @@
   }
 
   .bar-label {
-    font-size: $font-heading-md;
+    font-size: $font-caption-sm;
     color: $color-text-placeholder;
     font-family: 'Noto Serif SC', serif;
     margin-top: $sp-2;
