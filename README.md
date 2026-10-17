@@ -47,16 +47,32 @@ trae-salary/
 ```bash
 npm install
 cd client
-npm run dev:h5          # 监听构建，产物在 client/dist
+npm run dev:h5
 ```
 
-用浏览器打开构建产物即可开发（推荐再配一个静态服务器）：
+起完直接访问终端打印的两个地址，存盘即自动重编译并刷新页面（webpack-dev-server 自带，不需要再另起静态服务器）：
 
-```bash
-cd client/dist && python3 -m http.server 8080
-```
+| 地址 | 怎么看 |
+| --- | --- |
+| `http://localhost:10086` | 电脑上开，浏览器设备模拟调到 390px 宽 |
+| `http://<本机局域网IP>:10086` | 手机连同一个 WiFi 直接用系统浏览器开，摸真实屏幕宽度 |
 
-**开发环境不需要任何服务端。** 浏览器里跑的是 `store.ts` 的 storage 兜底驱动（落 localStorage），真机上跑的是 SQLite，两者共用同一套上层 API，所以日常开发看不到差异。
+路由是 hash 形式，首页为 `http://localhost:10086/#/pages/index/index`。
+
+### H5 预览能覆盖什么、不能覆盖什么
+
+React 代码、SCSS、store 上层 API 完全同一套，界面与交互逻辑都能直接看到；差别只在容器：
+
+| | H5 预览 | 真机 APK |
+| --- | --- | --- |
+| 存储后端 | localStorage（`store.ts` 的 storage 兜底驱动） | `@capacitor-community/sqlite` |
+| 节假日请求 | 浏览器直连 timor.tech，被 CORS 挡时走内置 seed | CapacitorHttp 代发 |
+| 字体 | 电脑字体 | 安卓系统字体（明朝体会被顶掉） |
+| 状态栏 / 安全区 / 返回手势 | 无 | 有 |
+
+设置面板底部的临时诊断行会打印当前后端（`本地库 sqlite` 或 `本地库 storage`），一眼分清两种环境。
+
+改动一旦涉及 SQLite、Capacitor 插件、图标/启动图、原生返回键行为，H5 预览不能代替真机，走[第二节](#二出-apk)出包回装。
 
 ### 校验命令
 

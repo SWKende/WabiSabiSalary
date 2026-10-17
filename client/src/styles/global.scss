@@ -48,6 +48,15 @@
   --btn-height-md   : #{k.$btn-height-md};
   --btn-height-lg   : #{k.$btn-height-lg};
 
+  // 安全区：安卓 targetSdk 36 强制 edge-to-edge，WebView 会画进状态栏/手势条底下。
+  // 必须 index.html 的 viewport 带 viewport-fit=cover，否则 env() 恒为 0。
+  --safe-area-top    : env(safe-area-inset-top, 0px);
+  --safe-area-bottom : env(safe-area-inset-bottom, 0px);
+  --nav-top-gap      : calc(#{sp.$sp-5} + var(--safe-area-top));
+
+  // 滚动区留白：手势条会盖住视口底部，内容自带的 padding 会被吃掉一段。
+  --scroll-bottom-gap : calc(#{sp.$sp-8} + var(--safe-area-bottom));
+
   // 动效
   --duration-base : #{m.$motion-duration-base};
   --easing-standard : #{m.$motion-easing-standard};

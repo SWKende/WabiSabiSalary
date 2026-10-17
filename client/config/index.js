@@ -55,6 +55,13 @@ const config = {
     publicPath: '/',
     staticDirectory: 'static',
     esnextModules: ['taro-ui'],
+    devServer: {
+      // @tarojs/components 自身会产出编译警告，全屏遮罩会把页面整个盖住；
+      // 只让真错误弹遮罩，警告留在终端。
+      client: {
+        overlay: { errors: true, warnings: false }
+      }
+    },
     postcss: {
       autoprefixer: {
         enable: true,

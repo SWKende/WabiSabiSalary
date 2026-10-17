@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-  <meta content="width=device-width,initial-scale=1,user-scalable=no" name="viewport">
+  <meta content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover" name="viewport">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-touch-fullscreen" content="yes">
   <meta name="format-detection" content="telephone=no,address=no">
@@ -10,7 +10,18 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" >
   <title>工资时钟</title>
   <script>
-    !function(n){function e(){var e=n.document.documentElement,t=e.getBoundingClientRect().width;e.style.fontSize=t>=640?"40px":t<=320?"20px":t/320*20+"px"}n.addEventListener("resize",(function(){e()})),e()}(window);
+    // Taro 把 750 稿的 rpx 编成 1rem = 40rpx，而 40rpx 在 375 视口下正好是 20px，
+    // 所以根字号必须是 视口宽 / 375 * 20 —— 基线写错会让整站等比缩放且毫无报错。
+    // 下限取 320 视口对应的尺寸，上限 40px 即 750 视口，避免平板继续放大。
+    !function (n) {
+      function e() {
+        var el = n.document.documentElement;
+        var w = el.getBoundingClientRect().width;
+        el.style.fontSize = Math.min(Math.max(w / 375 * 20, 320 / 375 * 20), 40) + 'px';
+      }
+      n.addEventListener('resize', function () { e(); });
+      e();
+    }(window);
   </script>
 </head>
 <body>

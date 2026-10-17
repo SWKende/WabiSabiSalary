@@ -18,7 +18,6 @@ import {
   type CnDayType,
   type CnHolidayDataset,
 } from '../../utils/cnHoliday'
-import { getWindowInfo } from '../../utils/window'
 import { readJSON, writeJSON, storageDiagnostics } from '../../utils/store'
 import { useStoreReady } from '../../utils/useStoreReady'
 import holidayGameSvg from './assets/holiday-game.svg'
@@ -114,23 +113,6 @@ const countWorkdaysInMonth = (year: number, month: number, dataset: CnHolidayDat
 
 function HomeScreen() {
   const initialHomePageState = getInitialHomePageState()
-
-  // 胶囊按钮信息（右侧预留空间 + 是否存在胶囊）
-  const navLayout = useMemo(() => {
-    try {
-      const windowInfo = getWindowInfo()
-      const rect = Taro.getMenuButtonBoundingClientRect()
-      if (rect && rect.width > 0) {
-        return {
-          capsuleRight: windowInfo.windowWidth - rect.left + 12,
-          hasCapsule: true,
-        }
-      }
-    } catch {
-      /* ignore */
-    }
-    return { capsuleRight: 0, hasCapsule: false }
-  }, [])
 
   const [config, setConfig] = useState<SalaryConfig>(() => ({
     ...DEFAULT_CONFIG,
@@ -540,12 +522,10 @@ function HomeScreen() {
 
   return (
     <View className='salary-app-root'>
-      {/* 自定义导航栏（适配胶囊按钮） */}
+      {/* 顶部导航栏 */}
       <CustomNavBar
         timeStr={timeInfo.timeStr}
         status={timeInfo.isHoliday ? 'holiday' : timeInfo.isWorking ? 'working' : 'resting'}
-        capsuleRight={navLayout.capsuleRight}
-        hasCapsule={navLayout.hasCapsule}
       />
 
       <View className='module-container' style={{ opacity: moduleOpacity }}>
@@ -1009,7 +989,7 @@ function HomeScreen() {
             <View className='launch-panel__overlay'>
               <Text className='launch-panel__badge'>持久记忆</Text>
               <Text className='launch-panel__title'>记账页</Text>
-              <Text className='launch-panel__desc'>再次打开小程序也会优先从记账页开始</Text>
+              <Text className='launch-panel__desc'>下次打开也会优先从记账页开始</Text>
               <View className='launch-panel__enter'>
                 <Text className='launch-panel__enter-text'>点击进入</Text>
                 <Text className='launch-panel__enter-arrow'>→</Text>
