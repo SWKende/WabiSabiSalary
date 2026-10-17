@@ -746,6 +746,9 @@ function HomeScreen() {
                 本地库 {diagnostics.backend} · {diagnostics.native ? '原生' : '非原生'}
                 {diagnostics.degraded ? ' · 已降级到 storage' : ''}
               </Text>
+              {diagnostics.degraded && diagnostics.reason && (
+                <Text className='settings-diagnostics'>原因：{diagnostics.reason}</Text>
+              )}
             </View>
 
             <View className='settings-footer'>

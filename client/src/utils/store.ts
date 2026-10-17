@@ -231,6 +231,23 @@ const createdAtCache = new Map<string, string>()
 const readyListeners = new Set<() => void>()
 /** 启动时的运行环境快照，供诊断使用（见 storageDiagnostics） */
 let nativeAtBootstrap = false
+/** 降级原因。真机上看不到 console，只能把它渲染到界面上 */
+let degradeReason: string | null = null
+
+function summarizeError(err: unknown): string {
+  let text: string
+  if (err instanceof Error) text = err.message
+  else if (typeof err === 'string') text = err
+  else {
+    const e = err as { message?: string; errMsg?: string } | null
+    try {
+      text = e?.message || e?.errMsg || JSON.stringify(err)
+    } catch {
+      text = String(err)
+    }
+  }
+  return text.length > 160 ? `${text.slice(0, 160)}…` : text
+}
 
 /** 原生桥接最坏情况下的等待上限；超过即降级到 storage，避免页面一直等在占位上 */
 const DEFAULT_OPEN_TIMEOUT_MS = 4000
@@ -290,9 +307,14 @@ export function storeBackendName(): string {
  * native 取的是**启动时**的探测结果，不能在这里重新问一次：@capacitor/core 被 import 之后
  * 会用真实对象覆盖 globalThis.Capacitor，届时再探测会把"本来在原生里"误判成浏览器。
  */
-export function storageDiagnostics(): { backend: string; native: boolean; degraded: boolean } {
+export function storageDiagnostics(): { backend: string; native: boolean; degraded: boolean; reason: string | null } {
   const name = storeBackendName()
-  return { backend: name, native: nativeAtBootstrap, degraded: nativeAtBootstrap && name !== 'sqlite' }
+  return {
+    backend: name,
+    native: nativeAtBootstrap,
+    degraded: nativeAtBootstrap && name !== 'sqlite',
+    reason: degradeReason,
+  }
 }
 
 /**
@@ -354,6 +376,7 @@ export function bootstrapStore(options: {
     try {
       active = await withTimeout(openAndLoad(), timeoutMs)
     } catch (err) {
+      degradeReason = summarizeError(err)
       console.warn('[store] 本地库打开失败或超时，降级到 storage 驱动', err)
       active = createTaroStorageBackend()
       await active.init()
@@ -460,4 +483,5 @@ export function __resetStore(): void {
   createdAtCache.clear()
   readyListeners.clear()
   nativeAtBootstrap = false
+  degradeReason = null
 }

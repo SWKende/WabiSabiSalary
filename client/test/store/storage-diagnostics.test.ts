@@ -40,6 +40,23 @@ function hangingBackend(): PersistBackend {
   }
 }
 
+/** 建库阶段直接抛错的后端 */
+function throwingBackend(message: string): PersistBackend {
+  const boom = () => {
+    throw new Error(message)
+  }
+  return {
+    name: 'sqlite',
+    init: boom,
+    loadAllMeta: boom,
+    writeMeta: boom,
+    deleteMeta: boom,
+    loadAllEntries: boom,
+    upsertEntry: boom,
+    deleteEntry: boom,
+  }
+}
+
 function pretendNative(on: boolean) {
   const target = globalThis as unknown as { Capacitor?: unknown }
   if (on) {
@@ -66,20 +83,22 @@ describe('storageDiagnostics', () => {
   it('浏览器开发环境：storage 后端且不算降级', async () => {
     pretendNative(false)
     await store.bootstrapStore()
-    expect(store.storageDiagnostics?.()).toEqual({ backend: 'storage', native: false, degraded: false })
+    expect(store.storageDiagnostics?.()).toEqual({ backend: 'storage', native: false, degraded: false, reason: null })
   })
 
   it('真机上 SQLite 正常工作：degraded 为 false', async () => {
     pretendNative(true)
     await store.bootstrapStore({ backend: fakeSqliteBackend() })
-    expect(store.storageDiagnostics?.()).toEqual({ backend: 'sqlite', native: true, degraded: false })
+    expect(store.storageDiagnostics?.()).toEqual({ backend: 'sqlite', native: true, degraded: false, reason: null })
   })
 
   it('真机上落到 storage：degraded 为 true（这就是装机要看的信号）', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     pretendNative(true)
     await store.bootstrapStore({ backend: hangingBackend(), openTimeoutMs: 20 })
-    expect(store.storageDiagnostics?.()).toEqual({ backend: 'storage', native: true, degraded: true })
+    const d = store.storageDiagnostics?.()
+    expect(d).toMatchObject({ backend: 'storage', native: true, degraded: true })
+    expect(d?.reason).toBeTruthy()
     warn.mockRestore()
   })
 
@@ -90,7 +109,15 @@ describe('storageDiagnostics', () => {
     // @capacitor/core 被 import 后会用真实对象覆盖 window.Capacitor，
     // 浏览器里那时 isNativePlatform() 变 false；诊断不能因此翻供
     pretendNative(false)
-    expect(store.storageDiagnostics?.()).toEqual({ backend: 'storage', native: true, degraded: true })
+    expect(store.storageDiagnostics?.()).toMatchObject({ backend: 'storage', native: true, degraded: true })
+    warn.mockRestore()
+  })
+
+  it('把建库失败的原因带出来，否则真机上只能靠猜', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+    pretendNative(true)
+    await store.bootstrapStore({ backend: throwingBackend('CapacitorSQLite 未实现') })
+    expect(store.storageDiagnostics?.().reason).toContain('CapacitorSQLite 未实现')
     warn.mockRestore()
   })
 })
