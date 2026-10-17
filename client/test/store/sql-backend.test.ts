@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createSqlBackend, SCHEMA_SQL, type SqlExecutor } from '../../src/utils/db'
+import { createSqlBackend, type SqlExecutor } from '../../src/utils/db'
 
 interface Recorded {
   sql: string
@@ -37,14 +37,24 @@ const sampleRow = {
 }
 
 describe('createSqlBackend', () => {
-  it('init 建表：包含 entries / meta / 索引', async () => {
-    const { executor, scripts } = createStubExecutor()
+  it('init 逐条执行 DDL，不把多条语句拼给驱动去切', async () => {
+    const { executor, scripts, executed } = createStubExecutor({
+      '*': [{ name: 'entries' }, { name: 'meta' }],
+    })
     await createSqlBackend(executor).init()
-    expect(scripts).toHaveLength(1)
-    expect(scripts[0]).toBe(SCHEMA_SQL)
-    expect(SCHEMA_SQL).toContain('CREATE TABLE IF NOT EXISTS entries')
-    expect(SCHEMA_SQL).toContain('CREATE TABLE IF NOT EXISTS meta')
-    expect(SCHEMA_SQL).toContain('CREATE INDEX IF NOT EXISTS idx_entries_occurred')
+    expect(scripts.length).toBeGreaterThanOrEqual(3)
+    const all = scripts.join(' ')
+    expect(all).toContain('CREATE TABLE IF NOT EXISTS entries')
+    expect(all).toContain('CREATE TABLE IF NOT EXISTS meta')
+    expect(all).toContain('CREATE INDEX IF NOT EXISTS idx_entries_occurred')
+    // 每条语句单独一次调用：真机上拼串交给驱动会被静默吞掉，只建成第一张表
+    expect(scripts.every((s) => !/CREATE[\s\S]*CREATE/.test(s))).toBe(true)
+    expect(executed.some((e) => e.sql.includes('sqlite_master'))).toBe(true)
+  })
+
+  it('建完自检：表缺失时抛出指明缺哪张表的错误', async () => {
+    const { executor } = createStubExecutor({ '*': [{ name: 'entries' }] })
+    await expect(createSqlBackend(executor).init()).rejects.toThrow(/meta/)
   })
 
   it('upsertEntry 走 ON CONFLICT 且参数顺序与列一致', async () => {

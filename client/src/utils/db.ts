@@ -51,7 +51,11 @@ export interface SqlExecutor {
   all<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<T[]>
 }
 
-export const SCHEMA_SQL = [
+/**
+ * 建表语句。必须逐条执行：真机上把多条 DDL 拼成一串交给 @capacitor-community/sqlite，
+ * 驱动会静默吞掉后面的语句，只建成第一张表，之后读取报 no such table: meta。
+ */
+export const SCHEMA_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS entries (
     id TEXT PRIMARY KEY,
     type TEXT NOT NULL,
@@ -62,13 +66,15 @@ export const SCHEMA_SQL = [
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   )`,
-  `CREATE INDEX IF NOT EXISTS idx_entries_occurred ON entries(occurred_at DESC)`,
   `CREATE TABLE IF NOT EXISTS meta (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL,
     updated_at TEXT NOT NULL
   )`,
-].join('; ')
+  `CREATE INDEX IF NOT EXISTS idx_entries_occurred ON entries(occurred_at DESC)`,
+]
+
+const REQUIRED_TABLES = ['entries', 'meta']
 
 const UPSERT_ENTRY_SQL = `INSERT INTO entries
   (id, type, amount, category, note, occurred_at, created_at, updated_at)
@@ -90,7 +96,19 @@ export function createSqlBackend(executor: SqlExecutor): PersistBackend {
   return {
     name: 'sqlite',
     async init() {
-      await executor.execute(SCHEMA_SQL)
+      for (const sql of SCHEMA_STATEMENTS) {
+        await executor.execute(sql)
+      }
+      // 自检：建表没成就在这一行炸，诊断能直接指出缺哪张表，
+      // 而不是等到下游 SELECT 才报一句看不懂的 no such table
+      const rows = await executor.all<{ name: string }>(
+        `SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('${REQUIRED_TABLES.join("','")}')`,
+      )
+      const created = new Set(rows.map((r) => r.name))
+      const missing = REQUIRED_TABLES.filter((t) => !created.has(t))
+      if (missing.length > 0) {
+        throw new Error(`建表后自检失败，本地库缺少 ${missing.join(' / ')}`)
+      }
     },
     async loadAllMeta() {
       return executor.all<MetaRow>('SELECT key, value, updated_at FROM meta')
