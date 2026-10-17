@@ -48,10 +48,11 @@
   --btn-height-md   : #{k.$btn-height-md};
   --btn-height-lg   : #{k.$btn-height-lg};
 
-  // 安全区：安卓 targetSdk 36 强制 edge-to-edge，WebView 会画进状态栏/手势条底下。
-  // 必须 index.html 的 viewport 带 viewport-fit=cover，否则 env() 恒为 0。
-  --safe-area-top    : env(safe-area-inset-top, 0px);
-  --safe-area-bottom : env(safe-area-inset-bottom, 0px);
+  // 安全区。安卓 WebView 里 env(safe-area-inset-*) 拿不到值，Capacitor 的 SystemBars
+  // 插件（insetsHandling 默认 css）会把真实 insets 注入成 --safe-area-inset-* 内联变量；
+  // iOS 与桌面浏览器没有这个注入，退回 env()。两者都要求 viewport 带 viewport-fit=cover。
+  --safe-area-top    : var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+  --safe-area-bottom : var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
   --nav-top-gap      : calc(#{sp.$sp-5} + var(--safe-area-top));
 
   // 滚动区留白：手势条会盖住视口底部，内容自带的 padding 会被吃掉一段。
