@@ -18,7 +18,16 @@ import {
   type CnDayType,
   type CnHolidayDataset,
 } from '../../utils/cnHoliday'
-import { readJSON, writeJSON, storageDiagnostics } from '../../utils/store'
+import { readJSON, writeJSON, storageDiagnostics, listRecords, metaKeys, flushStore } from '../../utils/store'
+import {
+  dumpSnapshot,
+  parseBackup,
+  applySnapshot,
+  markBackupDone,
+  backupNotice,
+  type BackupFile,
+} from '../../utils/backup'
+import { exportBackupFile, pickBackupFile } from '../../utils/backupIO'
 import { useStoreReady } from '../../utils/useStoreReady'
 import holidayGameSvg from './assets/holiday-game.svg'
 import holidayRunSvg from './assets/holiday-run.svg'
@@ -109,6 +118,10 @@ const countWorkdaysInMonth = (year: number, month: number, dataset: CnHolidayDat
     if (resolveIsWorkday(d, dataset)) count += 1
   }
   return Math.max(1, count)
+}
+
+function describeError(err: unknown): string {
+  return err instanceof Error ? err.message : String(err)
 }
 
 function HomeScreen() {
@@ -519,6 +532,47 @@ function HomeScreen() {
   const startStr = `${String(config.workStartHour).padStart(2, '0')}:00`
   const endStr = `${String(config.workEndHour).padStart(2, '0')}:00`
   const diagnostics = storageDiagnostics()
+  const notice = backupNotice({ degraded: diagnostics.degraded })
+
+  const [backupMsg, setBackupMsg] = useState<string | null>(null)
+  const [pendingBackup, setPendingBackup] = useState<BackupFile | null>(null)
+  const noticeText = backupMsg || notice
+
+  const handleExport = useCallback(async () => {
+    setPendingBackup(null)
+    try {
+      const snapshot = dumpSnapshot()
+      const where = await exportBackupFile(snapshot)
+      markBackupDone()
+      setBackupMsg(where === 'shared' ? '已导出（系统分享面板）' : '已导出为文件')
+    } catch (err) {
+      setBackupMsg(`导出失败：${describeError(err)}`)
+    }
+  }, [])
+
+  const handlePickBackup = useCallback(async () => {
+    setBackupMsg(null)
+    setPendingBackup(null)
+    const raw = await pickBackupFile()
+    if (raw === null) return
+    try {
+      // 校验通过才进确认态：坏文件在这一步就被挡下，本机数据一个字节没动
+      setPendingBackup(parseBackup(raw))
+    } catch (err) {
+      setBackupMsg(`导入失败：${describeError(err)}`)
+    }
+  }, [])
+
+  const handleConfirmImport = useCallback(async () => {
+    if (!pendingBackup) return
+    await applySnapshot(pendingBackup)
+    markBackupDone()
+    // reload 会丢掉还没落盘的写入，所以必须等写队列 flush 完再重启
+    await flushStore()
+    setPendingBackup(null)
+    // 整库换掉了。与其逐个通知读缓存的组件，不如重启一次让所有数据从库里重读
+    window.location.reload()
+  }, [pendingBackup])
 
   return (
     <View className='salary-app-root'>
@@ -741,13 +795,28 @@ function HomeScreen() {
                 />
               </View>
 
-              {/* 临时诊断：真机上确认 SQLite 是否真的在用；排查完可整段摘除 */}
-              <Text className='settings-diagnostics'>
-                本地库 {diagnostics.backend} · {diagnostics.native ? '原生' : '非原生'}
-                {diagnostics.degraded ? ' · 已降级到 storage' : ''}
-              </Text>
-              {diagnostics.degraded && diagnostics.reason && (
-                <Text className='settings-diagnostics'>原因：{diagnostics.reason}</Text>
+              <View className='settings-backup'>
+                <Text className='settings-backup-btn' onClick={handleExport}>导出备份</Text>
+                <Text className='settings-backup-btn' onClick={handlePickBackup}>导入备份</Text>
+              </View>
+
+              {pendingBackup ? (
+                <View className='settings-backup-confirm'>
+                  <Text className='settings-notice'>
+                    备份：记账 {pendingBackup.records.length} 条 · 配置 {Object.keys(pendingBackup.meta).length} 项
+                  </Text>
+                  <Text className='settings-notice'>
+                    当前：记账 {listRecords().length} 条 · 配置 {metaKeys().length} 项
+                  </Text>
+                  <View className='settings-backup-actions'>
+                    <Text className='settings-backup-btn' onClick={() => setPendingBackup(null)}>取 消</Text>
+                    <Text className='settings-backup-btn settings-backup-btn-danger' onClick={handleConfirmImport}>
+                      覆盖导入
+                    </Text>
+                  </View>
+                </View>
+              ) : (
+                noticeText && <Text className='settings-notice'>{noticeText}</Text>
               )}
             </View>
 

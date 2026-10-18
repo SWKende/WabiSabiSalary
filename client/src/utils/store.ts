@@ -415,6 +415,11 @@ export function writeJSON(key: string, value: unknown): void {
   enqueueWrite(`meta:${key}`, () => target.writeMeta(row))
 }
 
+/** 当前全部配置键，供备份枚举 */
+export function metaKeys(): string[] {
+  return [...metaCache.keys()]
+}
+
 export function removeMeta(key: string): void {
   metaCache.delete(key)
   if (!backend) return

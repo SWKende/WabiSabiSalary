@@ -1238,13 +1238,44 @@
 }
 
 /* 临时诊断行：真机排查存储后端用，排查完连同 index.tsx 里的用法一起摘除 */
-.settings-diagnostics {
+.settings-notice {
   display: block;
   margin-top: $sp-2;
   font-size: $font-caption-sm;
   letter-spacing: 2rpx;
   color: $color-text-placeholder;
   text-align: center;
+}
+
+.settings-backup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $sp-6;
+  margin-top: $sp-4;
+}
+
+.settings-backup-btn {
+  padding: $sp-2 $sp-3;
+  font-size: $font-caption-sm;
+  letter-spacing: 2rpx;
+  color: $color-text-placeholder;
+
+  &:active {
+    opacity: 0.55;
+  }
+
+  &.settings-backup-btn-danger {
+    color: $color-state-danger;
+  }
+}
+
+.settings-backup-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $sp-8;
+  margin-top: $sp-2;
 }
 
 .module-switch {
