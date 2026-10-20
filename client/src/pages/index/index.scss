@@ -617,16 +617,16 @@
 
   .hero-amount {
     display: flex;
-    align-items: flex-start;
+    align-items: baseline;
     justify-content: center;
     gap: $sp-1;
     margin-bottom: $sp-8;
 
+    // 与数字共用基线；不要用 margin-top 手工下移 —— 字号阶梯一变就会错位
     .hero-currency {
       font-size: $font-display-lg;
       color: $color-brand-primary-strong;
       font-weight: 300;
-      margin-top: $sp-3;
       font-family: 'Noto Serif SC', serif;
     }
 
@@ -841,7 +841,7 @@
 .live-amount-wrap {
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
   gap: 2px;
   margin-bottom: $sp-3;
@@ -850,7 +850,6 @@
     font-size: $font-display-lg;
     color: $color-brand-primary-strong;
     font-weight: 300;
-    margin-top: $sp-1;
     font-family: 'Noto Serif SC', serif;
   }
 }
