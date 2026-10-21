@@ -536,8 +536,8 @@
 // `.taro-scroll-view__scroll-y` 规则在本项目产物里根本没被注入，
 // 只靠 `scrollY` 属性会得到 overflow:visible，超出的内容被 .salary-app-root 裁掉且无法滚到。
 .page-scroll {
-  height: 100%;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: var(--scroll-bottom-gap);
@@ -549,7 +549,10 @@
   transition: opacity 0.22s ease;
   display: flex;
   flex-direction: column;
-  height: 100%;
+
+  // 不要写 height: 100%：它会按根容器满高算，把导航栏那几十 px 再叠一遍，
+  // 导致整个滚动区底部伸到屏幕外，最后一条内容永远滚不到。
+  min-height: 0;
 }
 
 // 页面指示器 — 侘寂极简
