@@ -1,4 +1,5 @@
 import type { BackupFile } from './backup'
+import { isNativeRuntime } from './db'
 
 /** 备份文件名。带上日期便于在微信/网盘里区分多次备份 */
 export function backupFileName(): string {
@@ -24,13 +25,29 @@ function downloadAsFile(content: string, name: string): void {
 }
 
 /**
- * 导出：优先走系统分享面板（安卓 WebView 原生支持，可发到微信/文件/网盘），
- * 不支持时退回下载链接。两条路都成，调用方不需要区分环境。
+ * 导出：真机必须走 Capacitor 的「写文件 + 系统分享」。
+ * Capacitor 的安卓 WebView 没有注册 DownloadListener，blob + <a download> 会静默失效，
+ * 不报错也不产出文件；浏览器里则反过来，那条路是唯一可用的。
  */
 export async function exportBackupFile(file: BackupFile): Promise<'shared' | 'downloaded'> {
   const name = backupFileName()
   const content = serialize(file)
-  const share = (navigator as { canShare?: (d: unknown) => boolean; share?: (d: unknown) => Promise<void> })
+
+  if (isNativeRuntime()) {
+    const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem')
+    const { Share } = await import('@capacitor/share')
+    // 写缓存目录即可：文件交给分享面板后由目标应用自行保存，本应用不需要长期保留
+    const saved = await Filesystem.writeFile({
+      path: name,
+      data: content,
+      directory: Directory.Cache,
+      encoding: Encoding.UTF8,
+    })
+    await Share.share({ title: name, url: saved.uri, dialogTitle: '导出备份' })
+    return 'shared'
+  }
+
+  const share = navigator as { canShare?: (d: unknown) => boolean; share?: (d: unknown) => Promise<void> }
 
   if (typeof share.canShare === 'function' && typeof share.share === 'function') {
     const candidate = new File([content], name, { type: 'application/json' })
