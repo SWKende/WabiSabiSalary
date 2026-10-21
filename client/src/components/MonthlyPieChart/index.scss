@@ -19,20 +19,20 @@
 }
 
 .pie-circle {
-  width: 280px;
-  height: 280px;
+  width: 240rpx;
+  height: 240rpx;
   border-radius: 50%;
   position: relative;
 
-  // 甜甜圈中心镂空
+  // 甜甜圈中心镂空。镂空占直径 62%，环才不显得厚重
   &::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 120px;
-    height: 120px;
+    width: 150rpx;
+    height: 150rpx;
     border-radius: 50%;
     background: $color-bg-page;
   }
