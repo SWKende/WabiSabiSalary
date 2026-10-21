@@ -105,7 +105,7 @@ npm run test:store                   # 只跑存储层测试
 
 ### 方式 A：云端构建（推荐，本机不需要 Android 环境）
 
-推送到 GitHub 后，Actions 会自动跑 `verify → apk`；也可在 Actions 页面点 **Run workflow** 手动触发。几分钟后在运行记录的 Artifacts 里下载 `salary-clock-debug-apk`，解压得到 `app-debug.apk`，传到手机安装即可。
+推送到 GitHub 后，Actions 会自动跑 `verify → apk`；也可在 Actions 页面点 **Run workflow** 手动触发。几分钟后在运行记录的 Artifacts 里下载 `WabiSabiSalary-debug-apk`，解压得到 `app-debug.apk`，传到手机安装即可。
 
 ### 方式 B：本机构建
 
