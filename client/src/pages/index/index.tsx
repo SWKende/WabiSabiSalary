@@ -18,6 +18,7 @@ import {
   type CnDayType,
   type CnHolidayDataset,
 } from '../../utils/cnHoliday'
+import { completedWorkdaysInPeriod, countWorkdaysInMonth } from '../../utils/salaryEarned'
 import { readJSON, writeJSON, storageDiagnostics, listRecords, metaKeys, flushStore } from '../../utils/store'
 import {
   dumpSnapshot,
@@ -101,23 +102,6 @@ const resolveWorkHoursPerDay = (workStartHour: number, workEndHour: number) => {
 const isWeekend = (d: Date) => {
   const w = d.getDay()
   return w === 0 || w === 6
-}
-
-const resolveIsWorkday = (d: Date, dataset: CnHolidayDataset | null) => {
-  const type = classifyCnDate(toYYYYMMDD(d), dataset)
-  if (type === 'workday') return true
-  if (type === 'holiday') return false
-  return !isWeekend(d)
-}
-
-const countWorkdaysInMonth = (year: number, month: number, dataset: CnHolidayDataset | null) => {
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  let count = 0
-  for (let day = 1; day <= daysInMonth; day++) {
-    const d = new Date(year, month, day)
-    if (resolveIsWorkday(d, dataset)) count += 1
-  }
-  return Math.max(1, count)
 }
 
 function describeError(err: unknown): string {
@@ -403,17 +387,10 @@ function HomeScreen() {
       }
     }
 
-    let monthEarned = 0
-    if (day > payday) {
-      const workedDays = day - payday
-      monthEarned = workedDays * dailySalary + todayEarned
-    } else if (day === payday) {
-      monthEarned = todayEarned
-    } else {
-      const prevMonthDays = new Date(year, month, 0).getDate()
-      const workedDays = prevMonthDays - payday + day
-      monthEarned = workedDays * dailySalary + todayEarned
-    }
+    // 分子必须按工作日计：日薪的分母是当月工作日数，若分子用自然日，
+    // 有周末/节假日的月份会提前超过月薪（2026-10 曾算到 12,516，而月薪是 11,000）。
+    const workedDays = completedWorkdaysInPeriod(now, payday, holidayDataset)
+    const monthEarned = workedDays * dailySalary + todayEarned
 
     const workProgress = isHoliday
       ? 0
