@@ -154,12 +154,18 @@ function BookkeepingPageInner({
         </View>
       </View>
 
-      {/* 记忆笔按钮 / 表单卡片 */}
-      {!showForm ? (
-        <View className='memory-pen-btn' onClick={openForm}>
-          <Text className='memory-pen-text'>記 一 筆</Text>
-        </View>
-      ) : (
+      {/* 记忆笔按钮：常驻挂载，只用 display 隐藏。
+          不要和下面的表单做三元互换 —— Taro H5 会复用同一位置的 taro-view-core，
+          复用后不再把 onClick 绑回去，表单关过一次这个按钮就彻底点不动了。 */}
+      <View
+        className='memory-pen-btn'
+        style={showForm ? { display: 'none' } : undefined}
+        onClick={openForm}
+      >
+        <Text className='memory-pen-text'>記 一 筆</Text>
+      </View>
+
+      {showForm && (
         <View
           className={`bookkeeping-form${formAnimDone ? ' is-anim-done' : ''}`}
           onAnimationEnd={handleFormAnimEnd}
