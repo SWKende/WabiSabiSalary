@@ -4,8 +4,9 @@ import './index.scss'
 interface NumberKeyboardProps {
   visible: boolean
   value: string
+  /** 每次按键即时回调，不再有「确认」这一步 */
   onChange: (value: string) => void
-  onConfirm: (value: string) => void
+  /** 点遮罩关闭（底部已无按钮） */
   onCancel: () => void
 }
 
@@ -46,7 +47,6 @@ export default function NumberKeyboard({
   visible,
   value,
   onChange,
-  onConfirm,
   onCancel,
 }: NumberKeyboardProps) {
   if (!visible) return null
@@ -73,15 +73,6 @@ export default function NumberKeyboard({
               </View>
             )
           })}
-        </View>
-
-        <View className='nk-footer'>
-          <View className='nk-btn nk-btn-cancel' onClick={onCancel}>
-            <Text className='nk-btn-text'>收 起</Text>
-          </View>
-          <View className='nk-btn nk-btn-confirm' onClick={() => onConfirm(value)}>
-            <Text className='nk-btn-text'>確 認</Text>
-          </View>
         </View>
       </View>
     </View>

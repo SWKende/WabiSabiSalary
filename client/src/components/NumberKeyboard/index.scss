@@ -23,7 +23,9 @@
   background: $color-bg-page;
   border-radius: $radius-md $radius-md 0 0;
   border-top: 1px solid $color-divider-subtle;
-  padding: $sp-4 $sp-5 calc($sp-5 + env(safe-area-inset-bottom, 0px));
+
+  // 底部按钮已去掉，最后一行按键直接贴面板底边，必须让开手机的手势条
+  padding: $sp-4 $sp-5 calc($sp-5 + var(--safe-area-bottom, 0px));
   box-sizing: border-box;
   animation: nkSlideUp 0.26s ease;
 }
@@ -98,45 +100,4 @@
   color: $color-text-primary;
   font-family: 'Shippori Mincho B1', serif;
   line-height: 1;
-}
-
-.nk-footer {
-  display: flex;
-  gap: $sp-3;
-  margin-top: $sp-4;
-}
-
-.nk-btn {
-  flex: 1;
-  min-height: $input-height-lg;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: $radius-sm;
-  transition: transform 0.2s ease, background 0.2s ease;
-
-  &:active {
-    transform: scale(0.98);
-  }
-}
-
-.nk-btn-cancel {
-  border: 1px solid $color-divider-subtle;
-  background: transparent;
-}
-
-.nk-btn-confirm {
-  background: $color-text-primary;
-  border: 1px solid $color-text-primary;
-
-  .nk-btn-text {
-    color: $color-bg-page;
-  }
-}
-
-.nk-btn-text {
-  font-size: $font-caption-md;
-  color: $color-text-secondary;
-  letter-spacing: 4px;
-  font-family: 'Noto Serif SC', serif;
 }
