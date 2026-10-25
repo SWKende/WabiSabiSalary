@@ -556,7 +556,7 @@
     padding: $sp-2 $sp-4;
     background: $color-bg-page;
     border: 1px solid $color-divider-subtle;
-    border-radius: $radius-full;
+    border-radius: $radius-2;
     transition: background 0.2s ease, border-color 0.2s ease;
 
     &.is-active {
