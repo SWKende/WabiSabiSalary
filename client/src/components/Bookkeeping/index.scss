@@ -553,10 +553,15 @@
   }
 
   .record-tag {
-    padding: $sp-2 $sp-4;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: $sp-10;
+    padding: 0 $sp-5;
     background: $color-bg-page;
     border: 1px solid $color-divider-subtle;
     border-radius: $radius-2;
+    box-sizing: border-box;
     transition: background 0.2s ease, border-color 0.2s ease;
 
     &.is-active {
