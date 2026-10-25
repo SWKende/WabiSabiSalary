@@ -544,6 +544,39 @@
     font-weight: 400;
   }
 
+  .record-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $sp-2;
+    margin-bottom: $sp-4;
+    padding-left: $sp-1;
+  }
+
+  .record-tag {
+    padding: $sp-2 $sp-4;
+    background: $color-bg-page;
+    border: 1px solid $color-divider-subtle;
+    border-radius: $radius-full;
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+    &.is-active {
+      background: $color-text-primary;
+      border-color: $color-text-primary;
+
+      .record-tag-text {
+        color: $color-bg-page;
+      }
+    }
+  }
+
+  .record-tag-text {
+    font-size: $font-caption-sm;
+    color: $color-text-secondary;
+    font-family: 'Noto Serif SC', serif;
+    line-height: 1;
+    letter-spacing: 1px;
+  }
+
   .record-item {
     display: flex;
     justify-content: space-between;

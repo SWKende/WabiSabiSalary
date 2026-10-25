@@ -16,6 +16,9 @@ export interface BookkeepingSettings {
   showMonthlyPie: boolean
 }
 
+/** 「最近記錄」筛选里的「全部」项 */
+const RECORD_FILTER_ALL = '全部'
+
 // 记账页面组件
 function BookkeepingPageInner({
   bkSettings,
@@ -65,6 +68,29 @@ function BookkeepingPageInner({
   const [activeType, setActiveType] = useState<'expense' | 'income'>('expense')
   const [category, setCategory] = useState(expenseCategories[0])
   const [records, setRecords] = useState<BookkeepingRecord[]>(() => listRecords())
+
+  // 「最近記錄」分类筛选，默认全部
+  const [recordFilter, setRecordFilter] = useState<string>(RECORD_FILTER_ALL)
+
+  const recordCategories = useMemo(() => {
+    const seen = new Set<string>()
+    for (const record of records) seen.add(record.category)
+    return Array.from(seen)
+  }, [records])
+
+  // 选中的分类被删空后自动退回「全部」，避免停在一个空列表上
+  const activeRecordFilter =
+    recordFilter === RECORD_FILTER_ALL || recordCategories.includes(recordFilter)
+      ? recordFilter
+      : RECORD_FILTER_ALL
+
+  const visibleRecords = useMemo(
+    () =>
+      activeRecordFilter === RECORD_FILTER_ALL
+        ? records
+        : records.filter((record) => record.category === activeRecordFilter),
+    [records, activeRecordFilter],
+  )
 
   const handleTypeSwitch = (type: 'expense' | 'income') => {
     setActiveType(type)
@@ -309,7 +335,18 @@ function BookkeepingPageInner({
       {records.length > 0 && (
         <View className='records-section'>
           <Text className='records-title'>最近記錄</Text>
-          {records.slice(0, 20).map((record) => (
+          <View className='record-filter'>
+            {[RECORD_FILTER_ALL, ...recordCategories].map((tag) => (
+              <View
+                key={tag}
+                className={`record-tag${activeRecordFilter === tag ? ' is-active' : ''}`}
+                onClick={() => setRecordFilter(tag)}
+              >
+                <Text className='record-tag-text'>{tag}</Text>
+              </View>
+            ))}
+          </View>
+          {visibleRecords.slice(0, 20).map((record) => (
             <View key={record.id} className='record-item'>
               <View className='record-left'>
                 <View className='record-category-badge'>
