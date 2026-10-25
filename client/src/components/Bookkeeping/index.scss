@@ -556,7 +556,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: $sp-10;
+    min-height: $sp-12;
     padding: 0 $sp-5;
     background: $color-bg-page;
     border: 1px solid $color-divider-subtle;
@@ -575,7 +575,7 @@
   }
 
   .record-tag-text {
-    font-size: $font-caption-sm;
+    font-size: $font-body-md;
     color: $color-text-secondary;
     font-family: 'Noto Serif SC', serif;
     line-height: 1;
