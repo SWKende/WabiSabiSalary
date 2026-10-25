@@ -18,6 +18,8 @@ export interface BookkeepingSettings {
 
 /** 「最近記錄」筛选里的「全部」项 */
 const RECORD_FILTER_ALL = '全部'
+/** 「最近記錄」每页条数 */
+const RECORD_PAGE_SIZE = 20
 
 // 记账页面组件
 function BookkeepingPageInner({
@@ -71,6 +73,8 @@ function BookkeepingPageInner({
 
   // 「最近記錄」分类筛选，默认全部
   const [recordFilter, setRecordFilter] = useState<string>(RECORD_FILTER_ALL)
+  // 分页：一次显示多少条，滚到底再追加一页
+  const [visibleCount, setVisibleCount] = useState<number>(RECORD_PAGE_SIZE)
 
   const recordCategories = useMemo(() => {
     const seen = new Set<string>()
@@ -91,6 +95,31 @@ function BookkeepingPageInner({
         : records.filter((record) => record.category === activeRecordFilter),
     [records, activeRecordFilter],
   )
+
+  const shownRecords = visibleRecords.slice(0, visibleCount)
+  const hasMore = visibleRecords.length > visibleCount
+
+  // 滚动到底附近就追加一页。
+  // 不用 IntersectionObserver：它依赖页面可见，后台/隐藏状态下不派发回调，
+  // 出问题时会静默失效；监听滚动容器的 scroll 事件在哪都能验。
+  useEffect(() => {
+    if (!hasMore) return
+    // Taro 的 View 不透传 ref，只能按类名取这个哨兵（页面里只有这一个列表）
+    const marker = document.querySelector('.record-load-more')
+    const scroller = marker?.closest('.page-scroll') as HTMLElement | null
+    if (!scroller) return
+
+    const check = () => {
+      const distanceToBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight
+      if (distanceToBottom < 240) {
+        setVisibleCount((count) => count + RECORD_PAGE_SIZE)
+      }
+    }
+    scroller.addEventListener('scroll', check, { passive: true })
+    // 绑定监听时可能已经在底部，那种情况不会有新的 scroll 事件，先自检一次
+    check()
+    return () => scroller.removeEventListener('scroll', check)
+  }, [hasMore, visibleCount, visibleRecords.length])
 
   const handleTypeSwitch = (type: 'expense' | 'income') => {
     setActiveType(type)
@@ -340,13 +369,16 @@ function BookkeepingPageInner({
               <View
                 key={tag}
                 className={`record-tag${activeRecordFilter === tag ? ' is-active' : ''}`}
-                onClick={() => setRecordFilter(tag)}
+                onClick={() => {
+                  setRecordFilter(tag)
+                  setVisibleCount(RECORD_PAGE_SIZE)
+                }}
               >
                 <Text className='record-tag-text'>{tag}</Text>
               </View>
             ))}
           </View>
-          {visibleRecords.slice(0, 20).map((record) => (
+          {shownRecords.map((record) => (
             <View key={record.id} className='record-item'>
               <View className='record-left'>
                 <View className='record-category-badge'>
@@ -367,6 +399,15 @@ function BookkeepingPageInner({
               </View>
             </View>
           ))}
+
+          {hasMore && (
+            <View
+              className='record-load-more'
+              onClick={() => setVisibleCount((count) => count + RECORD_PAGE_SIZE)}
+            >
+              <Text className='record-load-more-text'>下滑加載更多</Text>
+            </View>
+          )}
         </View>
       )}
 

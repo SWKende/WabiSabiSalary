@@ -582,6 +582,20 @@
     letter-spacing: 1px;
   }
 
+  .record-load-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $sp-5 0;
+  }
+
+  .record-load-more-text {
+    font-size: $font-body-md;
+    color: $color-text-placeholder;
+    letter-spacing: 3px;
+    font-family: 'Noto Serif SC', serif;
+  }
+
   .record-item {
     display: flex;
     justify-content: space-between;
