@@ -4,7 +4,7 @@ import Taro from '@tarojs/taro'
 import MonthlyBarChart from '../MonthlyBarChart'
 import MonthlyPieChart from '../MonthlyPieChart'
 import { createRecordTime, formatLocalDate, formatRecordTime, isRecordInMonth, isRecordOnDate } from '../../utils/format'
-import { addRecord, listRecords, removeRecord, type BookkeepingRecord } from '../../utils/store'
+import { addRecord, listRecords, removeRecord, updateRecord, type BookkeepingRecord } from '../../utils/store'
 import './index.scss'
 
 export type { BookkeepingRecord }
@@ -35,6 +35,8 @@ function BookkeepingPageInner({
   const [note, setNote] = useState('')
   const [selectedDate, setSelectedDate] = useState(() => formatLocalDate(new Date()))
   const [showForm, setShowForm] = useState(false)
+  // 非空表示表单处于编辑态：提交走 updateRecord 而不是 addRecord
+  const [editingRecord, setEditingRecord] = useState<BookkeepingRecord | null>(null)
   const [formAnimDone, setFormAnimDone] = useState(false)
   const formAnimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -126,21 +128,49 @@ function BookkeepingPageInner({
     setCategory(type === 'expense' ? expenseCategories[0] : incomeCategories[0])
   }
 
+  // 新建：清掉编辑态与上次残留输入
+  const startCreate = () => {
+    setEditingRecord(null)
+    setAmount('')
+    setNote('')
+    setSelectedDate(formatLocalDate(new Date()))
+    openForm()
+  }
+
+  // 编辑：把这条记录回填进同一个表单
+  const startEdit = (record: BookkeepingRecord) => {
+    setEditingRecord(record)
+    setAmount(record.amount)
+    setNote(record.note)
+    setActiveType(record.type)
+    setCategory(record.category)
+    setSelectedDate(record.time.slice(0, 10))
+    openForm()
+  }
+
   const handleSubmit = () => {
     if (!amount) return
-    addRecord({
-      type: activeType,
-      amount,
-      note: note || category,
-      category,
-      time: createRecordTime(selectedDate),
-    })
+
+    // 日期没改就沿用原时间点，否则编辑会把记录重置成「现在」
+    const time =
+      editingRecord && selectedDate === editingRecord.time.slice(0, 10)
+        ? editingRecord.time
+        : createRecordTime(selectedDate)
+
+    const payload = { type: activeType, amount, note: note || category, category, time }
+    if (editingRecord) {
+      updateRecord(editingRecord.id, payload)
+    } else {
+      addRecord(payload)
+    }
+
     setRecords(listRecords())
     setAmount('')
     setNote('')
     setSelectedDate(formatLocalDate(new Date()))
+    setEditingRecord(null)
     setShowForm(false)
-    Taro.showToast({ title: '已記錄', icon: 'success' })
+    Taro.showToast({ title: editingRecord ? '已更新' : '已記錄', icon: 'success' })
   }
 
   const handleDelete = (id: string) => {
@@ -215,7 +245,7 @@ function BookkeepingPageInner({
       <View
         className='memory-pen-btn'
         style={showForm ? { display: 'none' } : undefined}
-        onClick={openForm}
+        onClick={startCreate}
       >
         <Text className='memory-pen-text'>記 一 筆</Text>
       </View>
@@ -226,7 +256,13 @@ function BookkeepingPageInner({
           onAnimationEnd={handleFormAnimEnd}
         >
           <View className='form-card'>
-            <View className='form-close-btn' onClick={() => setShowForm(false)}>
+            <View
+              className='form-close-btn'
+              onClick={() => {
+                setShowForm(false)
+                setEditingRecord(null)
+              }}
+            >
               <Text className='form-close-icon'>✕</Text>
             </View>
             <View className='amount-row'>
@@ -295,7 +331,7 @@ function BookkeepingPageInner({
               className={`submit-btn ${!amount ? 'disabled' : ''}`}
               onClick={handleSubmit}
             >
-              <Text className='submit-text'>記 錄</Text>
+              <Text className='submit-text'>{editingRecord ? '更 新' : '記 錄'}</Text>
             </View>
           </View>
         </View>
@@ -379,7 +415,7 @@ function BookkeepingPageInner({
             ))}
           </View>
           {shownRecords.map((record) => (
-            <View key={record.id} className='record-item'>
+            <View key={record.id} className='record-item' onClick={() => startEdit(record)}>
               <View className='record-left'>
                 <View className='record-category-badge'>
                   <Text className='record-category'>{record.category}</Text>
@@ -393,7 +429,13 @@ function BookkeepingPageInner({
                 <Text className={`record-amount ${record.type === 'income' ? 'positive' : 'negative'}`}>
                   {record.type === 'income' ? '+' : '-'}¥{record.amount}
                 </Text>
-                <View className='record-delete' onClick={() => openDeleteConfirm(record)}>
+                <View
+                  className='record-delete'
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    openDeleteConfirm(record)
+                  }}
+                >
                   <Text className='record-delete-icon'>×</Text>
                 </View>
               </View>
