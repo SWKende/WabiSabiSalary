@@ -4,6 +4,7 @@ import {
   countWorkdaysBetween,
   countWorkdaysInMonth,
   payPeriodStart,
+  payPeriodWorkdays,
   resolveIsWorkday,
 } from '../../src/utils/salaryEarned'
 import { HOLIDAY_SEED } from '../../src/utils/holidaySeed'
@@ -52,6 +53,22 @@ describe('countWorkdaysBetween', () => {
 
   it('起止顺序颠倒时返回 0 而不是负数', () => {
     expect(countWorkdaysBetween(new Date(2026, 9, 9), new Date(2026, 9, 8), dataset)).toBe(0)
+  })
+})
+
+describe('payPeriodWorkdays', () => {
+  it('发薪日 1 日：周期等于整月，与 countWorkdaysInMonth 完全一致', () => {
+    expect(payPeriodWorkdays(oct(21), 1, dataset)).toBe(countWorkdaysInMonth(2026, 9, dataset))
+    expect(payPeriodWorkdays(oct(21), 1, dataset)).toBe(18)
+  })
+
+  it('发薪日 25 日：周期 9/25~10/24，共 16 个工作日', () => {
+    // 9/28-30 三个 + 10/8、10/9 + 10/10 调休 + 10/12-16 + 10/19-23
+    expect(payPeriodWorkdays(oct(21), 25, dataset)).toBe(16)
+  })
+
+  it('次月取数时算的是新周期（10/25~11/24，22 个工作日）', () => {
+    expect(payPeriodWorkdays(new Date(2026, 10, 3, 10, 0, 0), 25, dataset)).toBe(22)
   })
 })
 

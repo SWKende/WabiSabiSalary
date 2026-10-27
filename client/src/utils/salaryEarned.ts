@@ -47,6 +47,22 @@ export function payPeriodStart(now: Date, payday: number): Date {
 }
 
 /**
+ * 当前发薪周期内的工作日数，周期 = [发薪日, 下个发薪日)。
+ * 这是日薪的分母：分子按周期内已完成工作日计，两者必须同一个区间。
+ * 发薪日为 1 时周期就是整月，与 countWorkdaysInMonth 完全等价。
+ */
+export function payPeriodWorkdays(
+  now: Date,
+  payday: number,
+  dataset: CnHolidayDataset | null,
+): number {
+  const start = payPeriodStart(now, payday)
+  const nextStart = new Date(start.getFullYear(), start.getMonth() + 1, payday)
+  const lastDay = new Date(nextStart.getFullYear(), nextStart.getMonth(), nextStart.getDate() - 1)
+  return Math.max(1, countWorkdaysBetween(start, lastDay, dataset))
+}
+
+/**
  * 本发薪周期内、今天之前已完成的工作日数。
  * 必须按工作日而非自然日计：日薪的分母是当月工作日数，
  * 用自然日做分子会在有周末/假日的月份里提前超出月薪。

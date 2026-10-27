@@ -18,7 +18,7 @@ import {
   type CnDayType,
   type CnHolidayDataset,
 } from '../../utils/cnHoliday'
-import { completedWorkdaysInPeriod, countWorkdaysInMonth } from '../../utils/salaryEarned'
+import { completedWorkdaysInPeriod, payPeriodWorkdays } from '../../utils/salaryEarned'
 import { readJSON, writeJSON, storageDiagnostics, listRecords, metaKeys, flushStore } from '../../utils/store'
 import {
   dumpSnapshot,
@@ -285,9 +285,9 @@ function HomeScreen() {
   )
 
   const workDaysPerMonth = useMemo(() => {
-    const now = new Date()
-    return countWorkdaysInMonth(now.getFullYear(), now.getMonth(), holidayDataset)
-  }, [currentDateStr, holidayDataset])
+    // 周期内工作日，而不是自然月：发薪日大于 1 时周期会跨月，分子分母必须同区间
+    return payPeriodWorkdays(new Date(), config.payday, holidayDataset)
+  }, [currentDateStr, holidayDataset, config.payday])
 
   // 派生计算
   const dailySalary = useMemo(() => config.monthlySalary / workDaysPerMonth, [config.monthlySalary, workDaysPerMonth])
