@@ -27,7 +27,7 @@ function describeError(err: unknown): string {
   return err instanceof Error ? err.message : String(err)
 }
 
-function HomeScreen() {
+function HomeScreen({ onBackupImported }: { onBackupImported: () => void }) {
   const [showBkSettings, setShowBkSettings] = useState(false)
   const [bkSettingsClosing, setBkSettingsClosing] = useState(false)
   const [bkSettings, setBkSettings] = useState<BookkeepingSettings>(() => ({
@@ -111,9 +111,11 @@ function HomeScreen() {
 
   const [backupMsg, setBackupMsg] = useState<string | null>(null)
   const [pendingBackup, setPendingBackup] = useState<BackupFile | null>(null)
+  const importingBackup = useRef(false)
   const noticeText = backupMsg || notice
 
   const handleExport = useCallback(async () => {
+    if (importingBackup.current) return
     setPendingBackup(null)
     try {
       const snapshot = dumpSnapshot()
@@ -126,11 +128,12 @@ function HomeScreen() {
   }, [])
 
   const handlePickBackup = useCallback(async () => {
+    if (importingBackup.current) return
     setBackupMsg(null)
     setPendingBackup(null)
-    const raw = await pickBackupFile()
-    if (raw === null) return
     try {
+      const raw = await pickBackupFile()
+      if (raw === null) return
       // 校验通过才进确认态：坏文件在这一步就被挡下，本机数据一个字节没动
       setPendingBackup(parseBackup(raw))
     } catch (err) {
@@ -139,15 +142,23 @@ function HomeScreen() {
   }, [])
 
   const handleConfirmImport = useCallback(async () => {
-    if (!pendingBackup) return
-    await applySnapshot(pendingBackup)
-    markBackupDone()
-    // reload 会丢掉还没落盘的写入，所以必须等写队列 flush 完再重启
-    await flushStore()
+    if (!pendingBackup || importingBackup.current) return
+    importingBackup.current = true
     setPendingBackup(null)
-    // 整库换掉了。与其逐个通知读缓存的组件，不如重启一次让所有数据从库里重读
-    window.location.reload()
-  }, [pendingBackup])
+    setBackupMsg('正在导入…')
+
+    try {
+      await applySnapshot(pendingBackup)
+      markBackupDone()
+      await flushStore()
+      onBackupImported()
+      void Taro.showToast({ title: '备份已导入', icon: 'success' })
+    } catch (err) {
+      setBackupMsg(`导入失败：${describeError(err)}`)
+    } finally {
+      importingBackup.current = false
+    }
+  }, [pendingBackup, onBackupImported])
 
   return (
     <View className='bookkeeping-app-root'>
@@ -183,6 +194,7 @@ function HomeScreen() {
                 type='button'
                 className='settings-statistics-entry'
                 onClick={() => {
+                  if (importingBackup.current) return
                   setShowBkSettings(false)
                   void Taro.navigateTo({ url: '/pages/expense-statistics/index' })
                 }}
@@ -299,6 +311,10 @@ function HomeScreen() {
  */
 export default function Index() {
   const storeReady = useStoreReady()
+  const [backupRevision, setBackupRevision] = useState(0)
+  const refreshLedger = useCallback(() => setBackupRevision((revision) => revision + 1), [])
+
   if (!storeReady) return <View />
-  return <HomeScreen />
+  // 覆盖导入后重建首页内容，从内存账本读取完整快照，也清掉旧账目的编辑状态。
+  return <HomeScreen key={backupRevision} onBackupImported={refreshLedger} />
 }
