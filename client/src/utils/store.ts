@@ -86,10 +86,8 @@ function rowToRecord(row: EntryRow): BookkeepingRecord {
 
 const LEGACY_ENTRY_KEY = 'bookkeeping_records'
 const LEGACY_META_KEYS = [
-  'salary_config',
   'bookkeeping_settings',
-  'home_page_preference',
-  'cn_holiday_dataset_v1',
+  'backup_last_done_at',
 ] as const
 const STORAGE_META_REGISTRY = 'local_meta_keys_v1'
 

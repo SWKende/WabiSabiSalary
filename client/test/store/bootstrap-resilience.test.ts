@@ -12,8 +12,11 @@ vi.mock('@tarojs/taro', () => ({
 import {
   __resetStore,
   bootstrapStore,
+  flushStore,
   isStoreReady,
+  readJSON,
   storeBackendName,
+  writeJSON,
 } from '../../src/utils/store'
 import type { PersistBackend } from '../../src/utils/db'
 
@@ -77,10 +80,12 @@ describe('bootstrapStore 的可用性兜底', () => {
 
   it('降级后读写仍然可用', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
-    storage.set('salary_config', JSON.stringify({ payday: 11 }))
+    storage.set('bookkeeping_settings', JSON.stringify({ showWeeklyBar: false }))
     await bootstrapStore({ backend: createHangingBackend(), openTimeoutMs: 120 })
-    const { readJSON } = await import('../../src/utils/store')
-    expect(readJSON('salary_config', { payday: 1 })).toEqual({ payday: 11 })
+    expect(readJSON('bookkeeping_settings', { showWeeklyBar: true })).toEqual({ showWeeklyBar: false })
+    writeJSON('bookkeeping_settings', { showWeeklyBar: true })
+    await flushStore()
+    expect(JSON.parse(String(storage.get('bookkeeping_settings')))).toEqual({ showWeeklyBar: true })
     warn.mockRestore()
   })
 })

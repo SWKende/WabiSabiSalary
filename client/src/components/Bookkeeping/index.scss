@@ -1,6 +1,7 @@
 // ========== 记账页面 ==========
 
 @use '../../styles/variables' as *;
+@use '../../styles/components/ledger';
 
 .bookkeeping-page {
   position: relative;
@@ -40,9 +41,7 @@
     }
 
     .summary-value {
-      font-size: $font-body-sm;
-      font-weight: 500;
-      font-family: 'Shippori Mincho B1', serif;
+      @include ledger.amount;
 
       &.positive { color: $color-state-success; }
       &.negative { color: $color-state-danger; }
@@ -362,11 +361,8 @@
 .chart-section {
   position: relative;
   z-index: 1;
-  background: $color-bg-page;
-  border: 1px solid $color-divider-subtle;
-  border-radius: $radius-2;
-  padding: $sp-6;
-  margin-bottom: $sp-8;
+
+  @include ledger.chart-card;
 }
 
 .chart-header {
@@ -376,11 +372,7 @@
   margin-bottom: $sp-6;
 
   .chart-title {
-    font-size: $font-caption-sm;
-    color: $color-text-primary;
-    font-weight: 500;
-    letter-spacing: 4px;
-    font-family: 'Noto Serif SC', serif;
+    @include ledger.chart-heading;
   }
 }
 
@@ -661,9 +653,7 @@
       flex-shrink: 0;
 
       .record-amount {
-        font-size: $font-body-sm;
-        font-weight: 500;
-        font-family: 'Shippori Mincho B1', serif;
+        @include ledger.amount;
 
         &.positive { color: $color-state-success; }
         &.negative { color: $color-text-primary; }

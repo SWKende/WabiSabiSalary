@@ -5,7 +5,7 @@ import { isNativeRuntime } from './db'
 export function backupFileName(): string {
   const d = new Date()
   const stamp = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`
-  return `salary-clock-backup-${stamp}.json`
+  return `bookkeeping-backup-${stamp}.json`
 }
 
 function serialize(file: BackupFile): string {

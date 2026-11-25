@@ -3,6 +3,7 @@ import { useState, useMemo, useRef, useCallback, useEffect, memo } from 'react'
 import Taro from '@tarojs/taro'
 import MonthlyBarChart from '../MonthlyBarChart'
 import MonthlyPieChart from '../MonthlyPieChart'
+import { EXPENSE_CATEGORIES } from '../../constants/bookkeeping'
 import { createRecordTime, formatLocalDate, formatRecordTime, isRecordInMonth, isRecordOnDate } from '../../utils/format'
 import { addRecord, listRecords, removeRecord, updateRecord, type BookkeepingRecord } from '../../utils/store'
 import './index.scss'
@@ -66,11 +67,10 @@ function BookkeepingPageInner({
   }, [])
 
   const [recordPendingDelete, setRecordPendingDelete] = useState<BookkeepingRecord | null>(null)
-  const expenseCategories = ['餐飲', '交通', '購物', '数码', '娛樂', '居住', '通訊', '醫療', '教育']
   const incomeCategories = ['薪資', '獎金', '投資', '兼職', '紅包', '其他']
 
   const [activeType, setActiveType] = useState<'expense' | 'income'>('expense')
-  const [category, setCategory] = useState(expenseCategories[0])
+  const [category, setCategory] = useState(EXPENSE_CATEGORIES[0])
   const [records, setRecords] = useState<BookkeepingRecord[]>(() => listRecords())
 
   // 「最近記錄」分类筛选，默认全部
@@ -125,7 +125,7 @@ function BookkeepingPageInner({
 
   const handleTypeSwitch = (type: 'expense' | 'income') => {
     setActiveType(type)
-    setCategory(type === 'expense' ? expenseCategories[0] : incomeCategories[0])
+    setCategory(type === 'expense' ? EXPENSE_CATEGORIES[0] : incomeCategories[0])
   }
 
   // 新建：清掉编辑态与上次残留输入
@@ -292,7 +292,7 @@ function BookkeepingPageInner({
               </View>
               <ScrollView scrollX className='category-scroll'>
                 <View className='category-row'>
-                  {(activeType === 'expense' ? expenseCategories : incomeCategories).map((cat) => (
+                  {(activeType === 'expense' ? EXPENSE_CATEGORIES : incomeCategories).map((cat) => (
                     <View
                       key={cat}
                       className={`cat-chip ${category === cat ? 'active' : ''}`}

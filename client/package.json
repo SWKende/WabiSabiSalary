@@ -21,7 +21,7 @@
     "lint:css:strict-value": "stylelint --config .stylelintrc.strict-value.yml 'src/**/*.scss'",
     "lint:css:full": "stylelint --config .stylelintrc.yml 'src/**/*.scss'",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run test/ && node --test test/cnHolidayCore.test.mjs test/build/ajv-resolution.test.mjs",
+    "test": "vitest run test/ && node --test test/build/ajv-resolution.test.mjs",
     "test:css": "vitest run test/styles/",
     "test:store": "vitest run test/store/"
   },

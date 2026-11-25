@@ -1,0 +1,409 @@
+@use '../../styles/variables' as *;
+@use '../../styles/components/ledger';
+
+.expense-statistics {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-sizing: border-box;
+  padding-top: var(--nav-top-gap);
+  color: $color-text-primary;
+  font-family: 'Noto Serif SC', 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+
+  @include ledger.paper-surface;
+
+  // Taro 会改写标签选择器，原生控件用 :where() 保留。
+  :where(button, select, input) {
+    min-height: $btn-height-sm;
+    color: inherit;
+    font: inherit;
+  }
+
+  :where(button) {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  :where(button):disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  :is(button, select, input):focus-visible {
+    outline: 2px solid $color-text-secondary;
+    outline-offset: 2px;
+  }
+}
+
+.expense-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.expense-content {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 $sp-5 var(--scroll-bottom-gap);
+}
+
+.expense-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 0 $sp-1 $sp-4;
+
+  h1 {
+    margin: 0;
+    font-family: 'Noto Serif SC', serif;
+    font-size: $font-body-lg;
+    font-weight: 500;
+    letter-spacing: 6px;
+  }
+
+  .expense-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    width: $input-height-lg;
+    min-height: $input-height-lg;
+    border-radius: $radius-2;
+    color: $color-text-primary;
+
+    .expense-chevron {
+      width: $sp-4;
+      height: $sp-4;
+    }
+
+    &:active { background: $palette-alpha-sand-30; }
+  }
+}
+
+.expense-chevron {
+  display: inline-block;
+  flex: none;
+  width: $sp-3;
+  height: $sp-3;
+  box-sizing: border-box;
+  border-right: 1px solid currentcolor;
+  border-bottom: 1px solid currentcolor;
+  transform: translateY(-20%) rotate(45deg);
+  transition: transform $motion-duration-fast $motion-easing-standard;
+}
+
+.expense-chevron--left { transform: rotate(135deg); }
+.expense-chevron--right { transform: rotate(-45deg); }
+
+[aria-expanded='true'] > .expense-chevron {
+  transform: translateY(20%) rotate(225deg);
+}
+
+.expense-filters, .expense-results {
+  @include ledger.chart-card;
+}
+
+.expense-period {
+  display: grid;
+  grid-template-columns: $btn-height-sm minmax(0, auto) $btn-height-sm;
+  min-width: 0;
+
+  > :where(button) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $sp-2;
+    border-radius: $radius-2;
+    color: $color-text-secondary;
+
+    &:active:not(:disabled) { background: $palette-alpha-sand-30; }
+  }
+
+  .expense-period-label {
+    padding: 0 $sp-3;
+    border: 1px solid $color-divider-subtle;
+    background: $color-bg-page;
+    color: $color-text-primary;
+    font-size: $font-caption-md;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+
+    .expense-chevron { color: $color-text-secondary; }
+
+    span:first-child { overflow-wrap: anywhere; }
+
+    &[aria-expanded='true'] {
+      border-color: $color-brand-primary-strong;
+      background: $palette-alpha-sand-25;
+    }
+  }
+}
+
+.expense-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $sp-2;
+}
+
+.expense-modes {
+  display: flex;
+  flex: none;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-2;
+
+  :where(button) {
+    padding: $sp-2 $sp-4;
+    color: $color-text-secondary;
+    font-family: 'Noto Serif SC', serif;
+    font-size: $font-caption-md;
+    line-height: 1;
+    letter-spacing: 2px;
+    white-space: nowrap;
+
+    &[aria-pressed='true'] {
+      background: $color-text-primary;
+      color: $color-bg-page;
+    }
+
+    &:active:not([aria-pressed='true']) { background: $palette-alpha-sand-35; }
+  }
+}
+
+.expense-filters .expense-category-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $sp-2;
+  min-width: 0;
+  max-width: 100%;
+  margin-top: $sp-3;
+  padding: 0 $sp-5;
+  border: 1px solid $color-divider-subtle;
+  border-radius: $radius-2;
+  color: $color-text-secondary;
+  font-size: $font-caption-md;
+
+  > span:first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &[aria-expanded='true'], &:active {
+    border-color: $color-brand-primary-strong;
+    background: $palette-alpha-sand-25;
+    color: $color-text-primary;
+  }
+}
+
+.expense-period-picker {
+  display: flex;
+  align-items: flex-end;
+  gap: $sp-3;
+  margin: $sp-3 0;
+  padding: $sp-3 0;
+  border-top: 1px solid $color-divider-subtle;
+  border-bottom: 1px solid $color-divider-subtle;
+
+  .expense-period-field {
+    display: flex;
+    flex: 0 1 200rpx;
+    flex-direction: column;
+    min-width: 0;
+    gap: $sp-2;
+    color: $color-text-secondary;
+    font-size: $font-caption-md;
+  }
+
+  .expense-period-input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 $sp-3;
+    border: 1px solid $palette-alpha-ink-18;
+    border-radius: $radius-2;
+    background: $color-bg-page;
+    color: $color-text-primary;
+    font-size: $font-caption-md;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .expense-period-apply {
+    padding: 0 $sp-4;
+    border-radius: $radius-2;
+    background: $color-text-primary;
+    color: $color-bg-page;
+    font-size: $font-caption-md;
+    white-space: nowrap;
+
+    &:active { background: $color-text-secondary; }
+  }
+}
+
+.expense-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $sp-2;
+  margin-top: $sp-3;
+
+  :where(button) {
+    max-width: 100%;
+    padding: $sp-2 $sp-5;
+    border: 1px solid $color-divider-subtle;
+    border-radius: $radius-2;
+    color: $color-text-secondary;
+    font-size: $font-body-sm;
+    letter-spacing: 1px;
+    overflow-wrap: anywhere;
+
+    &[aria-pressed='true'] {
+      border-color: $color-text-primary;
+      background: $color-text-primary;
+      color: $color-bg-page;
+    }
+
+    &:active:not([aria-pressed='true']) { background: $palette-alpha-sand-30; }
+  }
+}
+
+.expense-total {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: $sp-2 $sp-4;
+  padding-bottom: $sp-5;
+
+  h2 {
+    margin: 0;
+
+    @include ledger.chart-heading;
+  }
+
+  strong {
+    @include ledger.amount;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+}
+
+.expense-empty, .expense-breakdown-title {
+  border-top: 1px solid $color-divider-subtle;
+  color: $color-text-tertiary;
+  font-size: $font-caption-sm;
+}
+
+.expense-empty {
+  padding: $sp-8 $sp-2;
+  text-align: center;
+
+  p { margin: 0; }
+
+  :where(button) {
+    margin-bottom: -$sp-2;
+    color: $color-text-primary;
+    font-size: $font-caption-md;
+    text-decoration: underline;
+    text-underline-offset: $sp-1;
+
+    &:active { color: $color-text-secondary; }
+  }
+}
+
+.expense-breakdown-title {
+  margin: 0;
+  padding: $sp-5 0 $sp-1;
+  font-weight: 500;
+  letter-spacing: 4px;
+}
+
+.expense-category {
+  & + & { border-top: 1px solid $color-divider-subtle; }
+
+  .expense-category-button {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto) auto;
+    align-items: center;
+    gap: $sp-3;
+    width: 100%;
+    padding: $sp-4 0;
+    text-align: left;
+
+    &:active { color: $color-text-secondary; }
+  }
+}
+
+.expense-category-name {
+  font-size: $font-body-md;
+  overflow-wrap: anywhere;
+}
+
+.expense-category-amount, .expense-entry-amount {
+  @include ledger.amount;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.expense-bar {
+  grid-column: 1 / -1;
+  height: $sp-1;
+  overflow: hidden;
+  border-radius: $radius-2;
+  background: $palette-alpha-ink-06;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: $color-brand-primary-strong;
+  }
+}
+
+.expense-detail-panel {
+  margin-bottom: $sp-3;
+  border-radius: $radius-2;
+  background: $palette-alpha-sand-20;
+}
+
+.expense-details {
+  margin: 0;
+  padding: 0 $sp-4;
+  list-style: none;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: $sp-3;
+    padding: $sp-3 0;
+    font-size: $font-caption-md;
+    overflow-wrap: anywhere;
+
+    & + li { border-top: 1px solid $color-divider-subtle; }
+  }
+
+  small {
+    display: block;
+    margin-top: $sp-1;
+    color: $color-text-tertiary;
+    font-size: $font-caption-md;
+  }
+}
+
+.expense-statistics .expense-more {
+  width: 100%;
+  color: $color-text-secondary;
+  font-size: $font-caption-md;
+
+  &:active { color: $color-text-primary; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .expense-chevron { transition: none; }
+}

@@ -18,6 +18,7 @@ export const BACKUP_STAMP_KEY = 'backup_last_done_at'
 /** 超过这么多天没备份就开始提醒 */
 export const BACKUP_REMINDER_DAYS = 30
 
+const BACKUP_META_KEYS = ['bookkeeping_settings', BACKUP_STAMP_KEY] as const
 const DAY_MS = 86_400_000
 
 export function markBackupDone(): void {
@@ -52,11 +53,24 @@ export interface BackupFile {
   meta: Record<string, unknown>
 }
 
-/** 当前全部数据。JSON 而非 .db：SQLite 与 storage 两条后端都能导入导出 */
+function validateBackupRecords(records: unknown[]): void {
+  for (const [index, entry] of records.entries()) {
+    if (!entry || typeof entry !== 'object') {
+      throw new Error(`备份中的第 ${index + 1} 条账目格式无效`)
+    }
+    const { amount, time } = entry as { amount?: unknown; time?: unknown }
+    if ((typeof amount !== 'string' && typeof amount !== 'number') || typeof time !== 'string') {
+      throw new Error(`备份中的第 ${index + 1} 条账目格式无效`)
+    }
+  }
+}
+
+/** 记账数据。JSON 而非 .db：SQLite 与 storage 两条后端都能导入导出 */
 export function dumpSnapshot(): BackupFile {
   const meta: Record<string, unknown> = {}
-  for (const key of metaKeys()) {
-    meta[key] = readJSON(key, null)
+  for (const key of BACKUP_META_KEYS) {
+    const value = readJSON<unknown>(key, undefined)
+    if (value !== undefined) meta[key] = value
   }
   return {
     app: BACKUP_APP,
@@ -84,7 +98,7 @@ export function parseBackup(raw: string): BackupFile {
 
   const file = data as Partial<BackupFile>
   if (file.app !== BACKUP_APP) {
-    throw new Error(`这不是工资时钟的备份（app = ${String(file.app)}）`)
+    throw new Error(`这不是本应用的备份（app = ${String(file.app)}）`)
   }
   if (file.version !== BACKUP_VERSION) {
     throw new Error(`不支持的备份版本：${String(file.version)}`)
@@ -92,8 +106,14 @@ export function parseBackup(raw: string): BackupFile {
   if (!Array.isArray(file.records)) {
     throw new Error('备份缺少 records 数组')
   }
+  validateBackupRecords(file.records)
   if (!file.meta || typeof file.meta !== 'object' || Array.isArray(file.meta)) {
     throw new Error('备份缺少 meta 对象')
+  }
+
+  const meta: Record<string, unknown> = {}
+  for (const key of BACKUP_META_KEYS) {
+    if (Object.prototype.hasOwnProperty.call(file.meta, key)) meta[key] = file.meta[key]
   }
 
   return {
@@ -101,12 +121,13 @@ export function parseBackup(raw: string): BackupFile {
     version: BACKUP_VERSION,
     exportedAt: typeof file.exportedAt === 'string' ? file.exportedAt : '',
     records: file.records,
-    meta: file.meta as Record<string, unknown>,
+    meta,
   }
 }
 
 /** 整库覆盖：先清空，再写入备份内容 */
 export async function applySnapshot(file: BackupFile): Promise<{ records: number; meta: number }> {
+  validateBackupRecords(file.records)
   for (const record of listRecords()) {
     removeRecord(record.id)
   }

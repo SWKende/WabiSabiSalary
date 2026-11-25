@@ -104,21 +104,24 @@ describe('dumpSnapshot / applySnapshot', () => {
     await bootstrapWithData()
   })
 
-  it('dump 带出全部记账与配置', async () => {
+  it('dump 仅导出记账与仍使用的配置', async () => {
     store.addRecord(record('a', 35))
     store.addRecord(record('b', 12))
     store.writeJSON('salary_config', { monthlySalary: 3000 })
+    store.writeJSON('home_page_preference', 'salary')
+    store.writeJSON('cn_holiday_dataset_v1', { byDate: {} })
+    store.writeJSON('bookkeeping_settings', { showMonthlyBar: false })
     await store.flushStore()
 
     const dump = dumpSnapshot()
     expect(dump.app).toBe(BACKUP_APP)
     expect(dump.records.map((r) => r.id).sort()).toEqual(['a', 'b'])
-    expect(dump.meta.salary_config).toEqual({ monthlySalary: 3000 })
+    expect(dump.meta).toEqual({ bookkeeping_settings: { showMonthlyBar: false } })
   })
 
   it('往返一致：dump → apply → dump 内容不变', async () => {
     store.addRecord(record('a', 35))
-    store.writeJSON('salary_config', { monthlySalary: 5000 })
+    store.writeJSON('bookkeeping_settings', { showMonthlyPie: false })
     await store.flushStore()
 
     const first = dumpSnapshot()
@@ -127,6 +130,27 @@ describe('dumpSnapshot / applySnapshot', () => {
 
     expect(second.records).toEqual(first.records)
     expect(second.meta).toEqual(first.meta)
+  })
+
+  it('旧工资时钟备份可恢复账目和图表设置，但不恢复已下线的配置', async () => {
+    const oldBackup = JSON.stringify({
+      app: 'salary-clock',
+      version: 1,
+      records: [{ ...record('income', 5000), type: 'income', category: '薪資' }],
+      meta: {
+        salary_config: { monthlySalary: 5000 },
+        home_page_preference: 'salary',
+        cn_holiday_dataset_v1: { byDate: {} },
+        bookkeeping_settings: { showWeeklyBar: false },
+      },
+    })
+
+    const parsed = parseBackup(oldBackup)
+    expect(parsed.meta).toEqual({ bookkeeping_settings: { showWeeklyBar: false } })
+    await applySnapshot(parsed)
+
+    expect(store.listRecords()).toMatchObject([{ type: 'income', category: '薪資', amount: '5000' }])
+    expect(store.metaKeys()).toEqual(['bookkeeping_settings'])
   })
 
   it('apply 是整库覆盖：本机多出来的记录会被清掉', async () => {
@@ -170,4 +194,16 @@ describe('dumpSnapshot / applySnapshot', () => {
     expect(() => parseBackup('{"app":"wrong","version":1,"records":[],"meta":{}}')).toThrow()
     expect(store.listRecords()).toHaveLength(1)
   })
+
+  it.each([null, {}, { amount: { toString: null }, time: '2026-10-11' }])(
+    '拒绝带有损坏账目的备份：%j',
+    async (invalidRecord) => {
+      store.addRecord(record('keep', 35))
+      await store.flushStore()
+      const raw = JSON.stringify({ ...dumpSnapshot(), records: [record('valid', 10), invalidRecord] })
+
+      expect(() => parseBackup(raw)).toThrow('第 2 条')
+      expect(store.listRecords().map((entry) => entry.id)).toEqual(['keep'])
+    },
+  )
 })

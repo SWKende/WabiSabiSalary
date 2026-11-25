@@ -42,6 +42,9 @@ function seedLegacy() {
   )
   storage.set('salary_config', JSON.stringify({ monthlySalary: 30000, workStartHour: 9, workEndHour: 18, payday: 15 }))
   storage.set('home_page_preference', JSON.stringify('bookkeeping'))
+  storage.set('cn_holiday_dataset_v1', JSON.stringify({ byDate: {} }))
+  storage.set('bookkeeping_settings', JSON.stringify({ showWeeklyBar: false }))
+  storage.set('backup_last_done_at', JSON.stringify('2026-10-18T00:00:00.000Z'))
 }
 
 function createFakeBackend(initial: { entries?: EntryRow[]; meta?: MetaRow[] } = {}) {
@@ -103,15 +106,13 @@ describe('bootstrapStore（浏览器/测试环境走 storage 兜底）', () => {
   it('未 bootstrap 前读到默认值，bootstrap 后读到已存数据', async () => {
     seedLegacy()
     expect(isStoreReady()).toBe(false)
-    expect(readJSON('salary_config', { payday: 1 })).toEqual({ payday: 1 })
+    expect(readJSON('bookkeeping_settings', { showWeeklyBar: true })).toEqual({ showWeeklyBar: true })
 
     await bootstrapStore()
 
     expect(isStoreReady()).toBe(true)
     expect(storeBackendName()).toBe('storage')
-    expect(readJSON('salary_config', { payday: 1 })).toEqual({
-      monthlySalary: 30000, workStartHour: 9, workEndHour: 18, payday: 15,
-    })
+    expect(readJSON('bookkeeping_settings', { showWeeklyBar: true })).toEqual({ showWeeklyBar: false })
   })
 
   it('旧记录缺 type 时按分类推断，且保留原始字段', async () => {
@@ -124,10 +125,10 @@ describe('bootstrapStore（浏览器/测试环境走 storage 兜底）', () => {
     expect(getRecord('r2')?.amount).toBe('5000')
   })
 
-  it('字符串型配置（首页偏好）可以原样读回', async () => {
+  it('字符串型配置（备份时间）可以原样读回', async () => {
     seedLegacy()
     await bootstrapStore()
-    expect(readJSON('home_page_preference', 'salary')).toBe('bookkeeping')
+    expect(readJSON('backup_last_done_at', '')).toBe('2026-10-18T00:00:00.000Z')
   })
 
   it('重复 bootstrap 幂等，不会把内存态冲掉', async () => {
@@ -144,7 +145,7 @@ describe('bootstrapStore（浏览器/测试环境走 storage 兜底）', () => {
     expect(storeBackendName()).toBe('storage')
     expect(isStoreReady()).toBe(true)
     expect(warn).toHaveBeenCalled()
-    expect(readJSON('salary_config', { payday: 1 })).toMatchObject({ payday: 15 })
+    expect(readJSON('bookkeeping_settings', { showWeeklyBar: true })).toEqual({ showWeeklyBar: false })
     warn.mockRestore()
   })
 })
@@ -272,15 +273,17 @@ describe('写队列（注入假后端）', () => {
     })
   })
 
-  it('空库首次启动会把旧 storage 数据迁移进 SQL 后端', async () => {
+  it('空库首次启动只把旧账目和仍使用的配置迁移进 SQL 后端', async () => {
     seedLegacy()
     const { backend, writes } = createFakeBackend({ entries: [], meta: [] })
     await bootstrapStore({ backend })
     await flushStore()
 
     expect(writes.filter((w) => w.startsWith('entry:'))).toHaveLength(3)
-    expect(writes).toContain('meta:salary_config')
-    expect(writes).toContain('meta:home_page_preference')
+    expect(writes.filter((write) => write.startsWith('meta:'))).toEqual([
+      'meta:bookkeeping_settings',
+      'meta:backup_last_done_at',
+    ])
     expect(listRecords().map((r) => r.id)).toEqual(['r1', 'r3', 'r2'])
   })
 
